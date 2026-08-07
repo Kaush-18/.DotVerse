@@ -1,27 +1,32 @@
-import Layout from "@/components/layout/Layout";
-import HeroBackground from "./HeroBackground";
+import Section from "@/components/layout/Section";
+import Container from "@/components/layout/Container";
+import Grid from "@/components/layout/Grid";
+
 import HeroContent from "./HeroContent";
 import HeroScene from "./HeroScene";
+import HeroBackground from "./HeroBackground";
 import ScrollIndicator from "./ScrollIndicator";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen overflow-hidden">
+    <Section>
 
       <HeroBackground />
 
-      <Layout>
-        <div className="grid min-h-screen items-center gap-24 pt-20 lg:grid-cols-2">
+      <Container>
+
+        <Grid>
 
           <HeroContent />
 
           <HeroScene />
 
-        </div>
-      </Layout>
+        </Grid>
+
+      </Container>
 
       <ScrollIndicator />
 
-    </section>
+    </Section>
   );
 }

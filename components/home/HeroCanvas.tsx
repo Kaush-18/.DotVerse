@@ -1,50 +1,43 @@
 "use client";
 
-import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import Lights from "./Lights";
-import SceneEnvironment from "./SceneEnvironment";
-import TShirt from "./TShirt";
+import { Float, OrbitControls } from "@react-three/drei";
 
-function CanvasFallback() {
-  return (
-    <div className="flex h-full w-full items-center justify-center">
-      <div className="h-16 w-16 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-    </div>
-  );
-}
+import SceneLights from "./SceneLights";
+import PlaceholderModel from "./PlaceholderModel";
 
 export default function HeroCanvas() {
   return (
-    <div className="h-[600px] w-full cursor-grab active:cursor-grabbing">
-      <Canvas
-        camera={{ position: [0, 0, 3.5], fov: 45 }}
-        dpr={[1, 2]}
-        shadows
-        gl={{ antialias: true, alpha: true }}
+    <Canvas
+      shadows
+      dpr={[1, 2]}
+      gl={{ antialias: true }}
+      camera={{
+        position: [0, 0, 5],
+        fov: 40,
+      }}
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <SceneLights />
+
+      <Float
+        speed={2}
+        rotationIntensity={0.4}
+        floatIntensity={1.4}
+        floatingRange={[-0.2, 0.2]}
       >
-        <Suspense fallback={null}>
-          <Lights />
-          <SceneEnvironment />
-          <TShirt />
+        <PlaceholderModel />
+      </Float>
 
-          {/* Allow subtle user interaction — damped so it stays tasteful */}
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            minPolarAngle={Math.PI / 3}
-            maxPolarAngle={Math.PI / 1.6}
-            dampingFactor={0.06}
-            enableDamping
-          />
-        </Suspense>
-      </Canvas>
-
-      {/* Fallback shown while the R3F Canvas boots */}
-      <noscript>
-        <CanvasFallback />
-      </noscript>
-    </div>
+      <OrbitControls
+        enableZoom={false}
+        enablePan={false}
+        autoRotate
+        autoRotateSpeed={1}
+      />
+    </Canvas>
   );
 }

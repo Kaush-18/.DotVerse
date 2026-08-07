@@ -1,47 +1,31 @@
-import Layout from "@/components/layout/Layout";
+import Container from "@/components/layout/Container";
 import Logo from "@/components/ui/Logo";
-import { ShoppingBag, Search, User } from "lucide-react";
+import { Search, ShoppingBag, User } from "lucide-react";
 
 export default function Navbar() {
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl">
-      <Layout>
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-xl">
+      <Container>
         <div className="flex h-20 items-center justify-between">
 
-          {/* Logo */}
           <Logo />
 
-          {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-10 md:flex">
-            <a href="#" className="transition hover:text-primary">Home</a>
-            <a href="#" className="transition hover:text-primary">Shop</a>
-            <a href="#" className="transition hover:text-primary">Collections</a>
-            <a href="#" className="transition hover:text-primary">About</a>
-            <a href="#" className="transition hover:text-primary">Contact</a>
+          <nav className="hidden items-center gap-10 lg:flex">
+            <a href="#">Home</a>
+            <a href="#">Shop</a>
+            <a href="#">Collections</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
           </nav>
 
-          {/* Right Side */}
           <div className="flex items-center gap-5">
-
-            <Search
-              size={20}
-              className="cursor-pointer transition hover:text-primary"
-            />
-
-            <ShoppingBag
-              size={20}
-              className="cursor-pointer transition hover:text-primary"
-            />
-
-            <User
-              size={20}
-              className="cursor-pointer transition hover:text-primary"
-            />
-
+            <Search size={20} />
+            <ShoppingBag size={20} />
+            <User size={20} />
           </div>
 
         </div>
-      </Layout>
+      </Container>
     </header>
   );
 }
