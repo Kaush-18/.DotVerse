@@ -32,3 +32,86 @@ body{
   overflow-x:hidden;
   min-height:100vh;
 }
+
+/* ===========================
+   HERO AURORA
+=========================== */
+
+.hero-aurora{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+
+    filter:blur(180px);
+
+    opacity:.18;
+
+    mix-blend-mode:screen;
+
+    animation:auroraMove 22s ease-in-out infinite alternate;
+}
+
+.hero-aurora-1{
+    width:700px;
+    height:700px;
+
+    left:-120px;
+    top:-100px;
+
+    background:#7c3aed;
+}
+
+.hero-aurora-2{
+
+    width:900px;
+    height:900px;
+
+    right:-200px;
+    top:15%;
+
+    background:#4338ca;
+
+    animation-duration:28s;
+}
+
+.hero-aurora-3{
+
+    width:650px;
+    height:650px;
+
+    left:40%;
+    bottom:-250px;
+
+    background:#5b21b6;
+
+    animation-duration:24s;
+}
+
+@keyframes auroraMove{
+
+0%{
+
+transform:
+translate(0px,0px)
+scale(1);
+
+}
+
+50%{
+
+transform:
+translate(80px,-40px)
+scale(1.15);
+
+}
+
+100%{
+
+transform:
+translate(-70px,60px)
+scale(.9);
+
+}
+
+}

@@ -1,21 +1,62 @@
+"use client";
+
 export default function HeroBackground() {
   return (
     <>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(124,58,237,0.15),transparent_35%)]" />
+      {/* Base Background */}
+      <div className="absolute inset-0 -z-30 bg-[#07070b]" />
 
-      <div className="absolute left-[-200px] top-1/2 h-[500px] w-[500px] -translate-y-1/2 rounded-full bg-blue-500/10 blur-[180px]" />
-
-      <div className="absolute right-[-100px] top-1/2 h-[700px] w-[700px] -translate-y-1/2 rounded-full bg-primary/20 blur-[200px]" />
-
+      {/* Purple Radial Glow */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, white 1px, transparent 1px),
-            linear-gradient(to bottom, white 1px, transparent 1px)
-          `,
-          backgroundSize: "60px 60px",
-        }}
+        className="
+          absolute
+          right-[-15%]
+          top-1/2
+          -z-20
+          h-[900px]
+          w-[900px]
+          -translate-y-1/2
+          rounded-full
+          bg-violet-700/20
+          blur-[180px]
+        "
+      />
+
+      {/* Blue Glow */}
+      <div
+        className="
+          absolute
+          left-[-20%]
+          top-0
+          -z-20
+          h-[600px]
+          w-[600px]
+          rounded-full
+          bg-indigo-500/10
+          blur-[180px]
+        "
+      />
+
+      {/* Grid */}
+      <div
+        className="
+          absolute
+          inset-0
+          -z-10
+          opacity-40
+          [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)]
+          [background-size:52px_52px]
+        "
+      />
+
+      {/* Vignette */}
+      <div
+        className="
+          absolute
+          inset-0
+          -z-10
+          bg-[radial-gradient(circle_at_center,transparent_45%,rgba(0,0,0,0.7))]
+        "
       />
     </>
   );

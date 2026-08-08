@@ -1,20 +1,21 @@
 import { ReactNode } from "react";
 
-export default function Grid({
-  children,
-}: {
+interface GridProps {
   children: ReactNode;
-}) {
+}
+
+export default function Grid({ children }: GridProps) {
   return (
     <div
-      className="
-        grid
-        min-h-[calc(100vh-80px)]
-        items-center
-        gap-12
-
-        lg:grid-cols-[45%_55%]
-      "
+    className="
+    grid
+    items-center
+    gap-16
+    
+    grid-cols-[42%_58%]
+    
+    grid-cols-1
+    "
     >
       {children}
     </div>

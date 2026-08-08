@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import clsx from "clsx";
 
-interface Props {
+interface SectionProps {
   children: ReactNode;
   className?: string;
 }
@@ -9,11 +9,11 @@ interface Props {
 export default function Section({
   children,
   className,
-}: Props) {
+}: SectionProps) {
   return (
     <section
       className={clsx(
-        "relative w-full overflow-hidden",
+        "relative overflow-hidden",
         className
       )}
     >

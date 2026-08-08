@@ -3,40 +3,44 @@
 import { Canvas } from "@react-three/fiber";
 import { Float, OrbitControls } from "@react-three/drei";
 
-import SceneLights from "./SceneLights";
 import PlaceholderModel from "./PlaceholderModel";
+import SceneLights from "./SceneLights";
 
 export default function HeroCanvas() {
   return (
     <Canvas
+      className="!h-full !w-full"
       shadows
       dpr={[1, 2]}
-      gl={{ antialias: true }}
       camera={{
-        position: [0, 0, 5],
-        fov: 40,
+        position: [0, 0.2, 5.6],
+        fov: 34,
       }}
-      style={{
-        width: "100%",
-        height: "100%",
+      gl={{
+        antialias: true,
+        alpha: true,
       }}
     >
+      {/* Lighting */}
       <SceneLights />
 
+      {/* Model */}
       <Float
-        speed={2}
-        rotationIntensity={0.4}
-        floatIntensity={1.4}
-        floatingRange={[-0.2, 0.2]}
+        speed={1.2}
+        rotationIntensity={0.18}
+        floatIntensity={0.7}
+        floatingRange={[-0.08, 0.08]}
       >
         <PlaceholderModel />
       </Float>
 
+      {/* Controls */}
       <OrbitControls
         enableZoom={false}
         enablePan={false}
+        enableRotate={false}
         autoRotate
-        autoRotateSpeed={1}
+        autoRotateSpeed={0.28}
       />
     </Canvas>
   );
