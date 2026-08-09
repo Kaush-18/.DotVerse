@@ -15,7 +15,7 @@ export default function HeroScene() {
         overflow-visible
       "
     >
-      {/* Atmospheric purple glow */}
+      {/* Primary atmospheric glow */}
       <div
         className="
           pointer-events-none
@@ -23,10 +23,13 @@ export default function HeroScene() {
           left-1/2
           top-1/2
           z-0
-          h-[55%]
-          w-[55%]
+
+          h-[58%]
+          w-[58%]
+
           -translate-x-1/2
           -translate-y-1/2
+
           rounded-full
           bg-violet-600/20
           blur-[120px]
@@ -38,60 +41,58 @@ export default function HeroScene() {
         className="
           pointer-events-none
           absolute
-          left-[52%]
+          left-1/2
           top-[48%]
           z-0
-          h-[35%]
-          w-[35%]
+
+          h-[36%]
+          w-[36%]
+
           -translate-x-1/2
           -translate-y-1/2
+
           rounded-full
           bg-purple-500/10
           blur-[100px]
         "
       />
 
-      {/* 3D Scene */}
+      {/* 3D scene */}
       <div
         className="
           relative
           z-10
+
           flex
-          h-full
-          w-full
-          max-w-[680px]
           items-center
           justify-center
 
-          /* Desktop */
-          lg:translate-x-[-2%]
+          w-full
+          aspect-square
+
+          max-w-[620px]
+
+          sm:max-w-[660px]
+
+          md:max-w-[700px]
+
+          lg:max-w-[720px]
+
+          xl:max-w-[760px]
+
+          2xl:max-w-[800px]
+
+          lg:translate-x-[3%]
           lg:translate-y-[1%]
 
-          /* Large desktop */
-          xl:max-w-[700px]
-          xl:translate-x-[-4%]
-
-          /* Tablet */
-          md:max-w-[600px]
-          md:translate-x-[-2%]
-
-          /* Mobile */
-          max-md:max-w-[520px]
-          max-md:translate-x-0
-          max-md:translate-y-0
+          xl:translate-x-[4%]
         "
       >
         <div
           className="
+            relative
             h-full
             w-full
-            scale-[0.88]
-
-            md:scale-[0.9]
-
-            lg:scale-[0.92]
-
-            xl:scale-[0.94]
           "
         >
           <HeroCanvas />

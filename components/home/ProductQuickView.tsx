@@ -1,0 +1,201 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect } from "react";
+import {
+  X,
+  Heart,
+  ShoppingBag,
+  Plus,
+  Minus,
+} from "lucide-react";
+
+import type { Product } from "./productData";
+
+type ProductQuickViewProps = {
+  product: Product | null;
+  onClose: () => void;
+};
+
+export default function ProductQuickView({
+  product,
+  onClose,
+}: ProductQuickViewProps) {
+  useEffect(() => {
+    if (!product) return;
+
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [product]);
+
+  useEffect(() => {
+    if (!product) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [product, onClose]);
+
+  if (!product) return null;
+
+  return (
+    <div
+      className="quick-view-overlay"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="quick-view-modal">
+        {/* CLOSE */}
+        <button
+          className="quick-view-close"
+          onClick={onClose}
+          aria-label="Close quick view"
+        >
+          <X size={20} />
+        </button>
+
+        {/* IMAGE */}
+        <div className="quick-view-image">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            sizes="50vw"
+            className="quick-view-product-image"
+          />
+        </div>
+
+        {/* DETAILS */}
+        <div className="quick-view-details">
+          <span className="quick-view-category">
+            {product.category}
+          </span>
+
+          <h2>{product.name}</h2>
+
+          <div className="quick-view-price">
+            <span>
+              ₹{product.price.toLocaleString("en-IN")}
+            </span>
+
+            {product.originalPrice && (
+              <del>
+                ₹
+                {product.originalPrice.toLocaleString(
+                  "en-IN"
+                )}
+              </del>
+            )}
+          </div>
+
+          <div className="quick-view-divider" />
+
+          <p className="quick-view-description">
+            Designed for the ones who move beyond the
+            ordinary. Premium streetwear built around the
+            .DotVerse identity.
+          </p>
+
+          {/* COLORS */}
+          <div className="quick-view-option">
+            <div className="quick-view-option-header">
+              <span>Color</span>
+              <span>Black</span>
+            </div>
+
+            <div className="quick-view-colors">
+              {product.colors.map((color, index) => (
+                <button
+                  key={`${product.id}-quick-color-${index}`}
+                  className={`quick-color ${
+                    index === 0 ? "selected" : ""
+                  }`}
+                  style={{
+                    backgroundColor: color,
+                  }}
+                  aria-label={`Color ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* SIZE */}
+          <div className="quick-view-option">
+            <div className="quick-view-option-header">
+              <span>Size</span>
+
+              <button className="size-guide">
+                Size guide
+              </button>
+            </div>
+
+            <div className="size-grid">
+              {["S", "M", "L", "XL", "XXL"].map(
+                (size, index) => (
+                  <button
+                    key={size}
+                    className={`size-button ${
+                      index === 1 ? "selected" : ""
+                    }`}
+                  >
+                    {size}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* QUANTITY */}
+          <div className="quick-view-option">
+            <div className="quick-view-option-header">
+              <span>Quantity</span>
+            </div>
+
+            <div className="quantity-control">
+              <button aria-label="Decrease quantity">
+                <Minus size={15} />
+              </button>
+
+              <span>1</span>
+
+              <button aria-label="Increase quantity">
+                <Plus size={15} />
+              </button>
+            </div>
+          </div>
+
+          {/* ACTIONS */}
+          <div className="quick-view-actions">
+            <button className="add-to-cart-button">
+              <ShoppingBag size={18} />
+              Add to cart
+            </button>
+
+            <button
+              className="quick-view-wishlist"
+              aria-label="Add to wishlist"
+            >
+              <Heart size={19} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

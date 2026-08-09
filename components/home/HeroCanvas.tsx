@@ -1,7 +1,8 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { Float, OrbitControls } from "@react-three/drei";
+import { Float } from "@react-three/drei";
+import * as THREE from "three";
 
 import PlaceholderModel from "./PlaceholderModel";
 import SceneLights from "./SceneLights";
@@ -9,39 +10,37 @@ import SceneLights from "./SceneLights";
 export default function HeroCanvas() {
   return (
     <Canvas
-      className="!h-full !w-full"
-      shadows
-      dpr={[1, 2]}
+      className="h-full w-full"
+      shadows={{
+        type: THREE.PCFShadowMap,
+      }}
+      dpr={[1, 1.75]}
       camera={{
-        position: [0, 0.2, 5.6],
-        fov: 34,
+        position: [0, 0.15, 6.1],
+        fov: 36,
       }}
       gl={{
         antialias: true,
         alpha: true,
+        powerPreference: "high-performance",
       }}
     >
-      {/* Lighting */}
       <SceneLights />
 
-      {/* Model */}
       <Float
-        speed={1.2}
-        rotationIntensity={0.18}
-        floatIntensity={0.7}
-        floatingRange={[-0.08, 0.08]}
+        speed={1.15}
+        rotationIntensity={0.12}
+        floatIntensity={0.45}
+        floatingRange={[-0.06, 0.06]}
       >
-        <PlaceholderModel />
+        <group
+          position={[0, 0.15, 0]}
+          rotation={[0, -0.15, 0]}
+          scale={1.15}
+        >
+          <PlaceholderModel />
+        </group>
       </Float>
-
-      {/* Controls */}
-      <OrbitControls
-        enableZoom={false}
-        enablePan={false}
-        enableRotate={false}
-        autoRotate
-        autoRotateSpeed={0.28}
-      />
     </Canvas>
   );
 }

@@ -1,4 +1,5 @@
 import Container from "@/components/layout/Container";
+
 import HeroContent from "./HeroContent";
 import HeroScene from "./HeroScene";
 import HeroGlow from "./HeroGlow";
@@ -11,93 +12,89 @@ export default function Hero() {
       className="
         relative
         isolate
-        min-h-[calc(100svh-80px)]
+        min-h-[calc(100svh-72px)]
         overflow-hidden
       "
     >
-      {/* =====================================================
-          BACKGROUND ATMOSPHERE
-      ===================================================== */}
-
+      {/* Background atmosphere */}
       <HeroGlow />
       <HeroAurora />
-
-      {/* =====================================================
-          MAIN HERO CONTAINER
-      ===================================================== */}
 
       <Container className="relative z-10">
         <div
           className="
             relative
             grid
-            min-h-[calc(100svh-80px)]
+            min-h-[calc(100svh-72px)]
             items-center
 
-            gap-8
-            py-8
+            grid-cols-1
+
+            md:grid-cols-[48%_52%]
 
             lg:grid-cols-[46%_54%]
-            lg:gap-6
-            lg:py-6
 
             xl:grid-cols-[44%_56%]
+
             2xl:grid-cols-[42%_58%]
           "
         >
-          {/* =================================================
-              LEFT — HERO CONTENT
-          ================================================= */}
-
+          {/* =====================================================
+              HERO CONTENT
+              ===================================================== */}
           <div
             className="
               relative
               z-20
               min-w-0
 
-              pl-4
-              sm:pl-6
-              md:pl-8
-              lg:pl-10
-              xl:pl-12
-              2xl:pl-16
+              flex
+              items-center
+
+              py-14
+
+              sm:py-16
+
+              md:py-0
             "
           >
             <HeroContent />
           </div>
 
-          {/* =================================================
-              RIGHT — 3D HERO SCENE
-          ================================================= */}
-
+          {/* =====================================================
+              3D SCENE
+              ===================================================== */}
           <div
             className="
               relative
               z-10
-              flex
               min-w-0
+              w-full
+
+              h-[390px]
+
+              sm:h-[420px]
+
+              md:h-[500px]
+
+              lg:h-[calc(100svh-72px)]
+
+              flex
               items-center
               justify-center
 
-              h-[420px]
-              w-full
+              md:-ml-4
 
-              sm:h-[500px]
+              lg:ml-0
 
-              lg:h-[calc(100svh-110px)]
-              lg:min-h-[560px]
+              -mt-8
 
-              xl:h-[calc(100svh-100px)]
-              xl:min-h-[600px]
+              md:mt-0
             "
           >
             <HeroScene />
           </div>
         </div>
-
-        {/* ===================================================
-            SCROLL INDICATOR
-        =================================================== */}
 
         <ScrollIndicator />
       </Container>

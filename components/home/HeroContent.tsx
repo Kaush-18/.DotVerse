@@ -35,14 +35,14 @@ export default function HeroContent() {
       "
     >
 
-      {/* =========================================================
+      {/* =====================================================
           BADGE
-      ========================================================= */}
+      ===================================================== */}
 
       <motion.div
         initial={{
           opacity: 0,
-          y: 18,
+          y: 20,
         }}
         animate={{
           opacity: 1,
@@ -50,27 +50,25 @@ export default function HeroContent() {
         }}
         transition={{
           delay: 0.8,
-          duration: 0.7,
+          duration: 0.6,
           ease: [0.22, 1, 0.36, 1],
         }}
+        className="mb-5"
       >
         <div
           className="
             inline-flex
             items-center
             gap-2
-
             rounded-full
             border
-            border-violet-500/30
-            bg-violet-500/[0.08]
-
-            px-4
-            py-1.5
-
-            backdrop-blur-xl
-
-            shadow-[0_0_30px_rgba(124,58,237,0.08)]
+            border-violet-500/40
+            bg-violet-500/10
+            px-3
+            py-1
+            backdrop-blur-md
+            sm:px-4
+            sm:py-1.5
           "
         >
           <span
@@ -79,22 +77,23 @@ export default function HeroContent() {
               w-1.5
               shrink-0
               rounded-full
-              bg-violet-400
-
-              shadow-[0_0_12px_rgba(167,139,250,0.9)]
-
+              bg-violet-500
+              shadow-[0_0_12px_rgba(139,92,246,0.9)]
               animate-pulse
+              sm:h-2
+              sm:w-2
             "
           />
 
           <p
             className="
-              text-[10px]
+              text-[9px]
               font-medium
               uppercase
-              tracking-[0.42em]
-              text-violet-300
-              sm:text-xs
+              tracking-[0.32em]
+              text-violet-400
+              sm:text-[10px]
+              md:text-xs
             "
           >
             {HERO.badge}
@@ -102,9 +101,10 @@ export default function HeroContent() {
         </div>
       </motion.div>
 
-      {/* =========================================================
-          MAIN HEADING
-      ========================================================= */}
+
+      {/* =====================================================
+          HEADING
+      ===================================================== */}
 
       <motion.h1
         initial={{
@@ -114,116 +114,119 @@ export default function HeroContent() {
           opacity: 1,
         }}
         transition={{
-          delay: 0.95,
+          delay: 0.9,
           duration: 0.5,
         }}
         className="
-          mt-5
-
-          max-w-[650px]
-
-          text-[clamp(3.8rem,6.2vw,6.8rem)]
           font-black
-          leading-[0.86]
-          tracking-[-0.055em]
-
+          tracking-[-0.065em]
+          leading-[0.84]
           text-white
+
+          text-[clamp(4rem,6vw,6.5rem)]
+
+          sm:text-[clamp(4.5rem,6vw,6.8rem)]
+
+          lg:text-[clamp(5rem,5.8vw,7rem)]
+
+          xl:text-[clamp(5.2rem,5.6vw,7.2rem)]
         "
       >
         {HERO.title.map((line, index) => (
           <motion.span
             key={`${line}-${index}`}
-            className="block overflow-hidden"
+            className="block"
+            initial={{
+              opacity: 0,
+              y: 70,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              delay: 1 + index * 0.12,
+              duration: 0.75,
+              ease: [0.22, 1, 0.36, 1],
+            }}
           >
-            <motion.span
-              className="block"
-              initial={{
-                opacity: 0,
-                y: 90,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              transition={{
-                delay: 1.05 + index * 0.12,
-                duration: 0.8,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            >
-              {line}
-            </motion.span>
+            {line}
           </motion.span>
         ))}
       </motion.h1>
 
-      {/* =========================================================
+
+      {/* =====================================================
           DESCRIPTION
-      ========================================================= */}
+      ===================================================== */}
 
       <motion.p
         initial={{
           opacity: 0,
-          y: 22,
+          y: 20,
         }}
         animate={{
           opacity: 1,
           y: 0,
         }}
         transition={{
-          delay: 1.5,
+          delay: 1.4,
           duration: 0.7,
           ease: [0.22, 1, 0.36, 1],
         }}
         className="
-          mt-6
-
-          max-w-[520px]
+          mt-5
+          max-w-[620px]
 
           text-sm
-          leading-7
+          leading-6
           text-white/60
 
+          sm:mt-6
           sm:text-base
           sm:leading-7
 
-          lg:text-[17px]
+          lg:text-xl
           lg:leading-8
         "
       >
         {HERO.description}
       </motion.p>
 
-      {/* =========================================================
-          CTA BUTTONS
-      ========================================================= */}
+
+      {/* =====================================================
+          BUTTONS
+      ===================================================== */}
 
       <motion.div
         initial={{
           opacity: 0,
-          y: 24,
+          y: 25,
         }}
         animate={{
           opacity: 1,
           y: 0,
         }}
         transition={{
-          delay: 1.7,
-          duration: 0.75,
+          delay: 1.6,
+          duration: 0.7,
           ease: [0.22, 1, 0.36, 1],
         }}
         className="
-          mt-7
+          mt-6
           flex
           flex-wrap
           items-center
           gap-3
+
+          sm:mt-7
         "
       >
+
         <Button
           className="
             px-7
-            py-4
+            py-3.5
             text-sm
             sm:px-8
             sm:py-4
@@ -237,7 +240,7 @@ export default function HeroContent() {
           variant="secondary"
           className="
             px-7
-            py-4
+            py-3.5
             text-sm
             sm:px-8
             sm:py-4
@@ -246,164 +249,147 @@ export default function HeroContent() {
         >
           {HERO.secondaryButton}
         </Button>
+
       </motion.div>
 
-      {/* =========================================================
+
+      {/* =====================================================
           STATS
-      ========================================================= */}
+      ===================================================== */}
 
       <motion.div
         initial={{
           opacity: 0,
-          y: 28,
+          y: 25,
         }}
         animate={{
           opacity: 1,
           y: 0,
         }}
         transition={{
-          delay: 1.9,
+          delay: 1.8,
           duration: 0.8,
           ease: [0.22, 1, 0.36, 1],
         }}
         className="
-          mt-9
-
+          mt-7
           grid
+          w-full
+max-w-[620px]
           grid-cols-3
-
           gap-2
-          sm:gap-3
 
-          max-w-[600px]
+          sm:mt-8
+          sm:gap-3
         "
       >
+
         {stats.map((item, index) => (
           <motion.div
             key={item.label}
             initial={{
               opacity: 0,
-              y: 18,
+              y: 20,
             }}
             animate={{
               opacity: 1,
               y: 0,
             }}
             transition={{
-              delay: 2 + index * 0.1,
+              delay: 1.9 + index * 0.1,
               duration: 0.6,
               ease: [0.22, 1, 0.36, 1],
             }}
             whileHover={{
-              y: -5,
+              y: -4,
             }}
             className="
               group
-              relative
-              overflow-hidden
+              min-w-0
 
-              rounded-2xl
-
+              rounded-xl
               border
-              border-white/[0.10]
+              border-white/10
 
-              bg-white/[0.035]
+              bg-violet-500/[0.12]
+              backdrop-blur-xl
 
               px-3
-              py-3.5
-
-              backdrop-blur-xl
+              py-2.5
 
               transition-all
               duration-500
 
-              hover:border-violet-400/30
-              hover:bg-white/[0.055]
+              hover:border-violet-500/40
+              hover:bg-violet-500/[0.18]
+              hover:shadow-[0_15px_40px_rgba(124,58,237,0.15)]
 
-              hover:shadow-[0_18px_50px_rgba(124,58,237,0.12)]
-
+              sm:rounded-2xl
               sm:px-4
-              sm:py-4
+              sm:py-3
             "
           >
-            {/* Hover glow */}
+
+            {/* Number */}
+
             <div
               className="
-                pointer-events-none
-                absolute
-                -right-8
-                -top-8
+                flex
+                items-baseline
+                whitespace-nowrap
 
-                h-20
-                w-20
+                text-2xl
+                font-black
+                leading-none
+                text-white
 
-                rounded-full
-
-                bg-violet-500/10
-
-                blur-2xl
-
-                opacity-0
-
-                transition-opacity
-                duration-500
-
-                group-hover:opacity-100
+                sm:text-3xl
+                lg:text-[2.6rem]
               "
-            />
+            >
+              <CountUp
+                end={item.number}
+                duration={2}
+                separator=","
+              />
 
-            <div className="relative">
-              <h3
+              <span
                 className="
-                  flex
-                  items-baseline
-                  gap-0.5
-
-                  text-[clamp(1.8rem,3vw,3rem)]
-                  font-black
-                  leading-none
-                  tracking-[-0.04em]
-
-                  text-white
-
                   transition-colors
                   duration-300
-
-                  group-hover:text-violet-300
+                  group-hover:text-violet-400
                 "
               >
-                <CountUp
-                  end={item.number}
-                  duration={2}
-                  separator=","
-                />
-
-                <span>{item.suffix}</span>
-              </h3>
-
-              <p
-                className="
-                  mt-1.5
-
-                  whitespace-nowrap
-
-                  text-[9px]
-                  font-medium
-                  uppercase
-                  tracking-[0.08em]
-
-                  text-white/45
-
-                  sm:text-[10px]
-                  sm:tracking-[0.1em]
-                "
-              >
-                {item.label}
-              </p>
+                {item.suffix}
+              </span>
             </div>
+
+
+            {/* Label */}
+
+            <p
+              className="
+                mt-1
+                truncate
+
+                text-[8px]
+                font-medium
+                uppercase
+                tracking-wide
+                text-white/45
+
+                sm:text-[9px]
+                lg:text-[10px]
+              "
+            >
+              {item.label}
+            </p>
+
           </motion.div>
         ))}
+
       </motion.div>
+
     </div>
   );
 }
