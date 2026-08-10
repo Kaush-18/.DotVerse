@@ -14,24 +14,32 @@ export default function FeaturedCollections() {
         relative
         overflow-hidden
         bg-[#05030b]
-        py-28
-        sm:py-32
-        lg:py-40
+        py-20
+        sm:py-24
+        md:py-28
+        lg:py-32
+        xl:py-40
       "
     >
-      {/* Background glow */}
+      {/* =====================================================
+          BACKGROUND ATMOSPHERE
+          ===================================================== */}
+
       <div
         className="
           pointer-events-none
           absolute
           left-1/2
           top-0
-          h-[500px]
-          w-[700px]
+          z-0
+          h-[420px]
+          w-[600px]
           -translate-x-1/2
           rounded-full
-          bg-violet-700/[0.08]
-          blur-[140px]
+          bg-violet-700/[0.07]
+          blur-[130px]
+          sm:h-[500px]
+          sm:w-[700px]
         "
       />
 
@@ -39,7 +47,22 @@ export default function FeaturedCollections() {
         {/* =====================================================
             SECTION HEADER
             ===================================================== */}
-        <div className="mb-14 grid gap-8 lg:mb-20 lg:grid-cols-[1fr_auto] lg:items-end">
+
+        <div
+          className="
+            mb-12
+            grid
+            gap-8
+            sm:mb-14
+            md:mb-16
+            lg:mb-20
+            lg:grid-cols-[minmax(0,1fr)_minmax(220px,320px)]
+            lg:items-end
+            lg:gap-12
+            xl:gap-20
+          "
+        >
+          {/* Heading */}
           <motion.div
             initial={{
               opacity: 0,
@@ -57,32 +80,57 @@ export default function FeaturedCollections() {
               duration: 0.7,
               ease: [0.22, 1, 0.36, 1],
             }}
+            className="min-w-0"
           >
-            <div className="mb-5 flex items-center gap-3">
-              <span className="h-px w-10 bg-violet-500" />
+            {/* Eyebrow */}
 
-              <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-violet-300">
+            <div
+              className="
+                mb-4
+                flex
+                items-center
+                gap-3
+                sm:mb-5
+              "
+            >
+              <span className="h-px w-8 bg-violet-500 sm:w-10" />
+
+              <span
+                className="
+                  text-[9px]
+                  font-semibold
+                  uppercase
+                  tracking-[0.28em]
+                  text-violet-300
+                  sm:text-[10px]
+                  sm:tracking-[0.3em]
+                "
+              >
                 Featured collections
               </span>
             </div>
 
+            {/* Main heading */}
+
             <h2
               className="
-                max-w-4xl
-                text-5xl
+                max-w-[850px]
+                text-[clamp(3.1rem,7vw,6rem)]
                 font-black
-                leading-[0.9]
-                tracking-[-0.06em]
+                leading-[0.88]
+                tracking-[-0.065em]
                 text-white
-                sm:text-6xl
-                lg:text-8xl
               "
             >
               Find your
               <br />
-              <span className="text-white/35">frequency.</span>
+              <span className="text-white/35">
+                frequency.
+              </span>
             </h2>
           </motion.div>
+
+          {/* Supporting text */}
 
           <motion.p
             initial={{
@@ -103,10 +151,11 @@ export default function FeaturedCollections() {
               ease: [0.22, 1, 0.36, 1],
             }}
             className="
-              max-w-md
+              max-w-[360px]
               text-sm
               leading-6
               text-white/45
+              lg:ml-auto
               lg:pb-2
               lg:text-right
             "
@@ -120,7 +169,22 @@ export default function FeaturedCollections() {
         {/* =====================================================
             COLLECTION GRID
             ===================================================== */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-4
+
+            sm:gap-5
+
+            md:grid-cols-2
+            md:gap-5
+
+            xl:grid-cols-3
+            xl:gap-5
+          "
+        >
           {collections.map((collection, index) => (
             <CollectionCard
               key={collection.id}
@@ -133,6 +197,7 @@ export default function FeaturedCollections() {
         {/* =====================================================
             BOTTOM LABEL
             ===================================================== */}
+
         <motion.div
           initial={{
             opacity: 0,
@@ -154,17 +219,36 @@ export default function FeaturedCollections() {
             gap-3
             border-t
             border-white/[0.07]
-            pt-6
+            pt-5
+
+            sm:mt-10
             sm:flex-row
             sm:items-center
             sm:justify-between
+            sm:pt-6
           "
         >
-          <span className="text-[10px] uppercase tracking-[0.25em] text-white/25">
+          <span
+            className="
+              text-[9px]
+              uppercase
+              tracking-[0.25em]
+              text-white/25
+              sm:text-[10px]
+            "
+          >
             .Dot / DotVerse
           </span>
 
-          <span className="text-[10px] uppercase tracking-[0.25em] text-white/25">
+          <span
+            className="
+              text-[9px]
+              uppercase
+              tracking-[0.25em]
+              text-white/25
+              sm:text-[10px]
+            "
+          >
             Designed beyond the ordinary
           </span>
         </motion.div>
