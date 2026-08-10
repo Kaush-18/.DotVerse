@@ -15,48 +15,17 @@ export default function ScrollIndicator() {
         delay: 2.4,
         duration: 0.8,
       }}
-      className="
-        pointer-events-none
-        absolute
-
-        left-1/2
-        bottom-5
-
-        z-30
-
-        flex
-        -translate-x-1/2
-        flex-col
-        items-center
-
-        sm:bottom-6
-
-        lg:bottom-5
-      "
+      className="scroll-indicator"
     >
 
       {/* Label */}
 
-      <div
-        className="
-          mb-2
-          flex
-          items-center
-          gap-2
-
-          text-[7px]
-          font-medium
-          uppercase
-          tracking-[0.45em]
-          text-violet-400/70
-
-          sm:text-[8px]
-        "
-      >
-        <span>Scroll</span>
-
+      <span className="scroll-indicator-text">
+        Scroll
         <span
           className="
+            inline-flex
+            ml-2
             h-1
             w-1
             rounded-full
@@ -64,20 +33,11 @@ export default function ScrollIndicator() {
             shadow-[0_0_8px_rgba(139,92,246,0.9)]
           "
         />
-      </div>
-
+      </span>
 
       {/* Vertical line */}
 
-      <div
-        className="
-          relative
-          h-8
-          w-px
-          overflow-hidden
-          bg-white/10
-        "
-      >
+      <div className="scroll-indicator-line">
         <motion.span
           animate={{
             y: [0, 22, 0],
@@ -88,23 +48,8 @@ export default function ScrollIndicator() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="
-            absolute
-            left-1/2
-            top-0
-
-            h-2
-            w-px
-
-            -translate-x-1/2
-
-            bg-violet-400
-
-            shadow-[0_0_8px_rgba(139,92,246,0.9)]
-          "
         />
       </div>
-
 
       {/* Tiny arrow */}
 
@@ -118,12 +63,7 @@ export default function ScrollIndicator() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="
-          mt-1
-          text-[9px]
-          leading-none
-          text-violet-400/60
-        "
+        className="scroll-indicator-text"
       >
         ↓
       </motion.span>

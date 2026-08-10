@@ -21,33 +21,33 @@ const navLinks = [
 
 export default function Navbar() {
   return (
-    <header className="absolute inset-x-0 top-0 z-50 w-full">
+    <header
+      className="
+        sticky
+        top-0
+        z-[1000]
+        w-full
+        h-[80px]
+
+        bg-[#05020c]/82
+        backdrop-blur-[18px]
+        -webkit-backdrop-blur-[18px]
+
+        border-b
+        border-white/[0.08]
+      "
+    >
       
-      {/* =====================================================
-          NAVBAR BACKGROUND
-      ===================================================== */}
-
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          border-b
-          border-white/[0.08]
-          bg-black/10
-          backdrop-blur-xl
-        "
-      />
-
       <Container className="relative z-10">
         <div
-          className="
-            flex
-            h-20
-            items-center
-            justify-between
-          "
-        >
+        className="
+          flex
+          h-[80px]
+          min-h-[80px]
+          items-center
+          justify-between
+        "
+      >
 
           {/* =================================================
               LOGO

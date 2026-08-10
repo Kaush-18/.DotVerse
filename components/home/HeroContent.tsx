@@ -26,15 +26,7 @@ const stats = [
 
 export default function HeroContent() {
   return (
-    <div
-      className="
-        relative
-        z-20
-        w-full
-        max-w-[680px]
-      "
-    >
-
+    <div className="hero-content">
       {/* =====================================================
           BADGE
       ===================================================== */}
@@ -53,7 +45,7 @@ export default function HeroContent() {
           duration: 0.6,
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="mt-5 sm:mt-6 lg:mt-7 mb-5"
+        className="hero-badge"
       >
         <div
           className="
@@ -117,20 +109,7 @@ export default function HeroContent() {
           delay: 0.9,
           duration: 0.5,
         }}
-        className="
-          font-black
-          tracking-[-0.065em]
-          leading-[0.84]
-          text-white
-
-          text-[clamp(4rem,6vw,6.5rem)]
-
-          sm:text-[clamp(4.5rem,6vw,6.8rem)]
-
-          lg:text-[clamp(5rem,5.8vw,7rem)]
-
-          xl:text-[clamp(5.2rem,5.6vw,7.2rem)]
-        "
+        className="hero-title"
       >
         {HERO.title.map((line, index) => (
           <motion.span
@@ -174,21 +153,7 @@ export default function HeroContent() {
           duration: 0.7,
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="
-          mt-5
-          max-w-[620px]
-
-          text-sm
-          leading-6
-          text-white/60
-
-          sm:mt-6
-          sm:text-base
-          sm:leading-7
-
-          lg:text-xl
-          lg:leading-8
-        "
+        className="hero-description"
       >
         {HERO.description}
       </motion.p>
@@ -212,15 +177,7 @@ export default function HeroContent() {
           duration: 0.7,
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="
-          mt-6
-          flex
-          flex-wrap
-          items-center
-          gap-3
-
-          sm:mt-7
-        "
+        className="hero-actions"
       >
 
         <Button
@@ -271,17 +228,7 @@ export default function HeroContent() {
           duration: 0.8,
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="
-          mt-7
-          grid
-          w-full
-max-w-[620px]
-          grid-cols-3
-          gap-2
-
-          sm:mt-8
-          sm:gap-3
-        "
+        className="hero-stats"
       >
 
         {stats.map((item, index) => (

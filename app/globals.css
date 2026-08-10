@@ -20,6 +20,8 @@
   --dot-text: #ffffff;
   --dot-text-secondary: rgba(255, 255, 255, 0.68);
   --dot-text-muted: rgba(255, 255, 255, 0.45);
+
+  --navbar-height: 80px;
 }
 
 * {
@@ -1322,5 +1324,305 @@ html {
   .quick-view-close {
     width: 36px;
     height: 36px;
+  }
+}
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  width: 100%;
+  height: 80px;
+
+  background: rgba(5, 2, 12, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* =========================================================
+   HERO SECTION
+========================================================= */
+
+.hero {
+  position: relative;
+
+  width: 100%;
+
+  min-height: calc(100dvh - 80px);
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+.hero-inner {
+  position: relative;
+
+  width: min(1400px, 100%);
+
+  min-height: calc(100dvh - 80px);
+
+  margin: 0 auto;
+
+  padding: clamp(24px, 4vh, 44px)
+           clamp(24px, 6vw, 80px)
+           clamp(24px, 3vh, 36px);
+
+  box-sizing: border-box;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 1.1fr);
+
+  align-items: center;
+
+  gap: clamp(20px, 5vw, 80px);
+}
+
+.hero-content {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: flex-start;
+
+  width: 100%;
+}
+
+.hero-badge {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+
+  width: fit-content;
+
+  margin: 0 0 clamp(18px, 2.5vh, 28px);
+
+  flex-shrink: 0;
+}
+
+.hero-title {
+  margin: 0;
+
+  font-size: clamp(56px, 6.2vw, 104px);
+
+  line-height: 0.88;
+
+  letter-spacing: -0.055em;
+
+  font-weight: 800;
+}
+
+.hero-description {
+  max-width: 620px;
+
+  margin-top: clamp(24px, 3vh, 32px);
+
+  font-size: clamp(16px, 1.4vw, 21px);
+
+  line-height: 1.6;
+
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  margin-top: clamp(26px, 3vh, 36px);
+}
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: clamp(28px, 3.5vh, 40px);
+}
+
+.hero-model {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  min-height: 440px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.hero-model canvas {
+  display: block;
+
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.scroll-indicator {
+  position: absolute;
+
+  left: 50%;
+  bottom: 14px;
+
+  transform: translateX(-50%);
+
+  z-index: 30;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  pointer-events: none;
+}
+
+.scroll-indicator-line {
+  width: 1px;
+  height: 26px;
+
+  margin-top: 7px;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(150, 75, 255, 0.9),
+    rgba(150, 75, 255, 0)
+  );
+
+  animation: scrollPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scaleY(0.65);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.scroll-indicator-text {
+  font-size: 8px;
+
+  letter-spacing: 0.35em;
+
+  color: rgba(170, 110, 255, 0.75);
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   HERO MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+  .navbar {
+    height: 64px;
+  }
+
+  .hero {
+    min-height: calc(100dvh - 64px);
+  }
+
+  .hero-inner {
+    min-height: calc(100dvh - 64px);
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 0;
+
+    padding:
+      22px
+      18px
+      34px;
+  }
+
+  .hero-content {
+    justify-content: flex-start;
+  }
+
+  .hero-badge {
+    margin-bottom: 18px;
+  }
+
+  .hero-title {
+    font-size: clamp(46px, 12.5vw, 64px);
+
+    line-height: 0.88;
+  }
+
+  .hero-description {
+    margin-top: 20px;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+  }
+
+  .hero-actions {
+    margin-top: 22px;
+  }
+
+  .hero-stats {
+    margin-top: 24px;
+  }
+
+  .hero-model {
+    width: 100%;
+
+    height: 280px;
+    min-height: 280px;
+
+    margin-top: 4px;
+  }
+
+  .scroll-indicator {
+    bottom: 8px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-inner {
+    padding:
+      18px
+      16px
+      30px;
+  }
+
+  .hero-badge {
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-size: clamp(43px, 12.5vw, 56px);
+  }
+
+  .hero-model {
+    height: 250px;
+    min-height: 250px;
   }
 }
