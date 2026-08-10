@@ -41,8 +41,11 @@ export default function CollectionCard({
         border-white/[0.08]
         ${collection.className}
         transition-all
-        duration-500
+        duration-700
+        ease-[cubic-bezier(0.22,1,0.36,1)]
+        hover:-translate-y-1
         hover:border-violet-400/30
+        hover:shadow-[0_24px_70px_rgba(0,0,0,0.28)]
       `}
     >
       {/* Ambient glow */}
@@ -57,9 +60,12 @@ export default function CollectionCard({
           rounded-full
           blur-3xl
           ${collection.glowClass}
-          transition-transform
-          duration-700
+          opacity-70
+          transition-all
+          duration-1000
+          ease-[cubic-bezier(0.22,1,0.36,1)]
           group-hover:scale-125
+          group-hover:opacity-90
         `}
       />
 
@@ -91,6 +97,11 @@ export default function CollectionCard({
           bg-white/[0.025]
           shadow-[0_0_80px_rgba(124,58,237,0.18)]
           backdrop-blur-sm
+          transition-all
+          duration-700
+          ease-out
+          group-hover:scale-110
+          group-hover:border-violet-300/30
         "
         animate={{
           y: [0, -10, 0],
@@ -107,7 +118,21 @@ export default function CollectionCard({
       </motion.div>
 
       {/* Content */}
-      <div className="relative z-10 flex min-h-[440px] flex-col justify-between p-7 sm:p-8 lg:p-10">
+      <div
+      className="
+        relative
+        z-10
+        flex
+        min-h-[390px]
+        flex-col
+        justify-between
+        p-6
+        sm:min-h-[420px]
+        sm:p-8
+        lg:min-h-[440px]
+        lg:p-10
+      "
+    >
         <div>
           <div className="mb-5 flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.9)]" />
@@ -120,8 +145,9 @@ export default function CollectionCard({
           <h3
             className="
               max-w-[360px]
-              text-5xl
+              text-[2.75rem]
               font-black
+              leading-[0.95]
               tracking-[-0.06em]
               text-white
               sm:text-6xl
@@ -134,10 +160,11 @@ export default function CollectionCard({
             className="
               mt-5
               max-w-[330px]
-              text-sm
-              leading-6
+              text-[13px]
+              leading-5
               text-white/50
               sm:text-base
+              sm:leading-6
             "
           >
             {collection.description}
@@ -165,8 +192,8 @@ export default function CollectionCard({
               transition-all
               duration-300
               hover:border-violet-400/40
-              hover:bg-violet-500
-              hover:shadow-[0_0_30px_rgba(124,58,237,0.35)]
+              hover:bg-violet-500/90
+              hover:shadow-[0_0_24px_rgba(124,58,237,0.28)]
             "
           >
             {collection.label}
@@ -184,13 +211,16 @@ export default function CollectionCard({
 
           <span
             className="
-              text-7xl
+              text-6xl
               font-black
               tracking-[-0.08em]
               text-white/[0.035]
               transition-all
-              duration-500
+              duration-700
+              ease-out
+              group-hover:translate-x-1
               group-hover:text-white/[0.08]
+              sm:text-7xl
             "
           >
             0{index + 1}

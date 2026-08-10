@@ -15,7 +15,11 @@ export default function HeroScene() {
         overflow-visible
       "
     >
-      {/* Primary atmospheric glow */}
+
+      {/* =====================================================
+          PRIMARY PURPLE ATMOSPHERIC GLOW
+      ===================================================== */}
+
       <div
         className="
           pointer-events-none
@@ -24,8 +28,8 @@ export default function HeroScene() {
           top-1/2
           z-0
 
-          h-[58%]
-          w-[58%]
+          h-[65%]
+          w-[65%]
 
           -translate-x-1/2
           -translate-y-1/2
@@ -33,59 +37,63 @@ export default function HeroScene() {
           rounded-full
           bg-violet-600/20
           blur-[120px]
+
+          lg:h-[62%]
+          lg:w-[62%]
+          lg:blur-[150px]
         "
       />
 
-      {/* Secondary glow */}
+
+      {/* =====================================================
+          SECONDARY GLOW
+      ===================================================== */}
+
       <div
         className="
           pointer-events-none
           absolute
           left-1/2
-          top-[48%]
+          top-[54%]
           z-0
 
-          h-[36%]
-          w-[36%]
+          h-[38%]
+          w-[38%]
 
           -translate-x-1/2
           -translate-y-1/2
 
           rounded-full
           bg-purple-500/10
-          blur-[100px]
+          blur-[90px]
         "
       />
 
-      {/* 3D scene */}
+
+      {/* =====================================================
+          CONTROLLED MODEL AREA
+      ===================================================== */}
+
       <div
         className="
           relative
           z-10
 
           flex
+          h-full
+          w-full
           items-center
           justify-center
 
-          w-full
-          aspect-square
+          max-w-[430px]
 
-          max-w-[620px]
+          sm:max-w-[470px]
 
-          sm:max-w-[660px]
+          md:max-w-[520px]
 
-          md:max-w-[700px]
+          lg:max-w-[620px]
 
-          lg:max-w-[720px]
-
-          xl:max-w-[760px]
-
-          2xl:max-w-[800px]
-
-          lg:translate-x-[3%]
-          lg:translate-y-[1%]
-
-          xl:translate-x-[4%]
+          xl:max-w-[680px]
         "
       >
         <div
@@ -93,11 +101,23 @@ export default function HeroScene() {
             relative
             h-full
             w-full
+
+            /* MOBILE */
+            scale-[0.92]
+
+            /* TABLET */
+            md:scale-[0.94]
+
+            /* DESKTOP */
+            lg:scale-[0.90]
+
+            xl:scale-[0.94]
           "
         >
           <HeroCanvas />
         </div>
       </div>
+
     </div>
   );
 }

@@ -14,9 +14,9 @@ export default function FeaturedCollections() {
         relative
         overflow-hidden
         bg-[#05030b]
-        py-24
-        sm:py-28
-        lg:py-36
+        py-28
+        sm:py-32
+        lg:py-40
       "
     >
       {/* Background glow */}
@@ -39,7 +39,7 @@ export default function FeaturedCollections() {
         {/* =====================================================
             SECTION HEADER
             ===================================================== */}
-        <div className="mb-12 grid gap-8 lg:mb-16 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div className="mb-14 grid gap-8 lg:mb-20 lg:grid-cols-[1fr_auto] lg:items-end">
           <motion.div
             initial={{
               opacity: 0,

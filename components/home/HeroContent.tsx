@@ -53,7 +53,7 @@ export default function HeroContent() {
           duration: 0.6,
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="mb-5"
+        className="mt-5 sm:mt-6 lg:mt-7 mb-5"
       >
         <div
           className="

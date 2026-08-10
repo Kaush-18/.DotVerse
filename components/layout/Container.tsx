@@ -1,26 +1,35 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { ReactNode } from "react";
+import clsx from "clsx";
 
-interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
+interface Props {
   children: ReactNode;
+  className?: string;
 }
 
 export default function Container({
   children,
-  className = "",
-  ...props
-}: ContainerProps) {
+  className,
+}: Props) {
   return (
     <div
-      className={`
-        mx-auto
-        w-full
-        max-w-[1440px]
-        px-5
-        md:px-10
-        2xl:px-16
-        ${className}
-      `}
-      {...props}
+      className={clsx(
+        `
+          mx-auto
+          w-full
+          max-w-[1440px]
+
+          px-5
+
+          sm:px-8
+
+          md:px-10
+
+          lg:px-12
+
+          xl:px-16
+        `,
+        className
+      )}
     >
       {children}
     </div>
