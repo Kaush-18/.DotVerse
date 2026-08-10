@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   Heart,
@@ -51,9 +52,12 @@ export default function ProductQuickView({
 
   if (!product) return null;
 
-  return (
+  const quickView = (
     <div
       className="quick-view-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${product.name} quick view`}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
@@ -63,6 +67,7 @@ export default function ProductQuickView({
       <div className="quick-view-modal">
         {/* CLOSE */}
         <button
+          type="button"
           className="quick-view-close"
           onClick={onClose}
           aria-label="Close quick view"
@@ -97,9 +102,7 @@ export default function ProductQuickView({
             {product.originalPrice && (
               <del>
                 ₹
-                {product.originalPrice.toLocaleString(
-                  "en-IN"
-                )}
+                {product.originalPrice.toLocaleString("en-IN")}
               </del>
             )}
           </div>
@@ -123,6 +126,7 @@ export default function ProductQuickView({
               {product.colors.map((color, index) => (
                 <button
                   key={`${product.id}-quick-color-${index}`}
+                  type="button"
                   className={`quick-color ${
                     index === 0 ? "selected" : ""
                   }`}
@@ -140,7 +144,10 @@ export default function ProductQuickView({
             <div className="quick-view-option-header">
               <span>Size</span>
 
-              <button className="size-guide">
+              <button
+                type="button"
+                className="size-guide"
+              >
                 Size guide
               </button>
             </div>
@@ -150,6 +157,7 @@ export default function ProductQuickView({
                 (size, index) => (
                   <button
                     key={size}
+                    type="button"
                     className={`size-button ${
                       index === 1 ? "selected" : ""
                     }`}
@@ -168,13 +176,19 @@ export default function ProductQuickView({
             </div>
 
             <div className="quantity-control">
-              <button aria-label="Decrease quantity">
+              <button
+                type="button"
+                aria-label="Decrease quantity"
+              >
                 <Minus size={15} />
               </button>
 
               <span>1</span>
 
-              <button aria-label="Increase quantity">
+              <button
+                type="button"
+                aria-label="Increase quantity"
+              >
                 <Plus size={15} />
               </button>
             </div>
@@ -182,12 +196,16 @@ export default function ProductQuickView({
 
           {/* ACTIONS */}
           <div className="quick-view-actions">
-            <button className="add-to-cart-button">
+            <button
+              type="button"
+              className="add-to-cart-button"
+            >
               <ShoppingBag size={18} />
               Add to cart
             </button>
 
             <button
+              type="button"
               className="quick-view-wishlist"
               aria-label="Add to wishlist"
             >
@@ -198,4 +216,6 @@ export default function ProductQuickView({
       </div>
     </div>
   );
+
+  return createPortal(quickView, document.body);
 }

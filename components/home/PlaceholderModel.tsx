@@ -1,28 +1,55 @@
 "use client";
 
-export default function PlaceholderModel() {
-  return (
-    <group
-      scale={0.68}
-      position={[0.38, 0.06, 0]}
-      rotation={[0.15, 0.55, 0]}
-    >
-      <mesh castShadow receiveShadow>
-        <torusKnotGeometry args={[1, 0.28, 320, 32]} />
+import { useGLTF } from "@react-three/drei";
+import * as THREE from "three";
 
-        <meshPhysicalMaterial
-          color="#050507"
-          metalness={0.88}
-          roughness={0.12}
-          envMapIntensity={1.8}
-          clearcoat={1}
-          clearcoatRoughness={0.08}
-          reflectivity={1}
-          sheen={0.25}
-          sheenRoughness={0.18}
-          sheenColor="#24105c"
-        />
-      </mesh>
-    </group>
+export default function PlaceholderModel() {
+  const { scene } = useGLTF("/models/dotverse-tshirt.glb");
+
+  scene.traverse((object) => {
+    if (!(object instanceof THREE.Mesh)) return;
+
+    // =====================================================
+    // HIDE HANGER ONLY
+    // =====================================================
+
+    if (object.name === "ShirtToHanger_Hanger_0") {
+      object.visible = false;
+      return;
+    }
+
+    // =====================================================
+    // STYLE THE ACTUAL T-SHIRT
+    // =====================================================
+
+    if (object.name === "ShirtToHanger_Shirt_0") {
+      object.visible = true;
+
+      object.castShadow = true;
+      object.receiveShadow = true;
+
+      const material = new THREE.MeshStandardMaterial({
+        color: new THREE.Color("#09090D"),
+        roughness: 0.62,
+        metalness: 0.02,
+
+        // Very subtle purple reflected light
+        emissive: new THREE.Color("#16002D"),
+        emissiveIntensity: 0.12,
+      });
+
+      object.material = material;
+    }
+  });
+
+  return (
+    <primitive
+      object={scene}
+      scale={3.4}
+      position={[0.35, -0.45, 0]}
+      rotation={[0, -0.18, 0]}
+    />
   );
 }
+
+useGLTF.preload("/models/dotverse-tshirt.glb");

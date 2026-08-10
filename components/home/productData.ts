@@ -18,7 +18,7 @@ export const products: Product[] = [
     originalPrice: 1499,
     badge: "NEW",
     colors: ["#171717", "#F2F2F2", "#6D28D9"],
-    image: "/products/cosmic-tee.webp",
+    image: "/images/products/cosmic-tee.png",
   },
 
   {
@@ -29,7 +29,7 @@ export const products: Product[] = [
     originalPrice: 1299,
     badge: "NEW",
     colors: ["#111111", "#292929"],
-    image: "/products/void-tee.webp",
+    image: "/images/products/void-tee.png",
   },
 
   {
@@ -39,7 +39,7 @@ export const products: Product[] = [
     price: 899,
     originalPrice: 1399,
     colors: ["#1A1A1A", "#E5E5E5", "#6D28D9"],
-    image: "/products/orbit-tee.webp",
+    image: "/images/products/orbit-tee.png",
   },
 
   {
@@ -50,6 +50,6 @@ export const products: Product[] = [
     originalPrice: 1399,
     badge: "LIMITED",
     colors: ["#171717", "#312E81"],
-    image: "/products/frequency-tee.webp",
+    image: "/images/products/frequency-tee.png",
   },
 ];
