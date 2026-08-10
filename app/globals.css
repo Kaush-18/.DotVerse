@@ -852,6 +852,23 @@ html {
 }
 
 /* =========================================================
+   MOBILE SAFE SPACING
+   767px and below
+========================================================= */
+
+@media (max-width: 767px) {
+  .new-arrivals-section {
+    padding-top: 72px;
+    overflow: visible;
+  }
+
+  .new-arrivals-title {
+    margin-top: 0;
+    transform: none;
+  }
+}
+
+/* =========================================================
    MOBILE DETAILS
    375px target
 ========================================================= */
@@ -884,10 +901,17 @@ html {
   }
 
   .new-arrivals-title {
-    font-size: clamp(3rem, 13vw, 4rem);
-    line-height: 0.9;
+    font-size: clamp(2.8rem, 12vw, 3.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.05em;
 
-    max-width: 340px;
+    width: 100%;
+    max-width: none;
+  }
+
+  .new-arrivals-title span {
+    display: block;
+    white-space: nowrap;
   }
 
   .view-products-btn {
