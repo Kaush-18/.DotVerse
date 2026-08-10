@@ -731,7 +731,18 @@ html {
   }
 
   .quick-view-btn {
-    display: none;
+    display: flex;
+
+    left: 50%;
+    bottom: 14px;
+
+    transform: translate(-50%, 0);
+
+    padding: 10px 14px;
+
+    font-size: 11px;
+
+    opacity: 1;
   }
 
   .product-badge {
