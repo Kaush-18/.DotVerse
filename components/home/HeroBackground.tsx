@@ -6,22 +6,6 @@ export default function HeroBackground() {
       {/* Base Background */}
       <div className="absolute inset-0 -z-30 bg-[#07070b]" />
 
-      {/* Purple Radial Glow */}
-      <div
-        className="
-          absolute
-          right-[-15%]
-          top-1/2
-          -z-20
-          h-[900px]
-          w-[900px]
-          -translate-y-1/2
-          rounded-full
-          bg-violet-700/20
-          blur-[180px]
-        "
-      />
-
       {/* Blue Glow */}
       <div
         className="

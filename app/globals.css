@@ -1454,6 +1454,10 @@ html {
   margin-top: clamp(28px, 3.5vh, 40px);
 }
 
+/* =========================================
+   HERO PRODUCT / 3D MODEL
+   ========================================= */
+
 .hero-model {
   position: relative;
 
@@ -1463,11 +1467,70 @@ html {
   min-height: 440px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
-  overflow: hidden;
+  overflow: visible;
+
+  isolation: isolate;
+}
+
+.hero-model::before {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  top: 52%;
+
+  width: min(620px, 75%);
+  height: min(500px, 70%);
+
+  transform: translate(-50%, -50%);
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(125, 43, 255, 0.48) 0%,
+      rgba(100, 35, 220, 0.28) 25%,
+      rgba(76, 24, 180, 0.12) 48%,
+      rgba(45, 10, 100, 0.04) 68%,
+      transparent 78%
+    );
+
+  filter: blur(28px);
+
+  opacity: 0.9;
+
+  z-index: -1;
+
+  pointer-events: none;
+}
+
+.hero-model::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 38%;
+  height: 35%;
+
+  transform: translate(-50%, -50%);
+
+  background: radial-gradient(
+    ellipse,
+    rgba(169, 92, 255, 0.2),
+    transparent 70%
+  );
+
+  filter: blur(35px);
+
+  z-index: -1;
+
+  pointer-events: none;
 }
 
 .hero-model canvas {
@@ -1475,61 +1538,185 @@ html {
 
   width: 100% !important;
   height: 100% !important;
+
+  position: relative;
+  z-index: 1;
 }
+
+/* =========================================
+   HERO MOBILE
+   ========================================= */
+
+@media (max-width: 768px) {
+  .hero-model {
+    min-height: 280px;
+  }
+
+  .hero-model::before {
+    width: 85%;
+    height: 75%;
+
+    top: 50%;
+
+    filter: blur(24px);
+  }
+
+  .hero-model::after {
+    width: 50%;
+    height: 40%;
+  }
+
+  .scroll-indicator {
+    bottom: 10px;
+  }
+
+  .scroll-indicator-line {
+    height: 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-model {
+    min-height: 250px;
+  }
+
+  .scroll-indicator {
+    bottom: 8px;
+  }
+
+  .scroll-indicator-label {
+    font-size: 8px;
+    letter-spacing: 0.35em;
+  }
+}
+
+/* =========================================
+   SCROLL INDICATOR
+   ========================================= */
 
 .scroll-indicator {
   position: absolute;
-
   left: 50%;
-  bottom: 14px;
+  bottom: 24px;
 
   transform: translateX(-50%);
-
-  z-index: 30;
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
+  z-index: 50;
+
   pointer-events: none;
+
+  width: max-content;
+
+  color: rgba(176, 123, 255, 0.8);
+}
+
+.scroll-indicator-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 9px;
+  font-weight: 500;
+
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+
+  opacity: 0.75;
+}
+
+.scroll-indicator-dot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #a875ff;
+
+  box-shadow:
+    0 0 8px rgba(168, 117, 255, 0.8),
+    0 0 16px rgba(168, 117, 255, 0.35);
+
+  animation: scrollDotPulse 1.8s ease-in-out infinite;
 }
 
 .scroll-indicator-line {
-  width: 1px;
-  height: 26px;
+  position: relative;
 
-  margin-top: 7px;
+  width: 1px;
+  height: 25px;
+
+  margin-top: 9px;
 
   background: linear-gradient(
     to bottom,
-    rgba(150, 75, 255, 0.9),
-    rgba(150, 75, 255, 0)
+    rgba(168, 117, 255, 0.9),
+    rgba(168, 117, 255, 0.25)
   );
 
-  animation: scrollPulse 1.8s ease-in-out infinite;
+  overflow: visible;
 }
 
-@keyframes scrollPulse {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: scaleY(0.65);
+.scroll-indicator-line::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 0;
+
+  width: 7px;
+  height: 7px;
+
+  border-right: 1px solid rgba(168, 117, 255, 0.9);
+  border-bottom: 1px solid rgba(168, 117, 255, 0.9);
+
+  transform:
+    translate(-50%, -2px)
+    rotate(45deg);
+
+  animation: scrollArrow 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollArrow {
+  0% {
+    opacity: 0.25;
+    transform:
+      translate(-50%, -6px)
+      rotate(45deg);
   }
 
   50% {
     opacity: 1;
-    transform: scaleY(1);
+    transform:
+      translate(-50%, 0)
+      rotate(45deg);
+  }
+
+  100% {
+    opacity: 0.25;
+    transform:
+      translate(-50%, 4px)
+      rotate(45deg);
   }
 }
 
-.scroll-indicator-text {
-  font-size: 8px;
+@keyframes scrollDotPulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
 
-  letter-spacing: 0.35em;
-
-  color: rgba(170, 110, 255, 0.75);
-
-  white-space: nowrap;
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* =========================================================

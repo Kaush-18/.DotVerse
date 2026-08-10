@@ -2,7 +2,6 @@
 
 import HeroContent from "./HeroContent";
 import HeroScene from "./HeroScene";
-import HeroGlow from "./HeroGlow";
 import HeroAurora from "./HeroAurora";
 import ScrollIndicator from "./ScrollIndicator";
 
@@ -13,7 +12,6 @@ export default function Hero() {
           BACKGROUND ATMOSPHERE
       ===================================================== */}
 
-      <HeroGlow />
       <HeroAurora />
 
       {/* =====================================================
