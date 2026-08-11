@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import Container from "@/components/layout/Container";
 import Logo from "@/components/ui/Logo";
 
@@ -10,16 +12,18 @@ import {
 } from "lucide-react";
 
 import { motion } from "framer-motion";
+import { useCart } from "@/context/CartContext";
 
 const navLinks = [
-  "Home",
-  "Shop",
-  "Collections",
-  "About",
-  "Contact",
+  { label: "Home", href: "/" },
+  { label: "Shop", href: "/shop" },
+  { label: "Collections", href: "#" },
+  { label: "About", href: "#" },
+  { label: "Contact", href: "#" },
 ];
 
 export default function Navbar() {
+  const { totalItems } = useCart();
   return (
     <header
       className="
@@ -99,9 +103,9 @@ export default function Navbar() {
           >
 
             {navLinks.map((item) => (
-              <a
-                key={item}
-                href="#"
+              <Link
+                key={item.label}
+                href={item.href}
                 className="
                   group
                   relative
@@ -116,7 +120,7 @@ export default function Navbar() {
                   lg:text-[15px]
                 "
               >
-                {item}
+                {item.label}
 
                 {/* Underline */}
                 <span
@@ -133,7 +137,7 @@ export default function Navbar() {
                     group-hover:w-full
                   "
                 />
-              </a>
+              </Link>
             ))}
 
           </motion.nav>
@@ -195,11 +199,11 @@ export default function Navbar() {
 
             {/* Shopping bag */}
 
-            <button
-              type="button"
-              aria-label="Shopping bag"
+            <Link
+              href="/cart"
               className="
                 group
+                relative
                 rounded-full
                 p-2.5
                 text-white/65
@@ -208,6 +212,7 @@ export default function Navbar() {
                 hover:bg-white/[0.07]
                 hover:text-white
               "
+              aria-label="Shopping bag"
             >
               <ShoppingBag
                 size={20}
@@ -218,7 +223,28 @@ export default function Navbar() {
                   group-hover:scale-110
                 "
               />
-            </button>
+              {totalItems > 0 && (
+                <span
+                  className="
+                    absolute
+                    top-0
+                    right-0
+                    flex
+                    h-4
+                    w-4
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-violet-600
+                    text-[10px]
+                    font-bold
+                    text-white
+                  "
+                >
+                  {totalItems}
+                </span>
+              )}
+            </Link>
 
 
             {/* Account */}

@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 
-import type { Product } from "./productData";
+import type { Product } from "@/types/product";
 
 interface ProductCardProps {
   product: Product;
@@ -70,15 +71,19 @@ export default function ProductCard({
         </button>
 
         {/* Image */}
-        <div className="product-image">
+        <Link
+          href={`/products/${product.slug}`}
+          className="product-image"
+          aria-label={`View ${product.name}`}
+        >
           <Image
-            src={product.image}
+            src={product.images[0]}
             alt={product.name}
             fill
             sizes="(max-width: 700px) 50vw, 25vw"
             className="product-img"
           />
-        </div>
+        </Link>
 
         {/* Quick View */}
         <button
@@ -106,7 +111,9 @@ export default function ProductCard({
         </div>
 
         <h3 className="product-name">
-          {product.name}
+          <Link href={`/products/${product.slug}`}>
+            {product.name}
+          </Link>
         </h3>
 
         {product.originalPrice && (
@@ -121,15 +128,15 @@ export default function ProductCard({
           <div className="color-options">
             {product.colors.map((color, colorIndex) => (
               <button
-                key={`${product.id}-${color}`}
+                key={`${product.id}-${color.value}`}
                 type="button"
                 className={`color-dot ${
                   colorIndex === 0 ? "active" : ""
                 }`}
                 style={{
-                  backgroundColor: color,
+                  backgroundColor: color.value,
                 }}
-                aria-label={`Color ${colorIndex + 1}`}
+                aria-label={color.name}
               />
             ))}
           </div>

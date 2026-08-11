@@ -386,6 +386,7 @@ export default function CollectionCard({
             >
               →
             </span>
+            
           </button>
 
           {/* Background number */}

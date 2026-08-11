@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { products } from "./productData";
-import type { Product } from "./productData";
-import ProductCard from "./ProductCard";
+import { products } from "@/data/products";
+import type { Product } from "@/types/product";
+import ProductGrid from "@/components/product/ProductGrid";
 import ProductQuickView from "./ProductQuickView";
 import Container from "@/components/layout/Container";
 
@@ -33,28 +34,22 @@ export default function NewArrivals() {
             </h2>
           </div>
 
-          <button
-            type="button"
+          <Link
+            href="/shop"
             className="view-products-btn"
           >
             <span>View all products</span>
             <ArrowRight size={18} />
-          </button>
+          </Link>
         </div>
 
         {/* =====================================================
             PRODUCTS
         ===================================================== */}
-        <div className="products-grid">
-          {products.map((product, index) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              index={index}
-              onQuickView={setSelectedProduct}
-            />
-          ))}
-        </div>
+        <ProductGrid
+            products={products.filter((product) => product.featured).slice(0, 4)}
+            onQuickView={setSelectedProduct}
+          />
       </Container>
 
       {/* =====================================================

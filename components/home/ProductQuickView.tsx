@@ -11,7 +11,7 @@ import {
   Minus,
 } from "lucide-react";
 
-import type { Product } from "./productData";
+import type { Product } from "@/types/product";
 
 type ProductQuickViewProps = {
   product: Product | null;
@@ -78,7 +78,7 @@ export default function ProductQuickView({
         {/* IMAGE */}
         <div className="quick-view-image">
           <Image
-            src={product.image}
+            src={product.images[0]}
             alt={product.name}
             fill
             sizes="50vw"
@@ -110,16 +110,14 @@ export default function ProductQuickView({
           <div className="quick-view-divider" />
 
           <p className="quick-view-description">
-            Designed for the ones who move beyond the
-            ordinary. Premium streetwear built around the
-            .DotVerse identity.
+            {product.description}
           </p>
 
           {/* COLORS */}
           <div className="quick-view-option">
             <div className="quick-view-option-header">
               <span>Color</span>
-              <span>Black</span>
+              <span>{product.colors[0]?.name || "Black"}</span>
             </div>
 
             <div className="quick-view-colors">
@@ -131,9 +129,9 @@ export default function ProductQuickView({
                     index === 0 ? "selected" : ""
                   }`}
                   style={{
-                    backgroundColor: color,
+                    backgroundColor: color.value,
                   }}
-                  aria-label={`Color ${index + 1}`}
+                  aria-label={color.name}
                 />
               ))}
             </div>
@@ -153,8 +151,7 @@ export default function ProductQuickView({
             </div>
 
             <div className="size-grid">
-              {["S", "M", "L", "XL", "XXL"].map(
-                (size, index) => (
+              {product.sizes.map((size, index) => (
                   <button
                     key={size}
                     type="button"
@@ -164,8 +161,7 @@ export default function ProductQuickView({
                   >
                     {size}
                   </button>
-                )
-              )}
+              ))}
             </div>
           </div>
 
