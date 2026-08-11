@@ -93,9 +93,12 @@ export default function CartPage() {
                     <span className="text-white">Total</span>
                     <span className="text-white">₹{subtotal.toLocaleString("en-IN")}</span>
                   </div>
-                  <button className="w-full py-4 bg-violet-600 rounded-full font-bold text-white mt-6">
+                  <Link
+                    href="/checkout"
+                    className="block w-full py-4 bg-violet-600 rounded-full font-bold text-center text-white mt-6 hover:bg-violet-700 transition-colors"
+                  >
                     Proceed to checkout
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
