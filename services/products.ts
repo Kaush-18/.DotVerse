@@ -127,15 +127,18 @@ export async function getNewProducts(): Promise<Product[]> {
 
 export async function getRelatedProducts(
   productId: string,
-  collectionId: string,
+  collectionName: string,
+  categoryName: string,
   limit = 3,
 ): Promise<Product[]> {
-  const products = await prisma.product.findMany({
+  const sameCollection = await prisma.product.findMany({
     where: {
       id: {
         not: productId,
       },
-      collectionId,
+      collection: {
+        name: collectionName,
+      },
     },
     include: {
       category: true,
@@ -153,5 +156,39 @@ export async function getRelatedProducts(
     take: limit,
   });
 
-  return products.map(mapProduct);
+  if (sameCollection.length >= limit) {
+    return sameCollection.map(mapProduct);
+  }
+
+  const existingIds = [
+    productId,
+    ...sameCollection.map((product) => product.id),
+  ];
+
+  const sameCategory = await prisma.product.findMany({
+    where: {
+      id: {
+        notIn: existingIds,
+      },
+      category: {
+        name: categoryName,
+      },
+    },
+    include: {
+      category: true,
+      collection: true,
+      images: {
+        orderBy: {
+          position: "asc",
+        },
+      },
+      variants: true,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+    take: limit - sameCollection.length,
+  });
+
+  return [...sameCollection, ...sameCategory].map(mapProduct);
 }

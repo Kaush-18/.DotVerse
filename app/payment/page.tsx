@@ -1,0 +1,99 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
+import Container from "@/components/layout/Container";
+import Navbar from "@/components/layout/Navbar";
+import PageReveal from "@/components/animations/PageReveal";
+
+export default function PaymentPage() {
+  const router = useRouter();
+  const { items, subtotal } = useCart();
+  const total = subtotal; // Simplified
+
+  return (
+    <PageReveal>
+      <Navbar />
+
+      <main className="py-16">
+        <div className="mx-auto max-w-5xl px-4">
+          <h1 className="mb-10 text-3xl font-bold">PAYMENT</h1>
+          
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+            {/* Payment form placeholder */}
+            <section className="space-y-6">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+                <h2 className="text-lg font-semibold mb-4">Payment Method</h2>
+                <p className="text-white/60">
+                  Select your payment method. (Gateway integration coming soon)
+                </p>
+              </div>
+            </section>
+
+            {/* Order summary */}
+            <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+              <h2 className="mb-6 text-lg font-semibold">
+                YOUR ORDER
+              </h2>
+
+              <div className="space-y-4">
+                {items.map((item) => (
+                                <div
+                                  key={`${item.id}-${item.size}-${item.color}`}
+                                  className="flex items-center justify-between gap-4"
+                                >
+
+                    <div>
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-sm text-white/50">
+                        {item.color} / {item.size} × {item.quantity}
+                      </p>
+                    </div>
+
+                    <p className="font-medium">
+                      ₹{item.price * item.quantity}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="my-6 border-t border-white/10" />
+
+              <div className="flex justify-between text-sm text-white/60">
+                <span>Subtotal</span>
+                <span>₹{subtotal}</span>
+              </div>
+
+              <div className="mt-3 flex justify-between text-sm text-white/60">
+                <span>Shipping</span>
+                <span>Free</span>
+              </div>
+
+              <div className="my-5 border-t border-white/10" />
+
+              <div className="flex justify-between text-lg font-semibold">
+                <span>Total</span>
+                <span>₹{total}</span>
+              </div>
+
+              <button
+                type="button"
+                className="mt-6 w-full rounded-full bg-violet-600 px-6 py-4 font-semibold transition hover:bg-violet-500"
+              >
+                PLACE ORDER
+              </button>
+
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="mt-3 w-full rounded-full border border-white/10 px-6 py-4 text-sm text-white/70 transition hover:bg-white/5"
+              >
+                Back to checkout
+              </button>
+            </aside>
+          </div>
+        </div>
+      </main>
+    </PageReveal>
+  );
+}

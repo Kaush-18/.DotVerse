@@ -7,15 +7,18 @@ import { useState } from "react";
 import Container from "@/components/layout/Container";
 import Navbar from "@/components/layout/Navbar";
 import PageReveal from "@/components/animations/PageReveal";
+import ProductGrid from "@/components/product/ProductGrid";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types/product";
 
 interface ProductDetailClientProps {
   product: Product;
+  relatedProducts: Product[];
 }
 
 export default function ProductDetailClient({
   product,
+  relatedProducts,
 }: ProductDetailClientProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -219,6 +222,19 @@ export default function ProductDetailClient({
               </div>
             </div>
           </div>
+
+          <section className="border-t border-white/[0.08] py-16 sm:py-20">
+            <div className="mb-8 flex items-center gap-3">
+              <span className="h-px w-8 bg-violet-500" />
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-violet-300">
+                More from the universe
+              </p>
+            </div>
+
+            {relatedProducts.length > 0 && (
+              <ProductGrid products={relatedProducts} />
+            )}
+          </section>
         </Container>
       </main>
     </PageReveal>

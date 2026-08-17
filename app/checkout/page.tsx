@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import Container from "@/components/layout/Container";
 import Navbar from "@/components/layout/Navbar";
@@ -19,6 +20,7 @@ type CheckoutForm = {
 };
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { items, subtotal } = useCart();
   const [formData, setFormData] = useState<CheckoutForm>({
     email: "",
@@ -91,7 +93,11 @@ export default function CheckoutPage() {
                     <span>TOTAL</span>
                     <span>₹{subtotal.toLocaleString("en-IN")}</span>
                   </div>
-                  <button className="w-full py-4 bg-violet-600 rounded-full font-bold text-white mt-6 hover:bg-violet-700 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => router.push("/payment")}
+                    className="w-full py-4 bg-violet-600 rounded-full font-bold text-white mt-6 hover:bg-violet-700 transition-colors"
+                  >
                     CONTINUE TO PAYMENT
                   </button>
                 </div>
