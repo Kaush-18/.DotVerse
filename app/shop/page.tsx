@@ -2,9 +2,10 @@ import Container from "@/components/layout/Container";
 import Navbar from "@/components/layout/Navbar";
 import PageReveal from "@/components/animations/PageReveal";
 import ProductGrid from "@/components/product/ProductGrid";
-import { products } from "@/data/products";
+import { getProducts } from "@/services/products";
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const products = await getProducts();
   return (
     <PageReveal>
       <Navbar />
