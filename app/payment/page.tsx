@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
@@ -11,6 +12,8 @@ export default function PaymentPage() {
   const router = useRouter();
   const { items, subtotal } = useCart();
   const { formData } = useCheckout();
+  const [paymentMethod, setPaymentMethod] =
+    useState<"COD" | "UPI" | "CARD">("COD");
   const total = subtotal; // Simplified
 
   const hasCheckoutDetails =
@@ -75,10 +78,58 @@ export default function PaymentPage() {
             {/* Payment form placeholder */}
             <section className="space-y-6">
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-                <h2 className="text-lg font-semibold mb-4">Payment Method</h2>
-                <p className="text-white/60">
-                  Select your payment method. (Gateway integration coming soon)
-                </p>
+                <h2 className="mb-6 text-lg font-semibold">
+                  Payment Method
+                </h2>
+
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("COD")}
+                    className={`w-full rounded-xl border p-5 text-left transition ${
+                      paymentMethod === "COD"
+                        ? "border-violet-500 bg-violet-500/10"
+                        : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                    }`}
+                  >
+                    <p className="font-medium">Cash on Delivery</p>
+                    <p className="mt-1 text-sm text-white/50">
+                      Pay when your order arrives.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("UPI")}
+                    className={`w-full rounded-xl border p-5 text-left transition ${
+                      paymentMethod === "UPI"
+                        ? "border-violet-500 bg-violet-500/10"
+                        : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                    }`}
+                  >
+                    <p className="font-medium">UPI</p>
+                    <p className="mt-1 text-sm text-white/50">
+                      Google Pay, PhonePe, Paytm and other UPI apps.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("CARD")}
+                    className={`w-full rounded-xl border p-5 text-left transition ${
+                      paymentMethod === "CARD"
+                        ? "border-violet-500 bg-violet-500/10"
+                        : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                    }`}
+                  >
+                    <p className="font-medium">
+                      Credit / Debit Card
+                    </p>
+                    <p className="mt-1 text-sm text-white/50">
+                      Visa, Mastercard, RuPay and more.
+                    </p>
+                  </button>
+                </div>
               </div>
             </section>
 
