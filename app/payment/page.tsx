@@ -10,10 +10,18 @@ import PageReveal from "@/components/animations/PageReveal";
 
 export default function PaymentPage() {
   const router = useRouter();
-  const { items, subtotal } = useCart();
+  const { items, subtotal, clearCart } = useCart();
   const { formData } = useCheckout();
+
   const [paymentMethod, setPaymentMethod] =
     useState<"COD" | "UPI" | "CARD">("COD");
+
+  const [isPlacingOrder, setIsPlacingOrder] =
+    useState(false);
+
+  const [orderError, setOrderError] =
+    useState("");
+
   const total = subtotal; // Simplified
 
   const hasCheckoutDetails =
@@ -65,6 +73,62 @@ export default function PaymentPage() {
       </main>
     );
   }
+
+  const handlePlaceOrder = async () => {
+    if (isPlacingOrder) return;
+
+    setIsPlacingOrder(true);
+    setOrderError("");
+
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          paymentMethod,
+          items: items.map((item) => ({
+            id: item.id,
+            size: item.size,
+            color: item.color,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || "Failed to place order."
+        );
+      }
+
+      console.log("Order created:", data.order);
+
+      // Clear cart AFTER successful order creation
+      clearCart();
+
+      // Then show confirmation page
+      router.push(
+        `/order-success?order=${encodeURIComponent(
+          data.order.orderNumber
+        )}`
+      );
+    } catch (error) {
+      console.error("Place order failed:", error);
+
+      setOrderError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong while placing your order."
+      );
+    } finally {
+      setIsPlacingOrder(false);
+    }
+  };
 
   return (
     <PageReveal>
@@ -181,10 +245,18 @@ export default function PaymentPage() {
 
               <button
                 type="button"
-                className="mt-6 w-full rounded-full bg-violet-600 px-6 py-4 font-semibold transition hover:bg-violet-500"
+                onClick={handlePlaceOrder}
+                disabled={isPlacingOrder}
+                className="mt-6 w-full rounded-full bg-violet-600 px-6 py-4 font-semibold transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                PLACE ORDER
+                {isPlacingOrder ? "PLACING ORDER..." : "PLACE ORDER"}
               </button>
+
+              {orderError && (
+                <p className="mt-3 text-sm text-red-400">
+                  {orderError}
+                </p>
+              )}
 
               <button
                 type="button"

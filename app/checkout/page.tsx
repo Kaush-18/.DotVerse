@@ -12,8 +12,31 @@ export default function CheckoutPage() {
   const { items, subtotal } = useCart();
   const { formData, setFormData } = useCheckout();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleContinue = () => {
+    if (
+      !formData.email ||
+      !formData.phone ||
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.address ||
+      !formData.city ||
+      !formData.state ||
+      !formData.postalCode
+    ) {
+      alert("Please complete all required checkout details.");
+      return;
+    }
+
+    router.push("/payment");
   };
 
   return (
@@ -22,60 +45,168 @@ export default function CheckoutPage() {
 
       <main className="pt-20 pb-20">
         <Container>
-          <h1 className="text-4xl font-bold text-white mb-12">CHECKOUT</h1>
+          <h1 className="mb-12 text-4xl font-bold text-white">
+            CHECKOUT
+          </h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Form */}
-            <div className="lg:col-span-2 space-y-8">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+            {/* Checkout Form */}
+            <div className="space-y-8 lg:col-span-2">
+              {/* Contact */}
               <div>
-                <h2 className="text-sm font-bold text-violet-400 uppercase tracking-widest mb-4">CONTACT</h2>
+                <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-violet-400">
+                  CONTACT
+                </h2>
+
                 <div className="space-y-4">
-                  <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white" />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white outline-none transition focus:border-violet-500"
+                  />
+
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Phone number"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white outline-none transition focus:border-violet-500"
+                  />
                 </div>
               </div>
-              
+
+              {/* Delivery */}
               <div>
-                <h2 className="text-sm font-bold text-violet-400 uppercase tracking-widest mb-4">DELIVERY</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white" />
-                  <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white" />
-                  <input type="text" name="address" placeholder="Address" value={formData.address} onChange={handleChange} className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white sm:col-span-2" />
-                  <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleChange} className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white" />
-                  <input type="text" name="postalCode" placeholder="PIN" value={formData.postalCode} onChange={handleChange} className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white" />
+                <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-violet-400">
+                  DELIVERY
+                </h2>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="First name"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white outline-none transition focus:border-violet-500"
+                  />
+
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Last name"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white outline-none transition focus:border-violet-500"
+                  />
+
+                  <input
+                    type="text"
+                    name="address"
+                    placeholder="Address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white outline-none transition focus:border-violet-500 sm:col-span-2"
+                  />
+
+                  <input
+                    type="text"
+                    name="apartment"
+                    placeholder="Apartment, suite, etc. (optional)"
+                    value={formData.apartment || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white outline-none transition focus:border-violet-500 sm:col-span-2"
+                  />
+
+                  <input
+                    type="text"
+                    name="city"
+                    placeholder="City"
+                    value={formData.city}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white outline-none transition focus:border-violet-500"
+                  />
+
+                  <input
+                    type="text"
+                    name="state"
+                    placeholder="State"
+                    value={formData.state}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white outline-none transition focus:border-violet-500"
+                  />
+
+                  <input
+                    type="text"
+                    name="postalCode"
+                    placeholder="PIN code"
+                    value={formData.postalCode}
+                    onChange={handleChange}
+                    inputMode="numeric"
+                    maxLength={6}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white outline-none transition focus:border-violet-500"
+                  />
                 </div>
               </div>
             </div>
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="p-6 rounded-2xl border border-white/10 bg-white/5 h-fit sticky top-28">
-                <h2 className="text-sm font-bold text-violet-400 uppercase tracking-widest mb-6">YOUR ORDER</h2>
-                <div className="space-y-4 mb-6">
+              <div className="sticky top-28 h-fit rounded-2xl border border-white/10 bg-white/5 p-6">
+                <h2 className="mb-6 text-sm font-bold uppercase tracking-widest text-violet-400">
+                  YOUR ORDER
+                </h2>
+
+                <div className="mb-6 space-y-4">
                   {items.map((item) => (
-                    <div key={`${item.id}-${item.size}-${item.color}`} className="flex justify-between text-white/80">
-                      <span>{item.name} × {item.quantity}</span>
-                      <span>₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
+                    <div
+                      key={`${item.id}-${item.size}-${item.color}`}
+                      className="flex justify-between gap-4 text-white/80"
+                    >
+                      <span>
+                        {item.name} × {item.quantity}
+                      </span>
+
+                      <span className="shrink-0">
+                        ₹
+                        {(
+                          item.price * item.quantity
+                        ).toLocaleString("en-IN")}
+                      </span>
                     </div>
                   ))}
                 </div>
-                <hr className="border-white/10 mb-6" />
+
+                <hr className="mb-6 border-white/10" />
+
                 <div className="space-y-4">
                   <div className="flex justify-between text-white/60">
                     <span>Subtotal</span>
-                    <span>₹{subtotal.toLocaleString("en-IN")}</span>
+                    <span>
+                      ₹{subtotal.toLocaleString("en-IN")}
+                    </span>
                   </div>
+
                   <div className="flex justify-between text-white/60">
                     <span>Shipping</span>
                     <span>Free</span>
                   </div>
+
                   <div className="flex justify-between text-lg font-bold text-white">
                     <span>TOTAL</span>
-                    <span>₹{subtotal.toLocaleString("en-IN")}</span>
+                    <span>
+                      ₹{subtotal.toLocaleString("en-IN")}
+                    </span>
                   </div>
+
                   <button
                     type="button"
-                    onClick={() => router.push("/payment")}
-                    className="w-full py-4 bg-violet-600 rounded-full font-bold text-white mt-6 hover:bg-violet-700 transition-colors"
+                    onClick={handleContinue}
+                    className="mt-6 w-full rounded-full bg-violet-600 py-4 font-bold text-white transition-colors hover:bg-violet-700"
                   >
                     CONTINUE TO PAYMENT
                   </button>
