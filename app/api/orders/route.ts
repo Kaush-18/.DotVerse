@@ -10,12 +10,23 @@ type OrderItemInput = {
 
 type CreateOrderRequest = {
   email: string;
+  phone: string;
+
+
   firstName: string;
   lastName: string;
+
+
   address: string;
+  apartment?: string;
   city: string;
+  state: string;
   postalCode: string;
+
+
   paymentMethod: "COD" | "UPI" | "CARD";
+
+
   items: OrderItemInput[];
 };
 
@@ -32,10 +43,12 @@ export async function POST(request: Request) {
 
     if (
       !body.email ||
+      !body.phone ||
       !body.firstName ||
       !body.lastName ||
       !body.address ||
       !body.city ||
+      !body.state ||
       !body.postalCode
     ) {
       return NextResponse.json(
@@ -208,10 +221,17 @@ export async function POST(request: Request) {
           orderNumber: generateOrderNumber(),
 
           email: body.email,
+          phone: body.phone,
+
+
           firstName: body.firstName,
           lastName: body.lastName,
+
+
           address: body.address,
+          apartment: body.apartment || null,
           city: body.city,
+          state: body.state,
           postalCode: body.postalCode,
 
           subtotal,

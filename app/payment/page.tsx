@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { useCheckout } from "@/context/CheckoutContext";
 import Container from "@/components/layout/Container";
 import Navbar from "@/components/layout/Navbar";
 import PageReveal from "@/components/animations/PageReveal";
@@ -9,7 +10,58 @@ import PageReveal from "@/components/animations/PageReveal";
 export default function PaymentPage() {
   const router = useRouter();
   const { items, subtotal } = useCart();
+  const { formData } = useCheckout();
   const total = subtotal; // Simplified
+
+  const hasCheckoutDetails =
+    formData.email &&
+    formData.phone &&
+    formData.firstName &&
+    formData.lastName &&
+    formData.address &&
+    formData.city &&
+    formData.state &&
+    formData.postalCode;
+
+  if (items.length === 0) {
+    return (
+      <main className="min-h-screen bg-[#07040d] px-6 py-24 text-white">
+        <div className="mx-auto max-w-5xl">
+          <h1 className="text-4xl font-semibold">Your cart is empty</h1>
+
+          <button
+            onClick={() => router.push("/shop")}
+            className="mt-8 rounded-full bg-violet-600 px-8 py-4 font-medium transition hover:bg-violet-500"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (!hasCheckoutDetails) {
+    return (
+      <main className="min-h-screen bg-[#07040d] px-6 py-24 text-white">
+        <div className="mx-auto max-w-5xl">
+          <h1 className="text-4xl font-semibold">
+            Checkout details are incomplete
+          </h1>
+
+          <p className="mt-3 text-white/50">
+            Please complete your delivery information before continuing.
+          </p>
+
+          <button
+            onClick={() => router.push("/checkout")}
+            className="mt-8 rounded-full bg-violet-600 px-8 py-4 font-medium transition hover:bg-violet-500"
+          >
+            Back to Checkout
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <PageReveal>

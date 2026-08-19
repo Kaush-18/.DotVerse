@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
+import { CheckoutProvider } from "@/context/CheckoutContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,9 +45,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen" suppressHydrationWarning>
-        <CartProvider>
-          {children}
-        </CartProvider>
+        <CheckoutProvider>
+          <CartProvider>
+            {children}
+          </CartProvider>
+        </CheckoutProvider>
       </body>
     </html>
   );

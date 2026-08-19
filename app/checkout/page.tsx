@@ -1,37 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { useCheckout } from "@/context/CheckoutContext";
 import Container from "@/components/layout/Container";
 import Navbar from "@/components/layout/Navbar";
 import PageReveal from "@/components/animations/PageReveal";
 
-type CheckoutForm = {
-  email: string;
-  firstName: string;
-  lastName: string;
-  address: string;
-  apartment?: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  phone: string;
-};
-
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal } = useCart();
-  const [formData, setFormData] = useState<CheckoutForm>({
-    email: "",
-    firstName: "",
-    lastName: "",
-    address: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    phone: "",
-  });
+  const { formData, setFormData } = useCheckout();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

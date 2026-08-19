@@ -105,23 +105,32 @@ model Order {
   id            String        @id @default(cuid())
   orderNumber   String        @unique
 
+
   email         String
+  phone         String
+
 
   firstName     String
   lastName      String
   address       String
+  apartment     String?
   city          String
+  state         String
   postalCode    String
+
 
   subtotal      Int
   shipping      Int           @default(0)
   total         Int
 
+
   status        OrderStatus   @default(PENDING)
   paymentStatus PaymentStatus @default(PENDING)
   paymentMethod PaymentMethod @default(COD)
 
+
   items         OrderItem[]
+
 
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
