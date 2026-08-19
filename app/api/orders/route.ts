@@ -1,34 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-type OrderItemInput = {
-  id: string;
-  size: string;
-  color: string;
-  quantity: number;
-};
-
-type CreateOrderRequest = {
-  email: string;
-  phone: string;
-
-
-  firstName: string;
-  lastName: string;
-
-
-  address: string;
-  apartment?: string;
-  city: string;
-  state: string;
-  postalCode: string;
-
-
-  paymentMethod: "COD" | "UPI" | "CARD";
-
-
-  items: OrderItemInput[];
-};
+import {
+  OrderValidationError,
+  parseCreateOrderRequest,
+} from "@/lib/validation/order";
 
 function generateOrderNumber() {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -39,46 +14,9 @@ function generateOrderNumber() {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as CreateOrderRequest;
+    const rawBody: unknown = await request.json();
 
-    if (
-      !body.email ||
-      !body.phone ||
-      !body.firstName ||
-      !body.lastName ||
-      !body.address ||
-      !body.city ||
-      !body.state ||
-      !body.postalCode
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Missing required customer or delivery information.",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (!body.items || body.items.length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Your cart is empty.",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (!["COD", "UPI", "CARD"].includes(body.paymentMethod)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid payment method.",
-        },
-        { status: 400 },
-      );
-    }
+    const body = parseCreateOrderRequest(rawBody);
 
     const productIds = body.items.map((item) => item.id);
 
@@ -269,15 +207,22 @@ export async function POST(request: Request) {
       { status: 201 },
     );
   } catch (error) {
+    if (error instanceof OrderValidationError) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: error.message,
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("Order creation failed:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to create order.",
+        message: "Failed to create order.",
       },
       { status: 500 },
     );
