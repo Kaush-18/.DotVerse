@@ -190,7 +190,7 @@ export async function POST(request: Request) {
       return tx.order.create({
         data: {
           orderNumber: generateOrderNumber(),
-          idempotencyKey,
+          idempotencyKey: idempotencyKey!,
 
           email: body.email,
           phone: body.phone,
@@ -214,6 +214,7 @@ export async function POST(request: Request) {
             create: orderItems,
           },
         },
+
         include: {
           items: true,
         },
