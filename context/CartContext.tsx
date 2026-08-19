@@ -47,16 +47,23 @@ export function CartProvider({
 }: {
   children: ReactNode;
 }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-
-  // Load cart
-  useEffect(() => {
-    const savedCart = localStorage.getItem("dotverse-cart");
-
-    if (savedCart) {
-      setItems(JSON.parse(savedCart));
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window === "undefined") {
+      return [];
     }
-  }, []);
+
+    try {
+      const savedCart = localStorage.getItem("dotverse-cart");
+
+      if (!savedCart) {
+        return [];
+      }
+
+      return JSON.parse(savedCart) as CartItem[];
+    } catch {
+      return [];
+    }
+  });
 
   // Save cart
   useEffect(() => {

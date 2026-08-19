@@ -13,10 +13,46 @@ function generateOrderNumber() {
 }
 
 export async function POST(request: Request) {
+  let idempotencyKey: string | null = null;
+
   try {
     const rawBody: unknown = await request.json();
 
     const body = parseCreateOrderRequest(rawBody);
+
+    idempotencyKey = request.headers.get("Idempotency-Key");
+
+    if (!idempotencyKey) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Missing Idempotency-Key.",
+        },
+        { status: 400 },
+      );
+    }
+
+    const existingOrder = await prisma.order.findUnique({
+      where: {
+        idempotencyKey,
+      },
+      select: {
+        id: true,
+        orderNumber: true,
+        status: true,
+        paymentStatus: true,
+        total: true,
+      },
+    });
+
+    if (existingOrder) {
+      return NextResponse.json({
+        success: true,
+        message: "Order already exists.",
+        order: existingOrder,
+        idempotent: true,
+      });
+    }
 
     const productIds = body.items.map((item) => item.id);
 
@@ -48,10 +84,7 @@ export async function POST(request: Request) {
     }[] = [];
 
     for (const item of body.items) {
-      if (
-        !Number.isInteger(item.quantity) ||
-        item.quantity <= 0
-      ) {
+      if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
         return NextResponse.json(
           {
             success: false,
@@ -157,14 +190,13 @@ export async function POST(request: Request) {
       return tx.order.create({
         data: {
           orderNumber: generateOrderNumber(),
+          idempotencyKey,
 
           email: body.email,
           phone: body.phone,
 
-
           firstName: body.firstName,
           lastName: body.lastName,
-
 
           address: body.address,
           apartment: body.apartment || null,
@@ -215,6 +247,35 @@ export async function POST(request: Request) {
         },
         { status: 400 },
       );
+    }
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      const existingOrder = await prisma.order.findUnique({
+        where: {
+          idempotencyKey: idempotencyKey!,
+        },
+        select: {
+          id: true,
+          orderNumber: true,
+          status: true,
+          paymentStatus: true,
+          total: true,
+        },
+      });
+
+      if (existingOrder) {
+        return NextResponse.json({
+          success: true,
+          message: "Order already exists.",
+          order: existingOrder,
+          idempotent: true,
+        });
+      }
     }
 
     console.error("Order creation failed:", error);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
@@ -21,6 +21,8 @@ export default function PaymentPage() {
 
   const [orderError, setOrderError] =
     useState("");
+
+  const idempotencyKeyRef = useRef(crypto.randomUUID());
 
   const total = subtotal; // Simplified
 
@@ -85,6 +87,7 @@ export default function PaymentPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Idempotency-Key": idempotencyKeyRef.current,
         },
         body: JSON.stringify({
           ...formData,
