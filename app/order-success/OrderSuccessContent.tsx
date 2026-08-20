@@ -33,7 +33,7 @@ interface Order {
 export default function OrderSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const orderNumber = searchParams.get("orderNumber");
+  const orderNumber = searchParams.get("order");
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
