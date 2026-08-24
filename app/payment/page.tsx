@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
-import Container from "@/components/layout/Container";
 import PageReveal from "@/components/animations/PageReveal";
 
 export default function PaymentPage() {
@@ -108,7 +107,7 @@ export default function PaymentPage() {
         );
       }
 
-      console.log("Order created:", data.order);
+
 
       // Clear cart AFTER successful order creation
       clearCart();

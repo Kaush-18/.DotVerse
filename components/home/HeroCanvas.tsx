@@ -6,8 +6,6 @@ import {
   OrbitControls,
 } from "@react-three/drei";
 
-import * as THREE from "three";
-
 import PlaceholderModel from "./PlaceholderModel";
 import SceneLights from "./SceneLights";
 

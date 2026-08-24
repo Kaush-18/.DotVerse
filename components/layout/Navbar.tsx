@@ -55,9 +55,9 @@ export default function Navbar() {
     <>
       <header
         className="
-          fixed top-6 left-4 right-4 z-[100] mx-auto max-w-7xl
+          fixed top-4 left-4 right-4 z-[90] mx-auto max-w-7xl
           flex items-center justify-between
-          px-6 py-3
+          px-4 py-2
           rounded-full
           bg-[#07040d]/80 backdrop-blur-xl border border-white/10
           shadow-[0_0_20px_rgba(124,58,237,0.15)]
@@ -82,17 +82,17 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <button aria-label="Search" className="p-2 rounded-full hover:bg-white/10 text-white/70 transition-colors">
+        <div className="flex items-center gap-1 shrink-0">
+          <button aria-label="Search" className="p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
             <Search size={20} />
           </button>
-          <Link href="/account" aria-label="Account" className="p-2 rounded-full hover:bg-white/10 text-white/70 transition-colors">
+          <Link href="/account" aria-label="Account" className="p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
             <CircleUser size={20} />
           </Link>
-          <Link href="/cart" aria-label="Cart" className="relative p-2 rounded-full hover:bg-white/10 text-white/70 transition-colors">
+          <Link href="/cart" aria-label="Cart" className="relative p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
             <ShoppingBag size={20} />
             {totalItems > 0 && (
-              <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
+              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
                 {totalItems}
               </span>
             )}
@@ -102,9 +102,9 @@ export default function Navbar() {
             aria-label="Open navigation"
             aria-expanded={isMenuOpen}
             aria-controls="mobile-navigation"
-            className="min-[901px]:hidden p-2 rounded-full hover:bg-white/10 text-white/70 transition-colors"
+            className="min-[901px]:hidden p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors"
           >
-            <Menu size={24} />
+            <Menu size={20} />
           </button>
         </div>
       </header>
@@ -113,7 +113,7 @@ export default function Navbar() {
         <>
           {/* BACKDROP */}
           <div
-            className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md"
+            className="fixed inset-0 z-[95] bg-black/60 backdrop-blur-sm"
             onClick={closeMenu}
           />
           
@@ -121,44 +121,50 @@ export default function Navbar() {
           <div
             id="mobile-navigation"
             className="
-              fixed inset-y-0 right-0 z-[300]
-              h-[100dvh] w-[min(88vw,380px)]
+              fixed inset-y-0 right-0 z-[100]
+              h-[100dvh] w-[min(86vw,380px)]
               bg-[#07040d] border-l border-white/10
               shadow-2xl
-              transition-transform duration-300
+              flex flex-col
+              transition-transform duration-300 ease-in-out
             "
             style={{ transform: isMenuOpen ? 'translateX(0)' : 'translateX(100%)' }}
           >
-            <div className="flex items-center justify-between p-6">
+            <div className="flex items-center justify-between p-6 shrink-0">
               <Logo />
               <button 
                 onClick={closeMenu} 
                 aria-label="Close navigation" 
-                className="p-2 rounded-full hover:bg-white/10"
+                className="p-3 rounded-full hover:bg-white/10 text-white/70"
               >
                 <X size={24} />
               </button>
             </div>
             
-            <nav className="flex flex-col gap-2 p-6">
+            <nav className="flex flex-col gap-1 p-4 overflow-y-auto">
               {navLinks.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
                   onClick={closeMenu}
-                  className="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 text-lg font-medium transition-colors"
+                  className={`
+                    flex items-center gap-4 p-4 rounded-2xl text-lg font-medium transition-colors
+                    ${isActive(item.href) 
+                      ? "bg-white/10 text-white" 
+                      : "text-white/70 hover:bg-white/5 hover:text-white"}
+                  `}
                 >
-                  <item.icon size={20} className="text-violet-400" />
+                  <item.icon size={20} className={isActive(item.href) ? "text-violet-400" : "text-white/50"} />
                   {item.label}
                 </Link>
               ))}
             </nav>
 
-            <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10 flex flex-col gap-2">
-               <Link href="/account" onClick={closeMenu} className="p-4 rounded-2xl hover:bg-white/5 text-lg font-medium flex items-center gap-4">
+            <div className="mt-auto p-4 border-t border-white/10 flex flex-col gap-1 shrink-0">
+               <Link href="/account" onClick={closeMenu} className="p-4 rounded-2xl hover:bg-white/5 text-white/70 text-lg font-medium flex items-center gap-4 transition-colors">
                   <CircleUser size={20} /> Account
                </Link>
-               <Link href="/cart" onClick={closeMenu} className="p-4 rounded-2xl hover:bg-white/5 text-lg font-medium flex items-center gap-4">
+               <Link href="/cart" onClick={closeMenu} className="p-4 rounded-2xl hover:bg-white/5 text-white/70 text-lg font-medium flex items-center gap-4 transition-colors">
                   <ShoppingBag size={20} /> Cart
                </Link>
             </div>
