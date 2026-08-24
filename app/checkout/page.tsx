@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
 import Container from "@/components/layout/Container";
-import Navbar from "@/components/layout/Navbar";
 import PageReveal from "@/components/animations/PageReveal";
 
 export default function CheckoutPage() {
@@ -41,8 +40,6 @@ export default function CheckoutPage() {
 
   return (
     <PageReveal>
-      <Navbar />
-
       <main className="pt-20 pb-20">
         <Container>
           <h1 className="mb-12 text-4xl font-bold text-white">

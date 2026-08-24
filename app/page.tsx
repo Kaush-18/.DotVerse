@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
 import Loader from "@/components/loader/Loader";
-import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/home/Hero";
 import FeaturedCollections from "@/components/home/FeaturedCollections";
 import NewArrivals from "@/components/home/NewArrivals";
@@ -29,7 +28,6 @@ export default function Home() {
 
       {!loading && (
         <PageReveal>
-          <Navbar />
           <Hero />
           <FeaturedCollections />
           <NewArrivals />

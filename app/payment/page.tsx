@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
 import Container from "@/components/layout/Container";
-import Navbar from "@/components/layout/Navbar";
 import PageReveal from "@/components/animations/PageReveal";
 
 export default function PaymentPage() {
@@ -135,8 +134,6 @@ export default function PaymentPage() {
 
   return (
     <PageReveal>
-      <Navbar />
-
       <main className="py-16">
         <div className="mx-auto max-w-5xl px-4">
           <h1 className="mb-10 text-3xl font-bold">PAYMENT</h1>

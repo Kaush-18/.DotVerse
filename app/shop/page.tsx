@@ -1,5 +1,4 @@
 import Container from "@/components/layout/Container";
-import Navbar from "@/components/layout/Navbar";
 import PageReveal from "@/components/animations/PageReveal";
 import ProductGrid from "@/components/product/ProductGrid";
 import { getProducts } from "@/services/products";
@@ -8,8 +7,6 @@ export default async function ShopPage() {
   const products = await getProducts();
   return (
     <PageReveal>
-      <Navbar />
-
       <main>
         <section className="relative overflow-hidden pt-20 sm:pt-24 md:pt-28 lg:pt-32">
           {/* Background atmosphere */}

@@ -6,7 +6,6 @@ import Image from "next/image";
 
 import { useCart } from "@/context/CartContext";
 import Container from "@/components/layout/Container";
-import Navbar from "@/components/layout/Navbar";
 import PageReveal from "@/components/animations/PageReveal";
 
 export default function CartPage() {
@@ -14,8 +13,6 @@ export default function CartPage() {
 
   return (
     <PageReveal>
-      <Navbar />
-
       <main className="pt-20 pb-20">
         <Container>
           <h1 className="text-4xl font-bold text-white mb-8">CART</h1>

@@ -2,162 +2,170 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ShoppingBag, Search, User, Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { 
+  ShoppingBag, Search, Menu, X, 
+  Home, ShoppingBasket, Package, Layers, Info, Mail, CircleUser 
+} from "lucide-react";
 
-import Container from "@/components/layout/Container";
 import Logo from "@/components/ui/Logo";
 import { useCart } from "@/context/CartContext";
 
 const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Shop", href: "/shop" },
-  { label: "Track Order", href: "/track-order" },
-  { label: "Collections", href: "#" },
-  { label: "About", href: "#" },
-  { label: "Contact", href: "#" },
+  { label: "Home", href: "/", icon: Home },
+  { label: "Shop", href: "/shop", icon: ShoppingBasket },
+  { label: "Track Order", href: "/track-order", icon: Package },
+  { label: "Collections", href: "#", icon: Layers },
+  { label: "About", href: "#", icon: Info },
+  { label: "Contact", href: "#", icon: Mail },
 ];
 
 export default function Navbar() {
   const { totalItems } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
-  // Prevent background scroll when menu is open without layout shift
+  const closeMenu = () => setIsMenuOpen(false);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  // Scroll locking
   useEffect(() => {
     if (isMenuOpen) {
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.paddingRight = "0px";
       document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.paddingRight = "0px";
       document.body.style.overflow = "unset";
     };
   }, [isMenuOpen]);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const closeMenu = () => setIsMenuOpen(false);
+  // Close on Escape
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeMenu();
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
+
+  const isActive = (href: string) => pathname === href;
 
   return (
-    <header
-      className="
-        sticky
-        top-0
-        z-[1000]
-        w-full
-        h-[var(--navbar-height)]
-        bg-[#05020c]/82
-        backdrop-blur-[18px]
-        border-b
-        border-white/[0.08]
-      "
-    >
-      <Container className="relative z-10">
-        <div
-          className="
-            flex
-            h-[var(--navbar-height)]
-            min-h-[var(--navbar-height)]
-            items-center
-            justify-between
-          "
-        >
-          {/* LOGO */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="shrink-0"
-          >
-            <Logo />
-          </motion.div>
+    <>
+      <header
+        className="
+          fixed top-6 left-4 right-4 z-[100] mx-auto max-w-7xl
+          flex items-center justify-between
+          px-6 py-3
+          rounded-full
+          bg-[#07040d]/80 backdrop-blur-xl border border-white/10
+          shadow-[0_0_20px_rgba(124,58,237,0.15)]
+        "
+      >
+        <Logo />
 
-          {/* DESKTOP NAVIGATION */}
-          <nav
-            className="
-              hidden
-              items-center
-              gap-8
-              min-[901px]:flex
-              lg:gap-10
-            "
-          >
-            {navLinks.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="group relative whitespace-nowrap py-2 text-sm font-medium text-white/70 transition-colors duration-300 hover:text-white lg:text-[15px]"
-              >
-                {item.label}
-                <span className="absolute bottom-0 left-0 h-[1.5px] w-0 rounded-full bg-violet-500 transition-all duration-300 group-hover:w-full" />
-              </Link>
-            ))}
-          </nav>
-
-          {/* ACTIONS & HAMBURGER */}
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <button type="button" aria-label="Search" className="group rounded-full p-2.5 text-white/65 transition-all duration-300 hover:bg-white/[0.07] hover:text-white">
-              <Search size={20} strokeWidth={1.7} />
-            </button>
-
-            <Link href="/cart" className="group relative rounded-full p-2.5 text-white/65 transition-all duration-300 hover:bg-white/[0.07] hover:text-white" aria-label="Shopping bag">
-              <ShoppingBag size={20} strokeWidth={1.7} />
-              {totalItems > 0 && <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">{totalItems}</span>}
-            </Link>
-
-            <button type="button" aria-label="Account" className="group hidden rounded-full p-2.5 text-white/65 transition-all duration-300 hover:bg-white/[0.07] hover:text-white sm:block">
-              <User size={20} strokeWidth={1.7} />
-            </button>
-
-            {/* Mobile Hamburger */}
-            <button
-              type="button"
-              className="min-[901px]:hidden rounded-full p-2.5 text-white/65 hover:text-white"
-              onClick={toggleMenu}
-              aria-label="Toggle menu"
-              aria-expanded={isMenuOpen}
+        <nav className="hidden min-[901px]:flex items-center gap-1">
+          {navLinks.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`
+                px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+                ${isActive(item.href) 
+                  ? "text-white bg-white/10 shadow-[0_0_10px_rgba(124,58,237,0.3)]" 
+                  : "text-white/70 hover:text-white hover:bg-white/5"}
+              `}
             >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </Container>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
-      {/* MOBILE MENU */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 top-[var(--navbar-height)] z-[999] bg-[#07040d]/98 backdrop-blur-xl border-t border-white/10 min-[901px]:hidden"
-            style={{ minHeight: "calc(100dvh - var(--navbar-height))" }}
+        <div className="flex items-center gap-2 shrink-0">
+          <button aria-label="Search" className="p-2 rounded-full hover:bg-white/10 text-white/70 transition-colors">
+            <Search size={20} />
+          </button>
+          <Link href="/account" aria-label="Account" className="p-2 rounded-full hover:bg-white/10 text-white/70 transition-colors">
+            <CircleUser size={20} />
+          </Link>
+          <Link href="/cart" aria-label="Cart" className="relative p-2 rounded-full hover:bg-white/10 text-white/70 transition-colors">
+            <ShoppingBag size={20} />
+            {totalItems > 0 && (
+              <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
+                {totalItems}
+              </span>
+            )}
+          </Link>
+          <button
+            onClick={toggleMenu}
+            aria-label="Open navigation"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
+            className="min-[901px]:hidden p-2 rounded-full hover:bg-white/10 text-white/70 transition-colors"
           >
-            <nav className="flex flex-col p-8 gap-8">
-              {navLinks.map((item, index) => (
-                <motion.div
+            <Menu size={24} />
+          </button>
+        </div>
+      </header>
+
+      {isMenuOpen && (
+        <>
+          {/* BACKDROP */}
+          <div
+            className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md"
+            onClick={closeMenu}
+          />
+          
+          {/* DRAWER */}
+          <div
+            id="mobile-navigation"
+            className="
+              fixed inset-y-0 right-0 z-[300]
+              h-[100dvh] w-[min(88vw,380px)]
+              bg-[#07040d] border-l border-white/10
+              shadow-2xl
+              transition-transform duration-300
+            "
+            style={{ transform: isMenuOpen ? 'translateX(0)' : 'translateX(100%)' }}
+          >
+            <div className="flex items-center justify-between p-6">
+              <Logo />
+              <button 
+                onClick={closeMenu} 
+                aria-label="Close navigation" 
+                className="p-2 rounded-full hover:bg-white/10"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <nav className="flex flex-col gap-2 p-6">
+              {navLinks.map((item) => (
+                <Link
                   key={item.label}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  href={item.href}
+                  onClick={closeMenu}
+                  className="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 text-lg font-medium transition-colors"
                 >
-                  <Link
-                    href={item.href}
-                    className="text-3xl font-medium text-white hover:text-violet-400 block"
-                    onClick={closeMenu}
-                  >
-                    {item.label}
-                  </Link>
-                </motion.div>
+                  <item.icon size={20} className="text-violet-400" />
+                  {item.label}
+                </Link>
               ))}
             </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+
+            <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10 flex flex-col gap-2">
+               <Link href="/account" onClick={closeMenu} className="p-4 rounded-2xl hover:bg-white/5 text-lg font-medium flex items-center gap-4">
+                  <CircleUser size={20} /> Account
+               </Link>
+               <Link href="/cart" onClick={closeMenu} className="p-4 rounded-2xl hover:bg-white/5 text-lg font-medium flex items-center gap-4">
+                  <ShoppingBag size={20} /> Cart
+               </Link>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 }
+
