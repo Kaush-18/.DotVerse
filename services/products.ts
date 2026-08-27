@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Product, ProductBadge } from "@/types/product";
-import { Product as PrismaProduct, Category, Collection, ProductImage, ProductVariant } from "../generated/prisma/client";
+import { Product as PrismaProduct, Category, Collection, ProductImage, ProductVariant, Prisma } from "../generated/prisma/client";
 
 type FullProduct = PrismaProduct & {
   category: Category;
@@ -197,4 +197,70 @@ export async function getRelatedProducts(
   });
 
   return [...sameCollection, ...sameCategory].map(mapProduct);
+}
+
+export async function getFilteredProducts(params: {
+  q?: string;
+  category?: string;
+  collection?: string;
+  color?: string;
+  size?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  sort?: string;
+}): Promise<Product[]> {
+  const where: Prisma.ProductWhereInput = {};
+
+  if (params.q) {
+    where.OR = [
+      { name: { contains: params.q, mode: 'insensitive' } },
+      { description: { contains: params.q, mode: 'insensitive' } },
+    ];
+  }
+
+  if (params.category) where.category = { slug: params.category };
+  if (params.collection) where.collection = { slug: params.collection };
+
+  if (params.color || params.size) {
+    where.variants = {
+      some: {
+        ...(params.color ? { colorName: params.color } : {}),
+        ...(params.size ? { size: params.size } : {}),
+      },
+    };
+  }
+
+  if (params.minPrice !== undefined || params.maxPrice !== undefined) {
+    where.price = {
+      ...(params.minPrice !== undefined ? { gte: params.minPrice } : {}),
+      ...(params.maxPrice !== undefined ? { lte: params.maxPrice } : {}),
+    };
+  }
+
+  if (params.inStock) {
+    where.variants = { some: { stock: { gt: 0 } } };
+  }
+
+  const orderBy: Prisma.ProductOrderByWithRelationInput = {};
+  switch (params.sort) {
+    case 'price-asc': orderBy.price = 'asc'; break;
+    case 'price-desc': orderBy.price = 'desc'; break;
+    case 'newest': orderBy.createdAt = 'desc'; break;
+    case 'name-asc': orderBy.name = 'asc'; break;
+    default: orderBy.featured = 'desc';
+  }
+
+  const products = await prisma.product.findMany({
+    where,
+    orderBy,
+    include: {
+      category: true,
+      collection: true,
+      images: { orderBy: { position: 'asc' } },
+      variants: true,
+    },
+  });
+
+  return products.map(mapProduct);
 }
