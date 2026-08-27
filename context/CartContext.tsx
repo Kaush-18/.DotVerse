@@ -21,7 +21,7 @@ type CartItem = {
 
 type CartContextType = {
   items: CartItem[];
-  addToCart: (item: Omit<CartItem, "quantity">) => void;
+  addToCart: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
   removeFromCart: (
     id: string,
     size: string,
@@ -74,7 +74,8 @@ export function CartProvider({
   }, [items]);
 
   const addToCart = (
-    item: Omit<CartItem, "quantity">
+    item: Omit<CartItem, "quantity">,
+    quantity = 1
   ) => {
     setItems((currentItems) => {
       const existingItem = currentItems.find(
@@ -91,7 +92,7 @@ export function CartProvider({
           cartItem.color === item.color
             ? {
                 ...cartItem,
-                quantity: cartItem.quantity + 1,
+                quantity: cartItem.quantity + quantity,
               }
             : cartItem
         );
@@ -101,7 +102,7 @@ export function CartProvider({
         ...currentItems,
         {
           ...item,
-          quantity: 1,
+          quantity,
         },
       ];
     });

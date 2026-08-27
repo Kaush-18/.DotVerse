@@ -36,6 +36,12 @@ function mapProduct(product: FullProduct): Product {
     colors,
     sizes,
     stock,
+    variants: product.variants.map((v) => ({
+      size: v.size,
+      colorName: v.colorName,
+      colorValue: v.colorValue,
+      stock: v.stock,
+    })),
   };
 }
 

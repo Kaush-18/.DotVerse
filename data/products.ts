@@ -39,6 +39,7 @@ export const products: Product[] = [
     sizes: ["S", "M", "L", "XL", "XXL"],
 
     stock: 50,
+    variants: [],
 
     featured: true,
     isNew: true,
@@ -78,6 +79,7 @@ export const products: Product[] = [
     sizes: ["S", "M", "L", "XL", "XXL"],
 
     stock: 40,
+    variants: [],
 
     featured: true,
     isNew: true,
@@ -121,6 +123,7 @@ export const products: Product[] = [
     sizes: ["S", "M", "L", "XL", "XXL"],
 
     stock: 35,
+    variants: [],
 
     featured: true,
     isNew: true,
@@ -160,6 +163,7 @@ export const products: Product[] = [
     sizes: ["S", "M", "L", "XL", "XXL"],
 
     stock: 20,
+    variants: [],
 
     featured: true,
   },
