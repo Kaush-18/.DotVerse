@@ -16,7 +16,8 @@ const navLinks = [
   { label: "Home", href: "/", icon: Home },
   { label: "Shop", href: "/shop", icon: ShoppingBasket },
   { label: "Track Order", href: "/track-order", icon: Package },
-  { label: "Collections", href: "#", icon: Layers },
+  { label: "Shop", href: "/shop", icon: ShoppingBag },
+  { label: "Collections", href: "/shop#collections", icon: Layers },
   { label: "About", href: "#", icon: Info },
   { label: "Contact", href: "#", icon: Mail },
 ];

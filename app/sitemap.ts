@@ -17,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: product.updatedAt,
   }));
 
+  // Public, indexable routes
   return [
     {
       url: baseUrl,
