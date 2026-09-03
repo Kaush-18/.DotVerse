@@ -10,6 +10,7 @@ import {
 
 import Logo from "@/components/ui/Logo";
 import { useCart } from "@/context/CartContext";
+import { authClient } from "@/lib/auth-client";
 
 const navLinks = [
   { label: "Home", href: "/", icon: Home },
@@ -22,6 +23,7 @@ const navLinks = [
 
 export default function Navbar() {
   const { totalItems } = useCart();
+  const { data: session } = authClient.useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -86,7 +88,7 @@ export default function Navbar() {
           <button aria-label="Search" className="p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
             <Search size={20} />
           </button>
-          <Link href="/account" aria-label="Account" className="p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
+          <Link href={session ? "/account" : "/login"} aria-label="Account" className="p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
             <CircleUser size={20} />
           </Link>
           <Link href="/cart" aria-label="Cart" className="relative p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
@@ -161,7 +163,7 @@ export default function Navbar() {
             </nav>
 
             <div className="mt-auto p-4 border-t border-white/10 flex flex-col gap-1 shrink-0">
-               <Link href="/account" onClick={closeMenu} className="p-4 rounded-2xl hover:bg-white/5 text-white/70 text-lg font-medium flex items-center gap-4 transition-colors">
+               <Link href={session ? "/account" : "/login"} onClick={closeMenu} className="p-4 rounded-2xl hover:bg-white/5 text-white/70 text-lg font-medium flex items-center gap-4 transition-colors">
                   <CircleUser size={20} /> Account
                </Link>
                <Link href="/cart" onClick={closeMenu} className="p-4 rounded-2xl hover:bg-white/5 text-white/70 text-lg font-medium flex items-center gap-4 transition-colors">

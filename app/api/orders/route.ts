@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import {
   OrderValidationError,
   parseCreateOrderRequest,
@@ -16,6 +17,11 @@ export async function POST(request: Request) {
   let idempotencyKey: string | null = null;
 
   try {
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+    const userId = session?.user.id || null;
+
     const rawBody: unknown = await request.json();
 
     const body = parseCreateOrderRequest(rawBody);
@@ -191,6 +197,7 @@ export async function POST(request: Request) {
         data: {
           orderNumber: generateOrderNumber(),
           idempotencyKey: idempotencyKey!,
+          userId: userId,
 
           email: body.email,
           phone: body.phone,

@@ -1,1 +1,3 @@
-# .DotVerse
+# DotVerse
+
+A modern shopping experience.
