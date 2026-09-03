@@ -1,38 +1,14 @@
-"use client";
+import type { Metadata } from "next";
+import HomeContent from "@/components/home/HomeContent";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence } from "framer-motion";
-
-import Loader from "@/components/loader/Loader";
-import Hero from "@/components/home/Hero";
-import FeaturedCollections from "@/components/home/FeaturedCollections";
-import NewArrivals from "@/components/home/NewArrivals";
-import PageReveal from "@/components/animations/PageReveal";
+export const metadata: Metadata = {
+  title: "Premium Cosmic & Futuristic Streetwear",
+  description: "Discover premium streetwear inspired by space, cosmos, and futuristic culture. Explore unique cosmic T-shirts and futuristic designs by DotVerse.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default function Home() {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <>
-      <AnimatePresence mode="wait">
-        {loading && <Loader key="loader" />}
-      </AnimatePresence>
-
-      {!loading && (
-        <PageReveal>
-          <Hero />
-          <FeaturedCollections />
-          <NewArrivals />
-        </PageReveal>
-      )}
-    </>
-  );
+  return <HomeContent />;
 }

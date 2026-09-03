@@ -16,18 +16,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://dotverse.store"),
   title: {
-    default: "DotVerse — Premium Streetwear",
+    default: "DotVerse — Premium Cosmic & Futuristic Streetwear",
     template: "%s | DotVerse",
   },
   description:
-    "Minimal premium streetwear inspired by space, innovation, and futuristic culture.",
-  keywords: ["streetwear", "premium", "fashion", "space", "futuristic"],
+    "Discover premium streetwear inspired by space, cosmos, and futuristic culture. Explore unique cosmic T-shirts and futuristic designs by DotVerse.",
+  keywords: ["streetwear", "premium", "fashion", "space", "futuristic", "cosmic"],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "DotVerse — Premium Streetwear",
+    title: "DotVerse — Premium Cosmic & Futuristic Streetwear",
     description:
-      "Minimal premium streetwear inspired by space, innovation, and futuristic culture.",
+      "Discover premium streetwear inspired by space, cosmos, and futuristic culture. Explore unique cosmic T-shirts and futuristic designs by DotVerse.",
     type: "website",
+    url: "https://dotverse.store",
+    siteName: "DotVerse",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DotVerse — Premium Cosmic & Futuristic Streetwear",
+    description:
+      "Discover premium streetwear inspired by space, cosmos, and futuristic culture. Explore unique cosmic T-shirts and futuristic designs by DotVerse.",
   },
 };
 

@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import Container from "@/components/layout/Container";
 import PageReveal from "@/components/animations/PageReveal";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -17,6 +18,14 @@ interface ShopPageProps {
     sort?: string;
   }>;
 }
+
+export const metadata: Metadata = {
+  title: "Shop Premium Cosmic Streetwear",
+  description: "Explore DotVerse's collection of premium cosmic and futuristic streetwear T-shirts, designed for people who look beyond the ordinary.",
+  alternates: {
+    canonical: "/shop",
+  },
+};
 
 export default async function ShopPage(props: ShopPageProps) {
   const searchParams = await props.searchParams;
@@ -87,8 +96,8 @@ export default async function ShopPage(props: ShopPageProps) {
               <div className="flex flex-wrap gap-2 mb-8">
                 {activeFilters.map(([key, value]) => (
                   <span key={key} className="bg-white/10 text-white text-xs px-3 py-1 rounded-full flex items-center gap-2">
-                    {key}: {value}
-                    <a href={`/shop?${new URLSearchParams(Object.entries(searchParams).filter(([k]) => k !== key)).toString()}`}>×</a>
+                    {key}: {value as string}
+                    <a href={`/shop?${new URLSearchParams(Object.entries(searchParams).filter(([k]) => k !== key).map(([k, v]) => [k, v as string])).toString()}`}>×</a>
                   </span>
                 ))}
                 <a href="/shop" className="text-white/50 text-xs px-3 py-1">Clear all</a>
