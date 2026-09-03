@@ -18,28 +18,27 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://dotverse.store"),
   title: {
-    default: "DotVerse — Premium Cosmic & Futuristic Streetwear",
+    default: "DotVerse — Premium Streetwear Inspired by Space & Innovation",
     template: "%s | DotVerse",
   },
   description:
-    "Discover premium streetwear inspired by space, cosmos, and futuristic culture. Explore unique cosmic T-shirts and futuristic designs by DotVerse.",
-  keywords: ["streetwear", "premium", "fashion", "space", "futuristic", "cosmic"],
+    "Explore DotVerse, a premium streetwear brand inspired by space, cosmos, and futuristic design. Discover unique, high-quality apparel for the modern explorer.",
   alternates: {
-    canonical: "/",
+    canonical: "https://dotverse.store",
   },
   openGraph: {
-    title: "DotVerse — Premium Cosmic & Futuristic Streetwear",
+    title: "DotVerse — Premium Streetwear Inspired by Space & Innovation",
     description:
-      "Discover premium streetwear inspired by space, cosmos, and futuristic culture. Explore unique cosmic T-shirts and futuristic designs by DotVerse.",
+      "Explore DotVerse, a premium streetwear brand inspired by space, cosmos, and futuristic design. Discover unique, high-quality apparel for the modern explorer.",
     type: "website",
     url: "https://dotverse.store",
     siteName: "DotVerse",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DotVerse — Premium Cosmic & Futuristic Streetwear",
+    title: "DotVerse — Premium Streetwear Inspired by Space & Innovation",
     description:
-      "Discover premium streetwear inspired by space, cosmos, and futuristic culture. Explore unique cosmic T-shirts and futuristic designs by DotVerse.",
+      "Explore DotVerse, a premium streetwear brand inspired by space, cosmos, and futuristic design. Discover unique, high-quality apparel for the modern explorer.",
   },
 };
 
