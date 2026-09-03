@@ -15,30 +15,33 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
   if (!product) {
     return {
-      title: "Product Not Found",
+      title: "Product Not Found | DotVerse",
     };
   }
 
   const url = `https://dotverse.store/products/${product.slug}`;
+  const title = `${product.name} | ${product.category} | DotVerse`;
+  const description = product.description;
+  const image = product.images.length > 0 ? `https://dotverse.store${product.images[0]}` : undefined;
 
   return {
-    title: product.name,
-    description: product.description,
+    title,
+    description,
     alternates: {
       canonical: url,
     },
     openGraph: {
-      title: product.name,
-      description: product.description,
-      images: product.images.length > 0 ? [product.images[0]] : [],
+      title,
+      description,
+      images: image ? [{ url: image, alt: product.name }] : [],
       url,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: product.name,
-      description: product.description,
-      images: product.images.length > 0 ? [product.images[0]] : [],
+      title,
+      description,
+      images: image ? [image] : [],
     },
   };
 }
@@ -60,13 +63,13 @@ export default async function ProductPage({
     3,
   );
 
-  // JSON-LD
-  const jsonLd = {
+  // Schema.org Product
+  const productLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: product.images,
+    image: product.images.map(img => `https://dotverse.store${img}`),
     brand: {
       "@type": "Brand",
       name: "DotVerse",
@@ -81,11 +84,41 @@ export default async function ProductPage({
     },
   };
 
+  // Schema.org BreadcrumbList
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://dotverse.store"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Shop",
+        "item": "https://dotverse.store/shop"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": product.name,
+        "item": `https://dotverse.store/products/${product.slug}`
+      }
+    ]
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <ProductDetailClient
         product={product}

@@ -2,10 +2,23 @@ import type { Metadata } from "next";
 import HomeContent from "@/components/home/HomeContent";
 
 export const metadata: Metadata = {
-  title: "Premium Streetwear Inspired by Space & Innovation",
-  description: "Explore DotVerse, a premium streetwear brand inspired by space, cosmos, and futuristic design. Discover unique, high-quality apparel for the modern explorer.",
+  title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
+  description: "Shop DotVerse for premium streetwear and graphic T-shirts inspired by space, innovation, and futuristic culture. High-quality designs for the modern explorer.",
   alternates: {
     canonical: "https://dotverse.store",
+  },
+  openGraph: {
+    title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
+    description: "Shop DotVerse for premium streetwear and graphic T-shirts inspired by space, innovation, and futuristic culture.",
+    url: "https://dotverse.store",
+    siteName: "DotVerse",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
+    description: "Shop DotVerse for premium streetwear and graphic T-shirts inspired by space, innovation, and futuristic culture.",
   },
 };
 
@@ -19,6 +32,11 @@ export default function Home() {
       "@type": "SearchAction",
       "target": "https://dotverse.store/shop?q={search_term_string}",
       "query-input": "required name=search_term_string"
+    },
+    publisher: {
+      "@type": "Organization",
+      "name": "DotVerse",
+      "url": "https://dotverse.store"
     }
   };
 
