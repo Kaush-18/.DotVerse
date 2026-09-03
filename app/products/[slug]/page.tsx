@@ -22,13 +22,13 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const url = `https://dotverse.store/products/${product.slug}`;
 
   return {
-    title: `${product.name} | DotVerse`,
+    title: product.name,
     description: product.description,
     alternates: {
       canonical: url,
     },
     openGraph: {
-      title: `${product.name} | DotVerse`,
+      title: product.name,
       description: product.description,
       images: product.images.length > 0 ? [product.images[0]] : [],
       url,
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${product.name} | DotVerse`,
+      title: product.name,
       description: product.description,
       images: product.images.length > 0 ? [product.images[0]] : [],
     },
