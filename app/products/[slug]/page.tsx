@@ -78,7 +78,7 @@ export default async function ProductPage({
     offers: {
       "@type": "Offer",
       price: (product.price / 100).toFixed(2),
-      priceCurrency: "USD",
+      priceCurrency: "INR",
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       url: `https://dotverse.store/products/${product.slug}`,
     },
