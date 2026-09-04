@@ -28,9 +28,9 @@ export default function NewArrivals() {
             </div>
 
             <h2 className="new-arrivals-title">
-              Fresh from
+              New Premium
               <br />
-              <span>the universe.</span>
+              <span>Streetwear Arrivals</span>
             </h2>
           </div>
 

@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   title: "Shop Premium Cosmic Streetwear",
   description: "Explore DotVerse's collection of premium cosmic and futuristic streetwear T-shirts, designed for people who look beyond the ordinary.",
   alternates: {
-    canonical: "/shop",
+    canonical: "https://dotverse.store/shop",
   },
 };
 
@@ -83,9 +83,10 @@ export default async function ShopPage(props: ShopPageProps) {
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-[420px] text-sm leading-6 text-white/45">
-                {products.length} {products.length === 1 ? 'piece' : 'pieces'} found in the
-                DotVerse collection.
+              <p className="mt-6 max-w-[500px] text-sm leading-6 text-white/60">
+                Discover our premium streetwear collection featuring high-quality graphic T-shirts. 
+                Each piece blends futuristic design with cosmic-inspired motifs, crafted for those 
+                who look beyond the ordinary. Explore apparel engineered for comfort and distinct style.
               </p>
             </div>
 
