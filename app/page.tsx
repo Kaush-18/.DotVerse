@@ -36,7 +36,8 @@ export default function Home() {
     publisher: {
       "@type": "Organization",
       "name": "DotVerse",
-      "url": "https://dotverse.store"
+      "url": "https://dotverse.store",
+      "description": "Premium streetwear and graphic T-shirt brand"
     }
   };
 
