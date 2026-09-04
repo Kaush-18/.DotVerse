@@ -1,29 +1,31 @@
-"use client";
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function AccountPage() {
-  const { data: session, isPending } = authClient.useSession();
-  const router = useRouter();
+export default async function AccountDashboardPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  useEffect(() => {
-    if (!isPending && !session) {
-      router.push("/login?redirect=/account");
-    }
-  }, [session, isPending, router]);
+  if (!session) {
+    redirect("/login?redirect=/account");
+  }
 
-  if (isPending) return <div>Loading...</div>;
-  if (!session) return null;
+  const { user } = session;
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold text-white">Welcome, {session.user.name}</h1>
-      <div className="mt-8 flex gap-4">
-        <Link href="/account/profile" className="rounded-lg bg-white/5 p-4 text-white">Profile</Link>
-        <Link href="/account/orders" className="rounded-lg bg-white/5 p-4 text-white">Orders</Link>
-        <button onClick={async () => { await authClient.signOut(); router.push("/"); }} className="rounded-lg bg-red-900/50 p-4 text-white">Sign Out</button>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
+      <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6">
+        <h2 className="text-lg font-medium text-white">Welcome back, {user.name}</h2>
+        <p className="text-white/60">Manage your account settings and view your order history here.</p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6">
+            <h3 className="text-sm text-white/50 mb-1">Email</h3>
+            <p className="text-white">{user.email}</p>
+         </div>
       </div>
     </div>
   );
