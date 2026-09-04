@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://dotverse.store"),
   title: {
-    default: "DotVerse — Premium Streetwear Inspired by Space & Innovation",
+    default: "DotVerse | Premium Streetwear & Graphic T-Shirts",
     template: "%s | DotVerse",
   },
   description:
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     canonical: "https://dotverse.store",
   },
   openGraph: {
-    title: "DotVerse — Premium Streetwear Inspired by Space & Innovation",
+    title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
     description:
       "Explore DotVerse, a premium streetwear brand inspired by space, cosmos, and futuristic design. Discover unique, high-quality apparel for the modern explorer.",
     type: "website",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "DotVerse — Premium Streetwear Inspired by Space & Innovation",
+    title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
     description:
       "Explore DotVerse, a premium streetwear brand inspired by space, cosmos, and futuristic design. Discover unique, high-quality apparel for the modern explorer.",
   },
