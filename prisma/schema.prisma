@@ -11,72 +11,161 @@ model Category {
   id        String    @id @default(cuid())
   name      String
   slug      String    @unique
-  products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  products  Product[]
 }
 
 model Collection {
   id        String    @id @default(cuid())
   name      String
   slug      String    @unique
-  products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  products  Product[]
 }
 
 model Product {
-  id            String  @id @default(cuid())
-  slug          String  @unique
+  id            String           @id @default(cuid())
+  slug          String           @unique
   name          String
   description   String
   price         Int
   originalPrice Int?
   badge         String?
-  featured      Boolean @default(false)
-  isNew         Boolean @default(false)
-
-  categoryId   String
-  collectionId String
-
-  category   Category   @relation(fields: [categoryId], references: [id])
-  collection Collection @relation(fields: [collectionId], references: [id])
-
-  images     ProductImage[]
-  variants   ProductVariant[]
-  orderItems OrderItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  featured      Boolean          @default(false)
+  isNew         Boolean          @default(false)
+  categoryId    String
+  collectionId  String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  orderItems    OrderItem[]
+  category      Category         @relation(fields: [categoryId], references: [id])
+  collection    Collection       @relation(fields: [collectionId], references: [id])
+  images        ProductImage[]
+  variants      ProductVariant[]
 }
 
 model ProductImage {
-  id       String  @id @default(cuid())
-  url      String
-  alt      String?
-  position Int     @default(0)
-
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  position  Int      @default(0)
   productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
   createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model ProductVariant {
-  id         String @id @default(cuid())
+  id         String      @id @default(cuid())
   size       String
   colorName  String
   colorValue String
-  stock      Int    @default(0)
-
+  stock      Int         @default(0)
   productId  String
-  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   orderItems OrderItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([productId, size, colorName])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  firstName     String?
+  lastName      String?
+  phone         String?
+  accounts      Account[]
+  orders        Order[]
+  sessions      Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  issuer                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+}
+
+model Order {
+  id             String        @id @default(cuid())
+  orderNumber    String        @unique
+  email          String
+  firstName      String
+  lastName       String
+  address        String
+  city           String
+  postalCode     String
+  subtotal       Int
+  shipping       Int           @default(0)
+  total          Int
+  status         OrderStatus   @default(PENDING)
+  paymentStatus  PaymentStatus @default(PENDING)
+  paymentMethod  PaymentMethod @default(COD)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  apartment      String?
+  phone          String
+  state          String
+  idempotencyKey String        @unique
+  userId         String?
+  user           User?         @relation(fields: [userId], references: [id])
+  items          OrderItem[]
+}
+
+model OrderItem {
+  id           String          @id @default(cuid())
+  orderId      String
+  productId    String?
+  variantId    String?
+  productName  String
+  variantSize  String
+  variantColor String
+  price        Int
+  quantity     Int
+  createdAt    DateTime        @default(now())
+  order        Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product?        @relation(fields: [productId], references: [id])
+  variant      ProductVariant? @relation(fields: [variantId], references: [id])
 }
 
 enum OrderStatus {
@@ -99,112 +188,4 @@ enum PaymentMethod {
   COD
   UPI
   CARD
-}
-
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String
-  firstName     String?
-  lastName      String?
-  phone         String?
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  orders        Order[]
-}
-
-model Session {
-  id        String   @id @default(cuid())
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Account {
-  id                    String    @id @default(cuid())
-  accountId             String
-  providerId            String
-  issuer                String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-}
-
-model Verification {
-  id         String    @id @default(cuid())
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @updatedAt
-}
-
-model Order {
-  id             String @id @default(cuid())
-  orderNumber    String @unique
-  idempotencyKey String @unique
-  userId         String?
-  user           User?   @relation(fields: [userId], references: [id])
-
-  email String
-  phone String
-
-  firstName  String
-  lastName   String
-  address    String
-  apartment  String?
-  city       String
-  state      String
-  postalCode String
-
-  subtotal Int
-  shipping Int @default(0)
-  total    Int
-
-  status        OrderStatus   @default(PENDING)
-  paymentStatus PaymentStatus @default(PENDING)
-  paymentMethod PaymentMethod @default(COD)
-
-  items OrderItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model OrderItem {
-  id String @id @default(cuid())
-
-  orderId   String
-  productId String?
-  variantId String?
-
-  productName  String
-  variantSize  String
-  variantColor String
-
-  price    Int
-  quantity Int
-
-  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
-  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
-
-  createdAt DateTime @default(now())
 }

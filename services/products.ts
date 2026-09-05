@@ -222,13 +222,14 @@ export async function getFilteredProducts(params: {
   if (params.category) where.category = { slug: params.category };
   if (params.collection) where.collection = { slug: params.collection };
 
-  if (params.color || params.size) {
-    where.variants = {
-      some: {
-        ...(params.color ? { colorName: params.color } : {}),
-        ...(params.size ? { size: params.size } : {}),
-      },
-    };
+  const variantFilter = {
+    ...(params.color ? { colorName: params.color } : {}),
+    ...(params.size ? { size: params.size } : {}),
+    ...(params.inStock ? { stock: { gt: 0 } } : {}),
+  };
+
+  if (Object.keys(variantFilter).length > 0) {
+    where.variants = { some: variantFilter };
   }
 
   if (params.minPrice !== undefined || params.maxPrice !== undefined) {
@@ -236,10 +237,6 @@ export async function getFilteredProducts(params: {
       ...(params.minPrice !== undefined ? { gte: params.minPrice } : {}),
       ...(params.maxPrice !== undefined ? { lte: params.maxPrice } : {}),
     };
-  }
-
-  if (params.inStock) {
-    where.variants = { some: { stock: { gt: 0 } } };
   }
 
   const orderBy: Prisma.ProductOrderByWithRelationInput = {};

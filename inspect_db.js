@@ -1,21 +1,18 @@
-import { PrismaClient } from './generated/prisma/index.js';
-const prisma = new PrismaClient();
+import { Client } from "pg";
+import "dotenv/config";
 
-async function main() {
-  console.log('Inspecting User and Account tables...');
-  const users = await prisma.user.findMany({ include: { accounts: true } });
-  
-  if (users.length === 0) {
-    console.log('No users found.');
-  } else {
-    users.forEach(user => {
-      console.log(`User: ${user.email} (ID: ${user.id})`);
-      user.accounts.forEach(account => {
-        console.log(`  Account: ${account.providerId} (ID: ${account.id})`);
-        console.log(`  Password field present: ${!!account.password}`);
-      });
-    });
-  }
+const client = new Client({ connectionString: process.env.DATABASE_URL });
+await client.connect();
+try {
+  const result = await client.query(`
+    SELECT u.email, a."providerId", a.issuer, a."accountId", a."userId",
+           a.password IS NOT NULL AS "passwordPresent",
+           length(a.password) AS "passwordLength"
+    FROM "User" u
+    LEFT JOIN "Account" a ON a."userId" = u.id
+    ORDER BY u.email
+  `);
+  console.log(JSON.stringify(result.rows, null, 2));
+} finally {
+  await client.end();
 }
-
-main().catch(console.error).finally(() => prisma.$disconnect());

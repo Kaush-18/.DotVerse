@@ -6,6 +6,13 @@ import type { User } from "@/lib/auth";
 export default function ProfilePage() {
   const { data: session } = authClient.useSession();
   const user = session?.user as User | undefined;
+
+  if (!user) return null;
+
+  return <ProfileForm key={user.id} user={user} />;
+}
+
+function ProfileForm({ user }: { user: User }) {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [phone, setPhone] = useState(user?.phone || "");
@@ -30,8 +37,6 @@ export default function ProfilePage() {
     });
   };
 
-  if (!session) return null;
-
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-white">
       <h1 className="text-2xl font-bold mb-6">Profile</h1>
@@ -50,7 +55,7 @@ export default function ProfilePage() {
         </div>
         <div>
             <label className="block text-sm text-gray-400 mb-1">Email</label>
-            <input type="email" value={session.user.email} disabled className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-gray-400 cursor-not-allowed" />
+            <input type="email" value={user.email} disabled className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-gray-400 cursor-not-allowed" />
         </div>
         {message && <p className="text-sm text-green-400">{message}</p>}
         <button type="submit" className="w-full rounded-lg bg-violet-600 p-3 text-white font-semibold">Update Profile</button>

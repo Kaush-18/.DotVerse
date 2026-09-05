@@ -69,9 +69,9 @@ export default function Navbar() {
         <Logo />
 
         <nav className="hidden min-[901px]:flex items-center gap-1">
-          {navLinks.map((item) => (
+          {navLinks.map((item, index) => (
             <Link
-              key={item.label}
+              key={`${item.label}-${item.href}-${index}`}
               href={item.href}
               className={`
                 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
@@ -145,9 +145,9 @@ export default function Navbar() {
             </div>
             
             <nav className="flex flex-col gap-1 p-4 overflow-y-auto">
-              {navLinks.map((item) => (
+              {navLinks.map((item, index) => (
                 <Link
-                  key={item.label}
+                  key={`${item.label}-${item.href}-${index}`}
                   href={item.href}
                   onClick={closeMenu}
                   className={`

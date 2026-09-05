@@ -19,11 +19,15 @@ export default function RegisterPage() {
       return;
     }
     setError("");
-    await authClient.signUp.email({
+    const registrationData = {
       email,
       password,
       name: `${firstName} ${lastName}`,
-    }, {
+      firstName,
+      lastName,
+    } as Parameters<typeof authClient.signUp.email>[0];
+
+    await authClient.signUp.email(registrationData, {
       onSuccess: () => {
         router.push("/account");
       },
