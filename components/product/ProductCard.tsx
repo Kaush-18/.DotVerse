@@ -12,12 +12,14 @@ interface ProductCardProps {
   product: Product;
   index: number;
   onQuickView?: (product: Product) => void;
+  variant?: "default" | "editorial";
 }
 
 export default function ProductCard({
   product,
   index,
   onQuickView,
+  variant = "default",
 }: ProductCardProps) {
   const [liked, setLiked] = useState(false);
 
@@ -40,7 +42,7 @@ export default function ProductCard({
         delay: index * 0.1,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="product-card"
+      className={`product-card product-card--${variant}`}
     >
       {/* =====================================================
           PRODUCT IMAGE
@@ -80,20 +82,33 @@ export default function ProductCard({
             src={product.images[0]}
             alt={product.name}
             fill
-            sizes="(max-width: 700px) 50vw, 25vw"
+            sizes={
+              variant === "editorial"
+                ? "(max-width: 767px) 100vw, (max-width: 1100px) 60vw, 65vw"
+                : "(max-width: 700px) 50vw, 25vw"
+            }
             className="product-img"
           />
         </Link>
 
-        {/* Quick View */}
-        <button
-          type="button"
-          className="quick-view-btn"
-          onClick={() => onQuickView?.(product)}
-        >
-          <ShoppingBag size={15} />
-          <span>Quick view</span>
-        </button>
+        {variant === "editorial" ? (
+          <Link
+            href={`/products/${product.slug}`}
+            className="editorial-product-link"
+          >
+            <span>View product</span>
+            <span aria-hidden="true">→</span>
+          </Link>
+        ) : (
+          <button
+            type="button"
+            className="quick-view-btn"
+            onClick={() => onQuickView?.(product)}
+          >
+            <ShoppingBag size={15} />
+            <span>Quick view</span>
+          </button>
+        )}
       </div>
 
       {/* =====================================================

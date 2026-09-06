@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import { Metadata } from "next";
 import Container from "@/components/layout/Container";
 import PageReveal from "@/components/animations/PageReveal";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -19,13 +19,28 @@ interface ShopPageProps {
   }>;
 }
 
-export const metadata: Metadata = {
-  title: "Shop Premium Cosmic Streetwear",
-  description: "Explore DotVerse's collection of premium cosmic and futuristic streetwear T-shirts, designed for people who look beyond the ordinary.",
-  alternates: {
-    canonical: "https://dotverse.store/shop",
-  },
-};
+export async function generateMetadata({
+  searchParams,
+}: ShopPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const hasFilters = Object.values(params).some(Boolean);
+  const title = "Shop Premium Cosmic Streetwear";
+  const description =
+    "Explore DotVerse's collection of premium cosmic and futuristic streetwear T-shirts, designed for people who look beyond the ordinary.";
+
+  return {
+    title,
+    description,
+    alternates: { canonical: "https://dotverse.store/shop" },
+    robots: hasFilters ? { index: false, follow: true } : undefined,
+    openGraph: {
+      title,
+      description,
+      url: "https://dotverse.store/shop",
+      type: "website",
+    },
+  };
+}
 
 export default async function ShopPage(props: ShopPageProps) {
   const searchParams = await props.searchParams;

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Contact Us | DotVerse",
   description: "Get in touch with DotVerse Clothing Brand support.",
+  alternates: { canonical: absoluteUrl("/contact") },
 };
 
 export default function ContactPage() {

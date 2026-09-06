@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | DotVerse",
   description: "Privacy policy for DotVerse Clothing Brand.",
+  alternates: { canonical: absoluteUrl("/privacy-policy") },
 };
 
 export default function PrivacyPolicyPage() {

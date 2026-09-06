@@ -16,8 +16,7 @@ const navLinks = [
   { label: "Home", href: "/", icon: Home },
   { label: "Shop", href: "/shop", icon: ShoppingBasket },
   { label: "Track Order", href: "/track-order", icon: Package },
-  { label: "Shop", href: "/shop", icon: ShoppingBag },
-  { label: "Collections", href: "/shop", icon: Layers },
+  { label: "Collections", href: "/#collections", icon: Layers },
   { label: "About", href: "#", icon: Info },
   { label: "Contact", href: "#", icon: Mail },
 ];
@@ -181,4 +180,3 @@ export default function Navbar() {
     </>
   );
 }
-

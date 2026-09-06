@@ -26,7 +26,7 @@ export default function Container({
 
           lg:px-12
 
-          xl:px-16
+          xl:px-[clamp(64px,5vw,72px)]
         `,
         className
       )}

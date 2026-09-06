@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getProductBySlug, getRelatedProducts } from "@/services/products";
 import ProductDetailClient from "./ProductDetailClient";
 import type { Metadata } from "next";
+import { absoluteUrl, siteName, siteUrl } from "@/lib/seo";
 
 interface ProductPageProps {
   params: Promise<{
@@ -19,10 +20,10 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     };
   }
 
-  const url = `https://dotverse.store/products/${product.slug}`;
+  const url = absoluteUrl(`/products/${product.slug}`);
   const title = `${product.name} | ${product.category} | DotVerse`;
   const description = product.description;
-  const image = product.images.length > 0 ? `https://dotverse.store${product.images[0]}` : undefined;
+  const image = product.images.length > 0 ? absoluteUrl(product.images[0]) : undefined;
 
   return {
     title,
@@ -35,7 +36,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       description,
       images: image ? [{ url: image, alt: product.name }] : [],
       url,
-      type: 'website',
+      type: "website",
+      siteName,
     },
     twitter: {
       card: 'summary_large_image',
@@ -62,6 +64,7 @@ export default async function ProductPage({
     product.category,
     3,
   );
+  const productUrl = absoluteUrl(`/products/${product.slug}`);
 
   // Schema.org Product
   const productLd = {
@@ -69,7 +72,8 @@ export default async function ProductPage({
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: product.images.map(img => `https://dotverse.store${img}`),
+    image: product.images.map((img) => absoluteUrl(img)),
+    sku: product.id,
     brand: {
       "@type": "Brand",
       name: "DotVerse",
@@ -77,10 +81,15 @@ export default async function ProductPage({
     category: product.category,
     offers: {
       "@type": "Offer",
-      price: (product.price / 100).toFixed(2),
+      price: product.price.toFixed(2),
       priceCurrency: "INR",
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      url: `https://dotverse.store/products/${product.slug}`,
+      itemCondition: "https://schema.org/NewCondition",
+      url: productUrl,
+      seller: {
+        "@type": "Organization",
+        name: siteName,
+      },
     },
   };
 
@@ -93,19 +102,19 @@ export default async function ProductPage({
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://dotverse.store"
+        "item": siteUrl
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Shop",
-        "item": "https://dotverse.store/shop"
+        "item": absoluteUrl("/shop")
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": product.name,
-        "item": `https://dotverse.store/products/${product.slug}`
+        "item": productUrl
       }
     ]
   };

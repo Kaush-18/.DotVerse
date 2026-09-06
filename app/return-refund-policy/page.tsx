@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Return & Refund Policy | DotVerse",
   description: "Return and refund policy for DotVerse Clothing Brand.",
+  alternates: { canonical: absoluteUrl("/return-refund-policy") },
 };
 
 export default function ReturnRefundPolicyPage() {

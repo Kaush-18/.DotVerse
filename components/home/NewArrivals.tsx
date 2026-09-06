@@ -1,64 +1,71 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { products } from "@/data/products";
-import type { Product } from "@/types/product";
-import ProductGrid from "@/components/product/ProductGrid";
-import ProductQuickView from "./ProductQuickView";
 import Container from "@/components/layout/Container";
+import NewArrivalCard from "./NewArrivalCard";
 
 export default function NewArrivals() {
-  const [selectedProduct, setSelectedProduct] =
-    useState<Product | null>(null);
-
   return (
-    <section className="new-arrivals-section">
+    <section className="new-arrivals-section new-arrivals-rebuild">
       <Container>
-        {/* =====================================================
-            HEADER
-        ===================================================== */}
-        <div className="new-arrivals-header">
-          <div>
-            <div className="section-eyebrow">
-              <span />
-              <span>NEW ARRIVALS</span>
-            </div>
-
-            <h2 className="new-arrivals-title">
-              New Premium
+        <header className="new-arrivals-rebuild-header">
+          <div className="new-arrivals-rebuild-heading">
+            <span>NEW ARRIVALS</span>
+            <h2>
+              Fresh drops.
               <br />
-              <span>Streetwear Arrivals</span>
+              <em>Higher dreams.</em>
             </h2>
+            <p>
+              The latest from the DotVerse universe. New designs. New expressions. Same frequency.
+            </p>
           </div>
 
-          <Link
-            href="/shop"
-            className="view-products-btn"
-          >
-            <span>View all products</span>
-            <ArrowRight size={18} />
+          <div className="new-arrivals-rebuild-side">
+            <span className="new-arrivals-rebuild-side-mark" aria-hidden="true">✦</span>
+            <p>
+              WEAR
+              <br />
+              THE NEXT
+              <br />
+              FREQUENCY.
+            </p>
+            <small>
+              LIMITED DROPS.
+              <br />
+              INFINITE STORIES.
+            </small>
+          </div>
+
+          <Link href="/shop" className="new-arrivals-rebuild-view-all">
+            <span>VIEW ALL<br />PRODUCTS</span>
+            <ArrowRight size={20} aria-hidden="true" />
           </Link>
+        </header>
+
+        <div className="new-arrivals-rebuild-grid">
+          {products.filter((product) => product.featured).slice(0, 4).map((product, index) => (
+            <NewArrivalCard key={product.id} product={product} index={index} />
+          ))}
         </div>
 
-        {/* =====================================================
-            PRODUCTS
-        ===================================================== */}
-        <ProductGrid
-            products={products.filter((product) => product.featured).slice(0, 4)}
-            onQuickView={setSelectedProduct}
-          />
+        <footer className="new-arrivals-rebuild-footer">
+          <span aria-hidden="true">→</span>
+          <p>
+            SAME FABRIC.
+            <br />
+            A BRIGHTER YOU.
+          </p>
+          <span>
+            .DOTVERSE
+            <br />
+            EST. 2026
+          </span>
+        </footer>
       </Container>
-
-      {/* =====================================================
-          QUICK VIEW
-      ===================================================== */}
-      <ProductQuickView
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-      />
     </section>
   );
 }

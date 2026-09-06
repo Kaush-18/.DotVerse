@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Terms of Service | DotVerse",
   description: "Terms of service for DotVerse Clothing Brand.",
+  alternates: { canonical: absoluteUrl("/terms-of-service") },
 };
 
 export default function TermsOfServicePage() {

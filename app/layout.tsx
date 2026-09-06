@@ -4,6 +4,14 @@ import { CartProvider } from "@/context/CartContext";
 import { CheckoutProvider } from "@/context/CheckoutContext";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import {
+  absoluteUrl,
+  brandIcon,
+  defaultDescription,
+  defaultSocialImage,
+  siteName,
+  siteUrl,
+} from "@/lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,28 +26,32 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://dotverse.store"),
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
   title: {
     default: "DotVerse | Premium Streetwear & Graphic T-Shirts",
     template: "%s | DotVerse",
   },
-  description:
-    "Explore DotVerse, a premium streetwear brand inspired by space, cosmos, and futuristic design. Discover unique, high-quality apparel for the modern explorer.",
+  description: defaultDescription,
   alternates: {
-    canonical: "https://dotverse.store",
+    canonical: siteUrl,
   },
   openGraph: {
     title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
-    description:
-      "Explore DotVerse, a premium streetwear brand inspired by space, cosmos, and futuristic design. Discover unique, high-quality apparel for the modern explorer.",
+    description: defaultDescription,
     type: "website",
-    url: "https://dotverse.store",
-    siteName: "DotVerse",
+    url: siteUrl,
+    siteName,
+    images: [{ url: absoluteUrl(defaultSocialImage), alt: "DotVerse cosmic streetwear" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
-    description:
-      "Explore DotVerse, a premium streetwear brand inspired by space, cosmos, and futuristic design. Discover unique, high-quality apparel for the modern explorer.",
+    description: defaultDescription,
+    images: [absoluteUrl(defaultSocialImage)],
   },
 };
 
@@ -61,6 +73,27 @@ export default function RootLayout({
         <CheckoutProvider>
           <CartProvider>
             <Navbar />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify([
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "Organization",
+                    name: siteName,
+                    url: siteUrl,
+                    logo: absoluteUrl(brandIcon),
+                    description: defaultDescription,
+                  },
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    name: siteName,
+                    url: siteUrl,
+                  },
+                ]),
+              }}
+            />
             <main className="site-content w-full min-w-0">
               {children}
             </main>
