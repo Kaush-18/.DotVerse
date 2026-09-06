@@ -49,7 +49,7 @@ export default function CollectionCard({
       <div className="collections-rebuild-art">
         <Image
           src={artwork[collection.id]}
-          alt={`DotVerse ${collection.title[0]}${collection.title.slice(1).toLowerCase()} T-shirt`}
+          alt={`${collection.title} collection artwork by DotVerse`}
           fill
           sizes="(max-width: 767px) 100vw, (max-width: 1100px) 50vw, 33vw"
           className="collections-rebuild-art-image"

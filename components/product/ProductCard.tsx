@@ -80,7 +80,7 @@ export default function ProductCard({
         >
           <Image
             src={product.images[0]}
-            alt={product.name}
+            alt={`${product.name} by DotVerse`}
             fill
             sizes={
               variant === "editorial"

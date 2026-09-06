@@ -1,9 +1,11 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import Container from "@/components/layout/Container";
 import PageReveal from "@/components/animations/PageReveal";
 import ProductGrid from "@/components/product/ProductGrid";
 import ShopControls from "@/components/shop/ShopControls";
 import { getFilteredProducts } from "@/services/products";
+import { collections } from "@/components/home/collectionData";
 
 interface ShopPageProps {
   searchParams: Promise<{
@@ -103,6 +105,18 @@ export default async function ShopPage(props: ShopPageProps) {
                 Each piece blends futuristic design with cosmic-inspired motifs, crafted for those 
                 who look beyond the ordinary. Explore apparel engineered for comfort and distinct style.
               </p>
+
+              <nav aria-label="Shop collections" className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-300">
+                {collections.map((collection) => (
+                  <Link
+                    key={collection.id}
+                    href={`/collections/${collection.id}`}
+                    className="transition-colors hover:text-white"
+                  >
+                    Explore {collection.title}
+                  </Link>
+                ))}
+              </nav>
             </div>
 
             {/* Product grid */}

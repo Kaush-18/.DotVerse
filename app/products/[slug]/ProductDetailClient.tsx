@@ -9,6 +9,7 @@ import PageReveal from "@/components/animations/PageReveal";
 import ProductGrid from "@/components/product/ProductGrid";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types/product";
+import { collections } from "@/components/home/collectionData";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -25,6 +26,9 @@ export default function ProductDetailClient({
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { addToCart } = useCart();
+  const collection = collections.find(
+    (item) => item.title.toLowerCase() === product.collection.toLowerCase()
+  );
 
   const selectedVariant = useMemo(() => {
     if (!selectedSize || !selectedColor) return null;
@@ -102,14 +106,24 @@ export default function ProductDetailClient({
       <main>
         <Container>
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 pt-8 text-[10px] uppercase tracking-[0.2em] text-white/35">
+            <Link href="/" className="transition-colors hover:text-white">Home</Link>
+            <span>/</span>
             <Link href="/shop" className="transition-colors hover:text-white">Shop</Link>
+            {collection && (
+              <>
+                <span>/</span>
+                <Link href={`/collections/${collection.id}`} className="transition-colors hover:text-white">
+                  {collection.title}
+                </Link>
+              </>
+            )}
             <span>/</span>
             <span className="text-violet-300">{product.name}</span>
           </nav>
 
           <div className="grid grid-cols-1 gap-10 py-10 sm:py-12 md:grid-cols-2 md:gap-12 lg:gap-16">
             <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/[0.1] bg-[#0b0714] sm:rounded-3xl">
-              <Image src={product.images[0]} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" priority className="object-cover" />
+              <Image src={product.images[0]} alt={`${product.name} by DotVerse`} fill sizes="(max-width: 768px) 100vw, 50vw" priority className="object-cover" />
             </div>
 
             <div className="flex flex-col justify-center">
@@ -201,7 +215,10 @@ export default function ProductDetailClient({
             </div>
 
             {relatedProducts.length > 0 && (
-              <ProductGrid products={relatedProducts} />
+              <>
+                <h2 className="mb-8 text-2xl font-semibold text-white">More DotVerse pieces</h2>
+                <ProductGrid products={relatedProducts} />
+              </>
             )}
           </section>
         </Container>

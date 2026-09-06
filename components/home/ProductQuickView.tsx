@@ -79,7 +79,7 @@ export default function ProductQuickView({
         <div className="quick-view-image">
           <Image
             src={product.images[0]}
-            alt={product.name}
+            alt={`${product.name} by DotVerse`}
             fill
             sizes="50vw"
             className="quick-view-product-image"

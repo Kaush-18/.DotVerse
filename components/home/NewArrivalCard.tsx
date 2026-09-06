@@ -44,7 +44,7 @@ export default function NewArrivalCard({
         <Link href={`/products/${product.slug}`} aria-label={`View ${product.name}`}>
           <Image
             src={product.images[0]}
-            alt={product.name}
+            alt={`${product.name} by DotVerse`}
             fill
             sizes="(max-width: 700px) 100vw, (max-width: 1050px) 50vw, 25vw"
             className="new-arrivals-rebuild-image"

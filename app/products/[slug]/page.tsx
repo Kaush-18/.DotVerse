@@ -3,6 +3,7 @@ import { getProductBySlug, getRelatedProducts } from "@/services/products";
 import ProductDetailClient from "./ProductDetailClient";
 import type { Metadata } from "next";
 import { absoluteUrl, siteName, siteUrl } from "@/lib/seo";
+import { collections } from "@/components/home/collectionData";
 
 interface ProductPageProps {
   params: Promise<{
@@ -21,8 +22,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   }
 
   const url = absoluteUrl(`/products/${product.slug}`);
-  const title = `${product.name} | ${product.category} | DotVerse`;
-  const description = product.description;
+  const title = `${product.name} | ${product.category}`;
+  const description = `${product.description} Shop ${product.name} from the DotVerse ${product.collection} collection.`;
   const image = product.images.length > 0 ? absoluteUrl(product.images[0]) : undefined;
 
   return {
@@ -65,6 +66,10 @@ export default async function ProductPage({
     3,
   );
   const productUrl = absoluteUrl(`/products/${product.slug}`);
+  const productCollection = collections.find(
+    (collection) =>
+      collection.title.toLowerCase() === product.collection.toLowerCase(),
+  );
 
   // Schema.org Product
   const productLd = {
@@ -79,6 +84,9 @@ export default async function ProductPage({
       name: "DotVerse",
     },
     category: product.category,
+    url: productUrl,
+    color: product.colors.map((color) => color.name),
+    size: product.sizes,
     offers: {
       "@type": "Offer",
       price: product.price.toFixed(2),
@@ -110,9 +118,17 @@ export default async function ProductPage({
         "name": "Shop",
         "item": absoluteUrl("/shop")
       },
+      ...(productCollection
+        ? [{
+            "@type": "ListItem",
+            "position": 3,
+            "name": `${productCollection.title} Collection`,
+            "item": absoluteUrl(`/collections/${productCollection.id}`),
+          }]
+        : []),
       {
         "@type": "ListItem",
-        "position": 3,
+        "position": productCollection ? 4 : 3,
         "name": product.name,
         "item": productUrl
       }

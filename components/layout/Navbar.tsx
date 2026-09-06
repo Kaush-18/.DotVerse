@@ -18,7 +18,7 @@ const navLinks = [
   { label: "Track Order", href: "/track-order", icon: Package },
   { label: "Collections", href: "/#collections", icon: Layers },
   { label: "About", href: "#", icon: Info },
-  { label: "Contact", href: "#", icon: Mail },
+  { label: "Contact", href: "/contact", icon: Mail },
 ];
 
 export default function Navbar() {
