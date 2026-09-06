@@ -1,67 +1,19 @@
+import Link from "next/link";
+import { ArrowLeft, MapPin, Package, ReceiptText } from "lucide-react";
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
-import { redirect, notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-export default async function OrderDetailPage({
-  params,
-}: {
-  params: Promise<{ orderNumber: string }>;
-}) {
+const money = (paise: number) => `₹${(paise / 100).toFixed(2)}`;
+
+export default async function OrderDetailPage({ params }: { params: Promise<{ orderNumber: string }> }) {
   const { orderNumber } = await params;
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect(`/login?redirect=/account/orders/${encodeURIComponent(orderNumber)}`);
+  const order = await prisma.order.findFirst({ where: { orderNumber, userId: session.user.id }, include: { items: true } });
+  if (!order) notFound();
 
-  if (!session) {
-    redirect(`/login?redirect=/account/orders/${orderNumber}`);
-  }
-
-  const order = await prisma.order.findUnique({
-    where: { 
-        orderNumber,
-        userId: session.user.id 
-    },
-    include: { items: true },
-  });
-
-  if (!order) {
-    notFound();
-  }
-
-  return (
-    <div className="space-y-6 text-white">
-      <h1 className="text-2xl font-bold">Order {order.orderNumber}</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <h2 className="font-semibold mb-4">Order Details</h2>
-            <p>Date: {new Date(order.createdAt).toLocaleDateString()}</p>
-            <p>Status: {order.status}</p>
-            <p>Payment: {order.paymentStatus} ({order.paymentMethod})</p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <h2 className="font-semibold mb-4">Shipping Information</h2>
-            <p>{order.firstName} {order.lastName}</p>
-            <p>{order.address}</p>
-            {order.apartment && <p>{order.apartment}</p>}
-            <p>{order.city}, {order.state} {order.postalCode}</p>
-        </div>
-      </div>
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h2 className="font-semibold mb-4">Items</h2>
-        {order.items.map((item) => (
-            <div key={item.id} className="flex justify-between py-2 border-b border-white/5 last:border-0">
-                <div>
-                    <p className="font-medium">{item.productName}</p>
-                    <p className="text-sm text-gray-400">{item.variantSize} / {item.variantColor}</p>
-                </div>
-                <p>{item.quantity} x ₹{item.price / 100}</p>
-            </div>
-        ))}
-        <div className="mt-4 text-right font-bold text-lg">
-            Total: ₹{order.total / 100}
-        </div>
-      </div>
-    </div>
-  );
+  return <div className="space-y-7 text-white"><Link href="/account/orders" className="inline-flex items-center gap-2 text-xs text-white/50 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"><ArrowLeft size={14} /> Back to orders</Link><header className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 pb-6"><div><p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-violet-300/80">Order details</p><h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">{order.orderNumber}</h1><p className="mt-2 text-sm text-white/50">Placed {new Date(order.createdAt).toLocaleDateString()}</p></div><div className="rounded-full border border-violet-400/25 bg-violet-500/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-violet-200">{order.status}</div></header><div className="grid gap-4 md:grid-cols-2"><section className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><div className="flex items-center gap-2 text-sm font-semibold"><ReceiptText size={17} className="text-violet-300" /> Summary</div><dl className="mt-5 space-y-3 text-sm"><div className="flex justify-between gap-4 text-white/55"><dt>Payment</dt><dd className="text-right text-white">{order.paymentStatus} · {order.paymentMethod}</dd></div><div className="flex justify-between gap-4 text-white/55"><dt>Subtotal</dt><dd className="text-white">{money(order.subtotal)}</dd></div><div className="flex justify-between gap-4 text-white/55"><dt>Shipping</dt><dd className="text-white">{order.shipping ? money(order.shipping) : "Free"}</dd></div><div className="flex justify-between gap-4 border-t border-white/10 pt-3 font-semibold"><dt>Total</dt><dd>{money(order.total)}</dd></div></dl></section><section className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><div className="flex items-center gap-2 text-sm font-semibold"><MapPin size={17} className="text-violet-300" /> Shipping to</div><div className="mt-5 space-y-1 text-sm leading-6 text-white/65"><p className="font-medium text-white">{order.firstName} {order.lastName}</p><p>{order.address}</p>{order.apartment && <p>{order.apartment}</p>}<p>{order.city}, {order.state} {order.postalCode}</p><p className="pt-2 text-xs text-white/45">{order.email} · {order.phone}</p></div></section></div><section className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><div className="flex items-center gap-2 text-sm font-semibold"><Package size={17} className="text-violet-300" /> Items <span className="text-xs font-normal text-white/40">({order.items.length})</span></div><div className="mt-5 divide-y divide-white/10">{order.items.map((item) => <div key={item.id} className="flex flex-wrap items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"><div className="min-w-0"><p className="text-sm font-medium text-white">{item.productName}</p><p className="mt-1 text-xs text-white/45">{item.variantColor} / {item.variantSize} · Qty {item.quantity}</p></div><p className="text-sm font-medium text-white">{money(item.price * item.quantity)}</p></div>)}</div></section></div>;
 }
