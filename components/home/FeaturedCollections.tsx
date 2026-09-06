@@ -106,7 +106,7 @@ export default function FeaturedCollections() {
                   sm:tracking-[0.3em]
                 "
               >
-                Featured collections
+                Explore
               </span>
             </div>
 
@@ -122,10 +122,10 @@ export default function FeaturedCollections() {
                 text-white
               "
             >
-              Find your
+              Featured
               <br />
               <span className="text-white/35">
-                frequency.
+                Collection.
               </span>
             </h2>
           </motion.div>

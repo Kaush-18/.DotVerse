@@ -21,7 +21,7 @@ export default function HomeContent() {
   }, []);
 
   return (
-    <>
+    <div className="home-editorial">
       <AnimatePresence mode="wait">
         {loading && <Loader key="loader" />}
       </AnimatePresence>
@@ -33,6 +33,6 @@ export default function HomeContent() {
           <NewArrivals />
         </PageReveal>
       )}
-    </>
+    </div>
   );
 }

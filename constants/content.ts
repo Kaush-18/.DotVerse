@@ -1,16 +1,16 @@
 export const HERO = {
-    badge: "PREMIUM STREETWEAR",
+    badge: "DOTVERSE / EST. 2025",
   
     title: [
-      "Wear",
-      "Your",
-      "Universe."
+      "MORE THAN",
+      "JUST A",
+      "T-SHIRT."
     ],
   
     description:
-      "Minimal premium streetwear inspired by space, innovation and futuristic culture.",
+      "PREMIUM STREETWEAR FOR A BOLDER YOU.",
   
-    primaryButton: "Shop Collection",
+    primaryButton: "SHOP NOW  →",
   
-    secondaryButton: "Explore",
+    secondaryButton: "EXPLORE",
   };

@@ -31,14 +31,12 @@ export default function Button({
         `,
         variant === "primary"
           ? `
-            bg-gradient-to-r
-            from-violet-700
-            via-violet-600
-            to-indigo-600
-            text-white
-            shadow-[0_10px_35px_rgba(124,58,237,.35)]
+            bg-white
+            text-black
+            shadow-[0_10px_35px_rgba(0,0,0,.25)]
             hover:scale-105
-            hover:shadow-[0_15px_55px_rgba(124,58,237,.55)]
+            hover:bg-white/90
+            hover:shadow-[0_15px_55px_rgba(0,0,0,.4)]
           `
           : `
             border
@@ -47,7 +45,7 @@ export default function Button({
             text-white
             backdrop-blur-xl
             hover:bg-white/10
-            hover:border-violet-500/50
+            hover:border-white/40
             hover:scale-105
           `,
         className
@@ -81,7 +79,7 @@ export default function Button({
           transition-opacity
           duration-500
           group-hover:opacity-100
-          bg-violet-500/20
+          bg-white/15
         "
       />
 

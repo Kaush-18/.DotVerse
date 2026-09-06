@@ -65,8 +65,9 @@ export default function Navbar() {
           flex items-center justify-between
           px-4 py-2
           rounded-full
-          bg-[#07040d]/80 backdrop-blur-xl border border-white/10
-          shadow-[0_0_20px_rgba(124,58,237,0.15)]
+          navbar
+          bg-[#090909]/78 backdrop-blur-xl border border-white/10
+          shadow-[0_10px_35px_rgba(0,0,0,0.22)]
         "
       >
         <Logo />
@@ -79,7 +80,7 @@ export default function Navbar() {
               className={`
                 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
                 ${isActive(item.href) 
-                  ? "text-white bg-white/10 shadow-[0_0_10px_rgba(124,58,237,0.3)]" 
+                  ? "text-white bg-white/10 shadow-[0_0_10px_rgba(255,255,255,0.08)]"
                   : "text-white/70 hover:text-white hover:bg-white/5"}
               `}
             >
@@ -98,7 +99,7 @@ export default function Navbar() {
           <Link href="/cart" aria-label="Cart" className="relative p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
             <ShoppingBag size={20} />
             {totalItems > 0 && (
-              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
+              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black">
                 {totalItems}
               </span>
             )}
@@ -160,7 +161,7 @@ export default function Navbar() {
                       : "text-white/70 hover:bg-white/5 hover:text-white"}
                   `}
                 >
-                  <item.icon size={20} className={isActive(item.href) ? "text-violet-400" : "text-white/50"} />
+                  <item.icon size={20} className={isActive(item.href) ? "text-white" : "text-white/50"} />
                   {item.label}
                 </Link>
               ))}

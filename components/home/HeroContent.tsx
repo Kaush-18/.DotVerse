@@ -1,28 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import CountUp from "react-countup";
 
 import Button from "@/components/ui/Button";
 import { HERO } from "@/constants/content";
-
-const stats = [
-  {
-    number: 500,
-    suffix: "+",
-    label: "Premium Designs",
-  },
-  {
-    number: 24,
-    suffix: "K+",
-    label: "Happy Customers",
-  },
-  {
-    number: 100,
-    suffix: "%",
-    label: "Premium Quality",
-  },
-];
 
 export default function HeroContent() {
   return (
@@ -206,134 +187,6 @@ export default function HeroContent() {
         >
           {HERO.secondaryButton}
         </Button>
-
-      </motion.div>
-
-
-      {/* =====================================================
-          STATS
-      ===================================================== */}
-
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: 25,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-        transition={{
-          delay: 1.8,
-          duration: 0.8,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-        className="hero-stats"
-      >
-
-        {stats.map((item, index) => (
-          <motion.div
-            key={item.label}
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 1.9 + index * 0.1,
-              duration: 0.6,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            whileHover={{
-              y: -4,
-            }}
-            className="
-              group
-              min-w-0
-
-              rounded-xl
-              border
-              border-white/10
-
-              bg-violet-500/[0.12]
-              backdrop-blur-xl
-
-              px-3
-              py-2.5
-
-              transition-all
-              duration-500
-
-              hover:border-violet-500/40
-              hover:bg-violet-500/[0.18]
-              hover:shadow-[0_15px_40px_rgba(124,58,237,0.15)]
-
-              sm:rounded-2xl
-              sm:px-4
-              sm:py-3
-            "
-          >
-
-            {/* Number */}
-
-            <div
-              className="
-                flex
-                items-baseline
-                whitespace-nowrap
-
-                text-2xl
-                font-black
-                leading-none
-                text-white
-
-                sm:text-3xl
-                lg:text-[2.6rem]
-              "
-            >
-              <CountUp
-                end={item.number}
-                duration={2}
-                separator=","
-              />
-
-              <span
-                className="
-                  transition-colors
-                  duration-300
-                  group-hover:text-violet-400
-                "
-              >
-                {item.suffix}
-              </span>
-            </div>
-
-
-            {/* Label */}
-
-            <p
-              className="
-                mt-1
-                truncate
-
-                text-[8px]
-                font-medium
-                uppercase
-                tracking-wide
-                text-white/45
-
-                sm:text-[9px]
-                lg:text-[10px]
-              "
-            >
-              {item.label}
-            </p>
-
-          </motion.div>
-        ))}
 
       </motion.div>
 
