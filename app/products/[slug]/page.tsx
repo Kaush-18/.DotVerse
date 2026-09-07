@@ -3,6 +3,10 @@ import { getProductBySlug, getRelatedProducts } from "@/services/products";
 import ProductDetailClient from "./ProductDetailClient";
 import type { Metadata } from "next";
 import { absoluteUrl, siteName, siteUrl } from "@/lib/seo";
+import {
+  merchantReturnPolicy,
+  offerShippingDetails,
+} from "@/lib/seo/merchant-policy";
 import { collections } from "@/components/home/collectionData";
 
 interface ProductPageProps {
@@ -94,6 +98,8 @@ export default async function ProductPage({
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       itemCondition: "https://schema.org/NewCondition",
       url: productUrl,
+      hasMerchantReturnPolicy: merchantReturnPolicy,
+      shippingDetails: offerShippingDetails,
       seller: {
         "@type": "Organization",
         name: siteName,
