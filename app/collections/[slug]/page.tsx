@@ -37,8 +37,27 @@ export async function generateMetadata({
     return { title: "Collection Not Found | DotVerse", robots: { index: false } };
   }
 
-  const title = `${collection.title} Collection`;
-  const description = collection.description;
+  const metadataByCollection: Record<
+    string,
+    { title: string; description: string }
+  > = {
+    cosmic: {
+      title: "Cosmic Graphic T-Shirts & Streetwear",
+      description:
+        "Explore DotVerse's Cosmic collection of futuristic streetwear silhouettes designed for those who move beyond the ordinary.",
+    },
+    essentials: {
+      title: "Essentials Minimal Streetwear",
+      description:
+        "Shop DotVerse Essentials for minimal streetwear, clean forms, and everyday pieces built around the DotVerse identity.",
+    },
+    signature: {
+      title: "Signature Graphic Streetwear",
+      description:
+        "Discover DotVerse Signature, the original brand language expressed through bold, experimental, and unmistakably .Dot pieces.",
+    },
+  } as const;
+  const { title, description } = metadataByCollection[collection.id];
   const url = absoluteUrl(`/collections/${collection.id}`);
   const image = absoluteUrl(collectionImages[collection.id]);
 
@@ -80,7 +99,7 @@ export default async function CollectionPage({
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
-      { "@type": "ListItem", position: 2, name: "Collections", item: absoluteUrl("/#collections") },
+      { "@type": "ListItem", position: 2, name: "Shop", item: absoluteUrl("/shop") },
       { "@type": "ListItem", position: 3, name: `${collection.title} Collection`, item: collectionUrl },
     ],
   };
@@ -97,7 +116,7 @@ export default async function CollectionPage({
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/35">
             <Link href="/" className="transition-colors hover:text-white">Home</Link>
             <span>/</span>
-            <Link href="/#collections" className="transition-colors hover:text-white">Collections</Link>
+            <Link href="/shop" className="transition-colors hover:text-white">Shop</Link>
             <span>/</span>
             <span className="text-violet-300">{collection.title}</span>
           </nav>
