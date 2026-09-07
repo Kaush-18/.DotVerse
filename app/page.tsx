@@ -1,17 +1,22 @@
 import type { Metadata } from "next";
-import { absoluteUrl, defaultDescription, defaultSocialImage, siteUrl } from "@/lib/seo";
+import { absoluteUrl, defaultSocialImage } from "@/lib/seo";
 import HomeContent from "@/components/home/HomeContent";
 
+const homepageTitle = "DotVerse | Graphic T-Shirts & Modern Streetwear";
+const homepageDescription =
+  "DotVerse creates original graphic T-shirts and modern streetwear with distinctive visual design, everyday comfort, and quality you can wear. Explore the collection.";
+const homepageUrl = "https://dotverse.store/";
+
 export const metadata: Metadata = {
-  title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
-  description: defaultDescription,
+  title: homepageTitle,
+  description: homepageDescription,
   alternates: {
-    canonical: siteUrl,
+    canonical: homepageUrl,
   },
   openGraph: {
-    title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
-    description: defaultDescription,
-    url: siteUrl,
+    title: homepageTitle,
+    description: homepageDescription,
+    url: homepageUrl,
     siteName: "DotVerse",
     locale: "en_US",
     type: "website",
@@ -19,8 +24,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "DotVerse | Premium Streetwear & Graphic T-Shirts",
-    description: defaultDescription,
+    title: homepageTitle,
+    description: homepageDescription,
     images: [absoluteUrl(defaultSocialImage)],
   },
 };
