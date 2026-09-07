@@ -27,6 +27,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
   const url = absoluteUrl(`/products/${product.slug}`);
   const title = `${product.name} | ${product.category}`;
+  const socialTitle = `${product.name} | DotVerse ${product.category}`;
   const description = `${product.description} Shop ${product.name} from the DotVerse ${product.collection} collection.`;
   const image = product.images.length > 0 ? absoluteUrl(product.images[0]) : undefined;
 
@@ -37,16 +38,16 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       canonical: url,
     },
     openGraph: {
-      title,
+      title: socialTitle,
       description,
-      images: image ? [{ url: image, alt: product.name }] : [],
+      images: image ? [{ url: image, alt: `${product.name} by DotVerse` }] : [],
       url,
       type: "website",
       siteName,
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: socialTitle,
       description,
       images: image ? [image] : [],
     },
