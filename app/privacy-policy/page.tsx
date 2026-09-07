@@ -1,10 +1,27 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, defaultSocialImage, siteName } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | DotVerse",
-  description: "Privacy policy for DotVerse Clothing Brand.",
+  title: "Privacy Policy",
+  description:
+    "Read how DotVerse Clothing Brand collects, uses, and discloses information from website users.",
   alternates: { canonical: absoluteUrl("/privacy-policy") },
+  openGraph: {
+    title: "Privacy Policy | DotVerse",
+    description:
+      "Read how DotVerse Clothing Brand collects, uses, and discloses information from website users.",
+    type: "website",
+    url: absoluteUrl("/privacy-policy"),
+    siteName,
+    images: [{ url: absoluteUrl(defaultSocialImage), alt: "DotVerse streetwear" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy | DotVerse",
+    description:
+      "Read how DotVerse Clothing Brand collects, uses, and discloses information from website users.",
+    images: [absoluteUrl(defaultSocialImage)],
+  },
 };
 
 export default function PrivacyPolicyPage() {

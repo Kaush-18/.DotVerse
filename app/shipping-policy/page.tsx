@@ -1,10 +1,27 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, defaultSocialImage, siteName } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Shipping Policy | DotVerse",
-  description: "Shipping policy for DotVerse Clothing Brand.",
+  title: "Shipping Policy",
+  description:
+    "Review DotVerse shipping details, including delivery within India, free shipping, and 1–7 day order processing.",
   alternates: { canonical: absoluteUrl("/shipping-policy") },
+  openGraph: {
+    title: "Shipping Policy | DotVerse",
+    description:
+      "Review DotVerse shipping details, including delivery within India, free shipping, and 1–7 day order processing.",
+    type: "website",
+    url: absoluteUrl("/shipping-policy"),
+    siteName,
+    images: [{ url: absoluteUrl(defaultSocialImage), alt: "DotVerse streetwear" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shipping Policy | DotVerse",
+    description:
+      "Review DotVerse shipping details, including delivery within India, free shipping, and 1–7 day order processing.",
+    images: [absoluteUrl(defaultSocialImage)],
+  },
 };
 
 export default function ShippingPolicyPage() {

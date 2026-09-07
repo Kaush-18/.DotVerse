@@ -1,10 +1,27 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, defaultSocialImage, siteName } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | DotVerse",
-  description: "Terms of service for DotVerse Clothing Brand.",
+  title: "Terms of Service",
+  description:
+    "Read the terms governing use of the DotVerse website, product purchases, payments, intellectual property, and liability.",
   alternates: { canonical: absoluteUrl("/terms-of-service") },
+  openGraph: {
+    title: "Terms of Service | DotVerse",
+    description:
+      "Read the terms governing use of the DotVerse website, product purchases, payments, intellectual property, and liability.",
+    type: "website",
+    url: absoluteUrl("/terms-of-service"),
+    siteName,
+    images: [{ url: absoluteUrl(defaultSocialImage), alt: "DotVerse streetwear" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service | DotVerse",
+    description:
+      "Read the terms governing use of the DotVerse website, product purchases, payments, intellectual property, and liability.",
+    images: [absoluteUrl(defaultSocialImage)],
+  },
 };
 
 export default function TermsOfServicePage() {

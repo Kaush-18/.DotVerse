@@ -1,10 +1,27 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, defaultSocialImage, siteName } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Return & Refund Policy | DotVerse",
-  description: "Return and refund policy for DotVerse Clothing Brand.",
+  title: "Return & Refund Policy",
+  description:
+    "Review DotVerse return, exchange, refund, and damaged-item procedures, including the 7-day return window.",
   alternates: { canonical: absoluteUrl("/return-refund-policy") },
+  openGraph: {
+    title: "Return & Refund Policy | DotVerse",
+    description:
+      "Review DotVerse return, exchange, refund, and damaged-item procedures, including the 7-day return window.",
+    type: "website",
+    url: absoluteUrl("/return-refund-policy"),
+    siteName,
+    images: [{ url: absoluteUrl(defaultSocialImage), alt: "DotVerse streetwear" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Return & Refund Policy | DotVerse",
+    description:
+      "Review DotVerse return, exchange, refund, and damaged-item procedures, including the 7-day return window.",
+    images: [absoluteUrl(defaultSocialImage)],
+  },
 };
 
 export default function ReturnRefundPolicyPage() {

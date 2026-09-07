@@ -1,10 +1,27 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, defaultSocialImage, siteName } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Contact Us | DotVerse",
-  description: "Get in touch with DotVerse Clothing Brand support.",
+  title: "Contact DotVerse",
+  description:
+    "Contact DotVerse Clothing Brand by email or phone for support from Farrukhabad, Uttar Pradesh, India.",
   alternates: { canonical: absoluteUrl("/contact") },
+  openGraph: {
+    title: "Contact DotVerse | DotVerse",
+    description:
+      "Contact DotVerse Clothing Brand by email or phone for support from Farrukhabad, Uttar Pradesh, India.",
+    type: "website",
+    url: absoluteUrl("/contact"),
+    siteName,
+    images: [{ url: absoluteUrl(defaultSocialImage), alt: "DotVerse streetwear" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact DotVerse | DotVerse",
+    description:
+      "Contact DotVerse Clothing Brand by email or phone for support from Farrukhabad, Uttar Pradesh, India.",
+    images: [absoluteUrl(defaultSocialImage)],
+  },
 };
 
 export default function ContactPage() {
