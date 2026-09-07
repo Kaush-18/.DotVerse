@@ -36,6 +36,9 @@ export const metadata: Metadata = {
     template: "%s | DotVerse",
   },
   description: defaultDescription,
+  verification: {
+    google: "EBTQuN9pailbERq-r1_BK0yjpZwmddWRAerdPZAlu5c",
+  },
   alternates: {
     canonical: siteUrl,
   },
