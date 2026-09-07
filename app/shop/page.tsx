@@ -6,6 +6,11 @@ import ProductGrid from "@/components/product/ProductGrid";
 import ShopControls from "@/components/shop/ShopControls";
 import { getFilteredProducts } from "@/services/products";
 import { collections } from "@/components/home/collectionData";
+import {
+  absoluteUrl,
+  defaultSocialImage,
+  siteName,
+} from "@/lib/seo";
 
 interface ShopPageProps {
   searchParams: Promise<{
@@ -26,9 +31,9 @@ export async function generateMetadata({
 }: ShopPageProps): Promise<Metadata> {
   const params = await searchParams;
   const hasFilters = Object.values(params).some(Boolean);
-  const title = "Shop Premium Cosmic Streetwear";
+  const title = "Shop DotVerse Graphic T-Shirts & Streetwear";
   const description =
-    "Explore DotVerse's collection of premium cosmic and futuristic streetwear T-shirts, designed for people who look beyond the ordinary.";
+    "Browse DotVerse's original graphic T-shirts and modern streetwear collection, designed with distinctive visuals, everyday comfort, and a bold point of view.";
 
   return {
     title,
@@ -39,7 +44,20 @@ export async function generateMetadata({
       title,
       description,
       url: "https://dotverse.store/shop",
+      siteName,
       type: "website",
+      images: [
+        {
+          url: absoluteUrl(defaultSocialImage),
+          alt: "DotVerse graphic T-shirts and modern streetwear",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [absoluteUrl(defaultSocialImage)],
     },
   };
 }
@@ -93,11 +111,9 @@ export default async function ShopPage(props: ShopPageProps) {
               </div>
 
               <h1 className="max-w-[850px] text-[clamp(3.1rem,7vw,6rem)] font-black leading-[0.88] tracking-[-0.065em] text-white">
-                Build your
+                Shop original
                 <br />
-                <span className="text-white/35">
-                  universe.
-                </span>
+                <span className="text-white/35">graphic T-shirts.</span>
               </h1>
 
               <p className="mt-6 max-w-[500px] text-sm leading-6 text-white/60">
