@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Payment",
+  alternates: null,
   robots: { index: false, follow: true },
 };
 

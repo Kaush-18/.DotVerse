@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Order Confirmation",
+  alternates: null,
   robots: { index: false, follow: false },
 };
 
