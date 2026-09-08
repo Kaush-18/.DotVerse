@@ -9,6 +9,13 @@ type FullProduct = PrismaProduct & {
   variants: ProductVariant[];
 };
 
+export type RelatedProductsRelationship = "collection" | "category" | "generic";
+
+export type RelatedProductsResult = {
+  products: Product[];
+  relationship: RelatedProductsRelationship;
+};
+
 function mapProduct(product: FullProduct): Product {
   const colors = Array.from(
     new Map(
@@ -136,7 +143,7 @@ export async function getRelatedProducts(
   collectionName: string,
   categoryName: string,
   limit = 3,
-): Promise<Product[]> {
+): Promise<RelatedProductsResult> {
   const sameCollection = await prisma.product.findMany({
     where: {
       id: {
@@ -163,7 +170,10 @@ export async function getRelatedProducts(
   });
 
   if (sameCollection.length >= limit) {
-    return sameCollection.map(mapProduct);
+    return {
+      products: sameCollection.map(mapProduct),
+      relationship: "collection",
+    };
   }
 
   const existingIds = [
@@ -196,7 +206,17 @@ export async function getRelatedProducts(
     take: limit - sameCollection.length,
   });
 
-  return [...sameCollection, ...sameCategory].map(mapProduct);
+  const relationship =
+    sameCollection.length > 0 && sameCollection.length >= sameCategory.length
+      ? "collection"
+      : sameCategory.length > 0
+        ? "category"
+        : "generic";
+
+  return {
+    products: [...sameCollection, ...sameCategory].map(mapProduct),
+    relationship,
+  };
 }
 
 export async function getFilteredProducts(params: {

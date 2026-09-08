@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types/product";
+import { collections } from "./collectionData";
 
 const taglines: Record<string, string> = {
   "cosmic-tee": "Beyond the ordinary.",
@@ -27,6 +28,9 @@ export default function NewArrivalCard({
   const { addToCart } = useCart();
   const color = product.colors[0];
   const size = product.sizes[0] ?? "M";
+  const collection = collections.find(
+    (item) => item.title.toLowerCase() === product.collection.toLowerCase(),
+  );
 
   return (
     <motion.article
@@ -72,6 +76,15 @@ export default function NewArrivalCard({
           </h3>
           <span>₹{product.price.toLocaleString("en-IN")}</span>
         </div>
+
+        {collection && (
+          <Link
+            href={`/collections/${collection.id}`}
+            className="mt-2 inline-flex text-[9px] uppercase tracking-[0.18em] text-violet-300 transition-colors hover:text-white"
+          >
+            {collection.title} Collection
+          </Link>
+        )}
 
         <p>{taglines[product.id] ?? product.description}</p>
 

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-import Button from "@/components/ui/Button";
+import { LinkButton } from "@/components/ui/Button";
 import { HERO } from "@/constants/content";
 
 export default function HeroContent() {
@@ -161,7 +161,8 @@ export default function HeroContent() {
         className="hero-actions"
       >
 
-        <Button
+        <LinkButton
+          href="/shop"
           className="
             px-7
             py-3.5
@@ -172,9 +173,10 @@ export default function HeroContent() {
           "
         >
           {HERO.primaryButton}
-        </Button>
+        </LinkButton>
 
-        <Button
+        <LinkButton
+          href="/#collections"
           variant="secondary"
           className="
             px-7
@@ -186,7 +188,7 @@ export default function HeroContent() {
           "
         >
           {HERO.secondaryButton}
-        </Button>
+        </LinkButton>
 
       </motion.div>
 

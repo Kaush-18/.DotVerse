@@ -1,58 +1,74 @@
-import { cn } from "@/lib/utils";
-import { ButtonHTMLAttributes } from "react";
+"use client";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+import Link from "next/link";
+import {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  ReactNode,
+} from "react";
+
+import { cn } from "@/lib/utils";
+
+type ButtonStyleProps = {
   variant?: "primary" | "secondary";
+  className?: string;
+  children?: ReactNode;
+};
+
+type ButtonProps = ButtonStyleProps &
+  ButtonHTMLAttributes<HTMLButtonElement>;
+
+type LinkButtonProps = ButtonStyleProps &
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className" | "children"> & {
+    href: string;
+  };
+
+function getButtonClassName(
+  variant: ButtonStyleProps["variant"],
+  className?: string,
+) {
+  return cn(
+    `
+      group
+      relative
+      overflow-hidden
+      rounded-full
+      px-8
+      py-4
+      text-sm
+      font-semibold
+      tracking-wide
+      transition-all
+      duration-500
+      ease-out
+      active:scale-95
+    `,
+    variant === "secondary"
+      ? `
+          border
+          border-white/15
+          bg-white/5
+          text-white
+          backdrop-blur-xl
+          hover:bg-white/10
+          hover:border-white/40
+          hover:scale-105
+        `
+      : `
+          bg-white
+          text-black
+          shadow-[0_10px_35px_rgba(0,0,0,.25)]
+          hover:scale-105
+          hover:bg-white/90
+          hover:shadow-[0_15px_55px_rgba(0,0,0,.4)]
+        `,
+    className,
+  );
 }
 
-export default function Button({
-  variant = "primary",
-  className,
-  children,
-  ...props
-}: ButtonProps) {
+function ButtonContent({ children }: { children?: ReactNode }) {
   return (
-    <button
-      className={cn(
-        `
-        group
-        relative
-        overflow-hidden
-        rounded-full
-        px-8
-        py-4
-        text-sm
-        font-semibold
-        tracking-wide
-        transition-all
-        duration-500
-        ease-out
-        active:scale-95
-        `,
-        variant === "primary"
-          ? `
-            bg-white
-            text-black
-            shadow-[0_10px_35px_rgba(0,0,0,.25)]
-            hover:scale-105
-            hover:bg-white/90
-            hover:shadow-[0_15px_55px_rgba(0,0,0,.4)]
-          `
-          : `
-            border
-            border-white/15
-            bg-white/5
-            text-white
-            backdrop-blur-xl
-            hover:bg-white/10
-            hover:border-white/40
-            hover:scale-105
-          `,
-        className
-      )}
-      {...props}
-    >
-      {/* Shine Animation */}
+    <>
       <span
         className="
           absolute
@@ -68,7 +84,6 @@ export default function Button({
         "
       />
 
-      {/* Glow */}
       <span
         className="
           absolute
@@ -83,10 +98,43 @@ export default function Button({
         "
       />
 
-      {/* Content */}
       <span className="relative z-10 flex items-center justify-center gap-2">
         {children}
       </span>
+    </>
+  );
+}
+
+export default function Button({
+  variant = "primary",
+  className,
+  children,
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      className={getButtonClassName(variant, className)}
+      {...props}
+    >
+      <ButtonContent>{children}</ButtonContent>
     </button>
+  );
+}
+
+export function LinkButton({
+  href,
+  variant = "primary",
+  className,
+  children,
+  ...props
+}: LinkButtonProps) {
+  return (
+    <Link
+      href={href}
+      className={getButtonClassName(variant, className)}
+      {...props}
+    >
+      <ButtonContent>{children}</ButtonContent>
+    </Link>
   );
 }

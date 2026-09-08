@@ -1865,7 +1865,7 @@ html {
   margin-top: clamp(26px, 4vh, 42px);
 }
 
-.home-editorial .hero-actions button:first-child {
+.home-editorial .hero-actions :is(button, a):first-child {
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 0;
   background: rgba(255, 255, 255, 0.92);
@@ -1873,19 +1873,19 @@ html {
   box-shadow: none;
 }
 
-.home-editorial .hero-actions button:first-child:hover {
+.home-editorial .hero-actions :is(button, a):first-child:hover {
   background: #ffffff;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.34);
 }
 
-.home-editorial .hero-actions button:last-child {
+.home-editorial .hero-actions :is(button, a):last-child {
   border-radius: 0;
   border-color: rgba(255, 255, 255, 0.26);
   background: rgba(0, 0, 0, 0.18);
   color: rgba(255, 255, 255, 0.8);
 }
 
-.home-editorial .hero-actions button:last-child:hover {
+.home-editorial .hero-actions :is(button, a):last-child:hover {
   border-color: rgba(255, 255, 255, 0.6);
   background: rgba(255, 255, 255, 0.08);
 }
@@ -4588,7 +4588,7 @@ html {
     font-size: 2.65rem;
   }
 
-  .home-editorial .hero-actions button {
+  .home-editorial .hero-actions :is(button, a) {
     padding-inline: 1.15rem;
   }
 }

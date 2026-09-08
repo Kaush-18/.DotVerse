@@ -7,6 +7,7 @@ import { Heart, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 
 import type { Product } from "@/types/product";
+import { collections } from "@/components/home/collectionData";
 
 interface ProductCardProps {
   product: Product;
@@ -22,6 +23,9 @@ export default function ProductCard({
   variant = "default",
 }: ProductCardProps) {
   const [liked, setLiked] = useState(false);
+  const collection = collections.find(
+    (item) => item.title.toLowerCase() === product.collection.toLowerCase(),
+  );
 
   return (
     <motion.article
@@ -116,9 +120,19 @@ export default function ProductCard({
       ===================================================== */}
       <div className="product-info">
         <div className="product-top-row">
-          <span className="product-category">
-            {product.category}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="product-category">
+              {product.category}
+            </span>
+            {collection && (
+              <Link
+                href={`/collections/${collection.id}`}
+                className="text-[9px] uppercase tracking-[0.16em] text-violet-300 transition-colors hover:text-white"
+              >
+                {collection.title}
+              </Link>
+            )}
+          </div>
 
           <span className="product-price">
             ₹{product.price.toLocaleString("en-IN")}

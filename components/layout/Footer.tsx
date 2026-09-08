@@ -16,6 +16,9 @@ export default function Footer() {
             <h4>SHOP</h4>
             <Link href="/shop">All Products</Link>
             <Link href="/#collections">Collections</Link>
+            <Link href="/collections/cosmic">Cosmic</Link>
+            <Link href="/collections/essentials">Essentials</Link>
+            <Link href="/collections/signature">Signature</Link>
           </div>
 
           <div className="site-footer-column">

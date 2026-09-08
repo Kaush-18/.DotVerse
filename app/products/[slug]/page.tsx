@@ -74,7 +74,7 @@ export default async function ProductPage({
     notFound();
   }
 
-  const relatedProducts = await getRelatedProducts(
+  const relatedProductsResult = await getRelatedProducts(
     product.id,
     product.collection,
     product.category,
@@ -164,7 +164,8 @@ export default async function ProductPage({
       />
       <ProductDetailClient
         product={product}
-        relatedProducts={relatedProducts}
+        relatedProducts={relatedProductsResult.products}
+        relatedProductsRelationship={relatedProductsResult.relationship}
       />
     </>
   );

@@ -14,11 +14,13 @@ import { collections } from "@/components/home/collectionData";
 interface ProductDetailClientProps {
   product: Product;
   relatedProducts: Product[];
+  relatedProductsRelationship: "collection" | "category" | "generic";
 }
 
 export default function ProductDetailClient({
   product,
   relatedProducts,
+  relatedProductsRelationship,
 }: ProductDetailClientProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -129,6 +131,15 @@ export default function ProductDetailClient({
             <div className="flex flex-col justify-center">
               <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-black leading-[0.9] tracking-[-0.05em] text-white">{product.name}</h1>
 
+              {collection && (
+                <Link
+                  href={`/collections/${collection.id}`}
+                  className="mt-4 inline-flex w-fit text-[10px] font-semibold uppercase tracking-[0.25em] text-violet-300 transition-colors hover:text-white"
+                >
+                  {collection.title} Collection
+                </Link>
+              )}
+
               <p className="mt-6 text-sm leading-6 text-white/65">
                 {product.description}
               </p>
@@ -220,7 +231,13 @@ export default function ProductDetailClient({
 
             {relatedProducts.length > 0 && (
               <>
-                <h2 className="mb-8 text-2xl font-semibold text-white">More DotVerse pieces</h2>
+                <h2 className="mb-8 text-2xl font-semibold text-white">
+                  {relatedProductsRelationship === "collection" && collection
+                    ? `More from ${collection.title}`
+                    : relatedProductsRelationship === "category" && relatedProducts[0]
+                      ? `More ${relatedProducts[0].category}`
+                      : "Explore more DotVerse pieces"}
+                </h2>
                 <ProductGrid products={relatedProducts} />
               </>
             )}
