@@ -3,6 +3,7 @@ export interface Collection {
   eyebrow: string;
   title: string;
   description: string;
+  supportingDescription: string;
   label: string;
   className: string;
   glowClass: string;
@@ -15,6 +16,8 @@ export const collections: Collection[] = [
     title: "COSMIC",
     description:
       "Futuristic silhouettes designed for those who move beyond the ordinary.",
+    supportingDescription:
+      "Cosmic is the more futuristic side of the DotVerse universe, bringing together graphic T-shirts and everyday pieces with a sense of movement beyond the ordinary.",
     label: "Explore collection",
     className:
       "bg-[radial-gradient(circle_at_70%_35%,rgba(124,58,237,0.42),transparent_32%),linear-gradient(135deg,#160b2d,#07050d)]",
@@ -27,6 +30,8 @@ export const collections: Collection[] = [
     title: "ESSENTIALS",
     description:
       "Minimal streetwear. Clean forms. Everyday pieces built around the DotVerse identity.",
+    supportingDescription:
+      "Essentials is the cleaner, more understated side of DotVerse: minimal streetwear centered on everyday oversized T-shirts and the identity of .Dot.",
     label: "Explore collection",
     className:
       "bg-[radial-gradient(circle_at_30%_70%,rgba(168,85,247,0.32),transparent_30%),linear-gradient(135deg,#10091d,#05040a)]",
@@ -39,6 +44,8 @@ export const collections: Collection[] = [
     title: "SIGNATURE",
     description:
       "The original DotVerse language — bold, experimental and unmistakably .Dot.",
+    supportingDescription:
+      "Signature is the more expressive side of .Dot, bringing bold, experimental graphic design together with the limited-run spirit of the Frequency Tee.",
     label: "Explore collection",
     className:
       "bg-[radial-gradient(circle_at_65%_60%,rgba(99,102,241,0.35),transparent_30%),linear-gradient(135deg,#0d0a1b,#040309)]",

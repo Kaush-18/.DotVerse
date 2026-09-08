@@ -7,6 +7,7 @@ import Loader from "@/components/loader/Loader";
 import Hero from "@/components/home/Hero";
 import FeaturedCollections from "@/components/home/FeaturedCollections";
 import NewArrivals from "@/components/home/NewArrivals";
+import BrandContext from "@/components/home/BrandContext";
 import PageReveal from "@/components/animations/PageReveal";
 
 export default function HomeContent() {
@@ -31,6 +32,7 @@ export default function HomeContent() {
           <Hero />
           <FeaturedCollections />
           <NewArrivals />
+          <BrandContext />
         </PageReveal>
       )}
     </div>

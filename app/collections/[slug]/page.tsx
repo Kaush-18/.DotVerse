@@ -5,6 +5,7 @@ import Link from "next/link";
 import Container from "@/components/layout/Container";
 import PageReveal from "@/components/animations/PageReveal";
 import ProductGrid from "@/components/product/ProductGrid";
+import CollectionSupport from "@/components/collections/CollectionSupport";
 import { collections } from "@/components/home/collectionData";
 import { getFilteredProducts } from "@/services/products";
 import { absoluteUrl, siteName } from "@/lib/seo";
@@ -132,6 +133,8 @@ export default async function CollectionPage({
               {collection.description}
             </p>
           </header>
+
+          <CollectionSupport collection={collection} />
 
           {products.length > 0 ? (
             <section aria-labelledby="collection-products-heading">

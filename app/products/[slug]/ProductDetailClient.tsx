@@ -131,14 +131,17 @@ export default function ProductDetailClient({
             <div className="flex flex-col justify-center">
               <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-black leading-[0.9] tracking-[-0.05em] text-white">{product.name}</h1>
 
-              {collection && (
-                <Link
-                  href={`/collections/${collection.id}`}
-                  className="mt-4 inline-flex w-fit text-[10px] font-semibold uppercase tracking-[0.25em] text-violet-300 transition-colors hover:text-white"
-                >
-                  {collection.title} Collection
-                </Link>
-              )}
+              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.2em]">
+                {collection && (
+                  <Link
+                    href={`/collections/${collection.id}`}
+                    className="text-violet-300 transition-colors hover:text-white"
+                  >
+                    Part of {collection.title} Collection
+                  </Link>
+                )}
+                <span className="text-white/40">{product.category}</span>
+              </div>
 
               <p className="mt-6 text-sm leading-6 text-white/65">
                 {product.description}
@@ -238,9 +241,51 @@ export default function ProductDetailClient({
                       ? `More ${relatedProducts[0].category}`
                       : "Explore more DotVerse pieces"}
                 </h2>
+                <p className="mb-8 -mt-4 max-w-xl text-sm leading-6 text-white/55">
+                  {relatedProductsRelationship === "collection" && collection
+                    ? `Continue through the ${collection.title} side of the DotVerse universe.`
+                    : relatedProductsRelationship === "category"
+                      ? `Explore more ${relatedProducts[0]?.category.toLowerCase() ?? "pieces"} from the DotVerse catalogue.`
+                      : "Explore more pieces from the DotVerse catalogue."}
+                </p>
                 <ProductGrid products={relatedProducts} />
               </>
             )}
+          </section>
+
+          <section
+            className="border-t border-white/[0.08] py-12 sm:py-16"
+            aria-labelledby="product-explore-heading"
+          >
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-violet-300">
+                  Continue exploring
+                </p>
+                <h2
+                  id="product-explore-heading"
+                  className="mt-3 text-2xl font-semibold text-white"
+                >
+                  Find your next frequency.
+                </h2>
+              </div>
+              <nav
+                aria-label="Continue exploring DotVerse"
+                className="flex flex-wrap gap-x-5 gap-y-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65"
+              >
+                {collection && (
+                  <Link
+                    href={`/collections/${collection.id}`}
+                    className="transition-colors hover:text-white"
+                  >
+                    {collection.title} Collection →
+                  </Link>
+                )}
+                <Link href="/shop" className="transition-colors hover:text-white">
+                  Shop all pieces →
+                </Link>
+              </nav>
+            </div>
           </section>
         </Container>
       </main>
