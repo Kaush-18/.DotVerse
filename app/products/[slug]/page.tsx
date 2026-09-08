@@ -28,7 +28,17 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const url = absoluteUrl(`/products/${product.slug}`);
   const title = `${product.name} | ${product.category}`;
   const socialTitle = `${product.name} | DotVerse ${product.category}`;
-  const description = `${product.description} Shop ${product.name} from the DotVerse ${product.collection} collection.`;
+  const descriptions: Record<string, string> = {
+    "cosmic-tee":
+      "Shop the DotVerse Cosmic Tee, a heavy graphic T-shirt with dense-print artwork, a drop-shoulder cut, and a relaxed drape for all-day wear.",
+    "void-tee":
+      "Shop the DotVerse Void Tee, an oversized T-shirt with contrast-ribbed trims and structured heavyweight jersey that holds its shape.",
+    "orbit-tee":
+      "Shop the DotVerse Orbit Tee, a premium everyday T-shirt with a sculpted collar, clean lines, soft hand-feel, and a lasting drape.",
+    "frequency-tee":
+      "Shop the DotVerse Frequency Tee, a limited-run graphic T-shirt with hand-drawn electrostatic artwork, a boxy fit, and tonal sculpted ribbing.",
+  };
+  const description = descriptions[product.slug] ?? product.description;
   const image = product.images.length > 0 ? absoluteUrl(product.images[0]) : undefined;
 
   return {

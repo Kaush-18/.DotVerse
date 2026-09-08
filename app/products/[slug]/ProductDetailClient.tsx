@@ -129,6 +129,10 @@ export default function ProductDetailClient({
             <div className="flex flex-col justify-center">
               <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-black leading-[0.9] tracking-[-0.05em] text-white">{product.name}</h1>
 
+              <p className="mt-6 text-sm leading-6 text-white/65">
+                {product.description}
+              </p>
+
               {/* Price and Badges */}
               <div className="mt-6 flex items-baseline gap-3">
                 <span className="text-2xl font-bold text-white">₹{product.price}</span>

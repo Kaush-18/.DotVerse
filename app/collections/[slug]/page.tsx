@@ -42,19 +42,19 @@ export async function generateMetadata({
     { title: string; description: string }
   > = {
     cosmic: {
-      title: "Cosmic Graphic T-Shirts & Streetwear",
+      title: "Cosmic Graphic T-Shirts",
       description:
-        "Explore DotVerse's Cosmic collection of futuristic streetwear silhouettes designed for those who move beyond the ordinary.",
+        "Explore DotVerse's Cosmic collection of graphic and premium T-shirts, featuring futuristic silhouettes and cosmic-inspired streetwear pieces.",
     },
     essentials: {
-      title: "Essentials Minimal Streetwear",
+      title: "Essentials Oversized T-Shirts",
       description:
-        "Shop DotVerse Essentials for minimal streetwear, clean forms, and everyday pieces built around the DotVerse identity.",
+        "Shop DotVerse Essentials for oversized, minimal streetwear built around clean forms and everyday T-shirt silhouettes.",
     },
     signature: {
-      title: "Signature Graphic Streetwear",
+      title: "Signature Graphic T-Shirts",
       description:
-        "Discover DotVerse Signature, the original brand language expressed through bold, experimental, and unmistakably .Dot pieces.",
+        "Discover DotVerse Signature for bold graphic streetwear, including the limited-run Frequency Tee with hand-drawn electrostatic artwork.",
     },
   } as const;
   const { title, description } = metadataByCollection[collection.id];
