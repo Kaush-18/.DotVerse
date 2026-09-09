@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   ShoppingBag, Search, Menu, X, 
-  Home, ShoppingBasket, Package, Layers, Mail, CircleUser
+  Home, ShoppingBasket, Package, Layers, Mail, CircleUser, Info
 } from "lucide-react";
 
 import Logo from "@/components/ui/Logo";
@@ -17,6 +17,7 @@ const navLinks = [
   { label: "Shop", href: "/shop", icon: ShoppingBasket },
   { label: "Track Order", href: "/track-order", icon: Package },
   { label: "Collections", href: "/#collections", icon: Layers },
+  { label: "About", href: "/about", icon: Info },
   { label: "Contact", href: "/contact", icon: Mail },
 ];
 

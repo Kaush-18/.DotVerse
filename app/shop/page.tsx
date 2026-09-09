@@ -133,6 +133,11 @@ export default async function ShopPage(props: ShopPageProps) {
                   </Link>
                 ))}
               </nav>
+
+              <p className="mt-6 max-w-[500px] text-sm leading-6 text-white/55">
+                Explore the full DotVerse catalogue across Cosmic, Essentials,
+                and Signature.
+              </p>
             </div>
 
             {/* Product grid */}

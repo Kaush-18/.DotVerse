@@ -23,6 +23,8 @@ export default function Footer() {
 
           <div className="site-footer-column">
             <h4>CUSTOMER CARE</h4>
+            <Link href="/about">About</Link>
+            <Link href="/size-guide">Size &amp; Fit</Link>
             <Link href="/contact">Contact</Link>
             <Link href="/shipping-policy">Shipping Policy</Link>
             <Link href="/return-refund-policy">Return &amp; Refund</Link>

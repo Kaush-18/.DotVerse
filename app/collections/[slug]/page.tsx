@@ -138,6 +138,9 @@ export default async function CollectionPage({
 
           {products.length > 0 ? (
             <section aria-labelledby="collection-products-heading">
+              <p className="mb-6 max-w-xl text-sm leading-6 text-white/55">
+                Explore the pieces in this collection.
+              </p>
               <h2 id="collection-products-heading" className="sr-only">
                 {collection.title} collection products
               </h2>
