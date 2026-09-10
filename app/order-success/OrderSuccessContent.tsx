@@ -102,6 +102,24 @@ export default function OrderSuccessContent() {
     );
   }
 
+  const isOnline = order.paymentMethod !== "COD";
+  const paymentConfirmed = order.paymentStatus === "PAID";
+  const paymentFailed = order.paymentStatus === "FAILED";
+  const awaitingConfirmation = isOnline && !paymentConfirmed && !paymentFailed;
+  const orderConfirmed = !isOnline || paymentConfirmed;
+
+  const heading = paymentFailed
+    ? "PAYMENT FAILED"
+    : orderConfirmed
+      ? "ORDER CONFIRMED"
+      : "ORDER PLACED";
+
+  const description = paymentFailed
+    ? "We couldn't confirm your payment for this order. No amount was charged. You can retry payment from the payment page."
+    : orderConfirmed
+      ? "Your order has been successfully placed."
+      : "Your order has been received. We're confirming your payment with the payment provider — this can take a moment.";
+
   return (
     <PageReveal>
       <main className="min-h-screen bg-[#07040d] px-6 py-16 text-white md:py-24">
@@ -109,7 +127,9 @@ export default function OrderSuccessContent() {
 
           <section className="text-center">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-violet-400/30 bg-violet-500/10">
-              <span className="text-4xl text-violet-300">✓</span>
+              <span className="text-4xl text-violet-300">
+                {paymentFailed ? "!" : awaitingConfirmation ? "…" : "✓"}
+              </span>
             </div>
 
             <p className="mt-8 text-xs font-semibold uppercase tracking-[0.35em] text-violet-400">
@@ -117,13 +137,17 @@ export default function OrderSuccessContent() {
             </p>
 
             <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-              ORDER CONFIRMED
+              {heading}
             </h1>
 
             <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/50 md:text-base">
-              Thank you for your purchase,{" "}
-              <span className="text-white">{order.firstName}</span>.
-              Your order has been successfully placed.
+              {orderConfirmed && (
+                <>
+                  Thank you for your purchase,{" "}
+                  <span className="text-white">{order.firstName}</span>.{" "}
+                </>
+              )}
+              {description}
             </p>
 
             <div className="mt-7">

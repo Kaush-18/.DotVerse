@@ -7,15 +7,38 @@ import { useCheckout } from "@/context/CheckoutContext";
 import PageReveal from "@/components/animations/PageReveal";
 import Script from "next/script";
 
+type RazorpayPaymentFailure = {
+  error?: {
+    code?: string;
+    description?: string;
+    reason?: string;
+  };
+};
+
+type RazorpayCheckout = {
+  open: () => void;
+  close?: () => void;
+  on?: (
+    event: string,
+    handler: (response: RazorpayPaymentFailure) => void,
+  ) => void;
+};
+
+type RazorpayConstructor = new (
+  options: Record<string, unknown>,
+) => RazorpayCheckout;
+
 declare global {
   interface Window {
-    Razorpay: {
-      new (options: object): {
-        open: () => void;
-      };
-    };
+    Razorpay?: RazorpayConstructor;
   }
 }
+
+type CreatedOrder = {
+  id: string;
+  orderNumber: string;
+  raw: Record<string, unknown>;
+};
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -31,9 +54,25 @@ export default function PaymentPage() {
   const [orderError, setOrderError] =
     useState("");
 
+  const [paymentFailed, setPaymentFailed] =
+    useState(false);
+
+  const [createdOrder, setCreatedOrder] =
+    useState<CreatedOrder | null>(null);
+
+  const [razorpayReady, setRazorpayReady] =
+    useState(false);
+
+  const [razorpayLoadError, setRazorpayLoadError] =
+    useState(false);
+
   const idempotencyKeyRef = useRef(crypto.randomUUID());
 
+  const paymentFailedRef = useRef(false);
+
   const total = subtotal; // Simplified
+
+  const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
   const hasCheckoutDetails =
     formData.email &&
@@ -85,104 +124,153 @@ export default function PaymentPage() {
     );
   }
 
+  const createOrderOnce = async (): Promise<CreatedOrder> => {
+    if (createdOrder) {
+      return createdOrder;
+    }
+
+    const response = await fetch("/api/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": idempotencyKeyRef.current,
+      },
+      body: JSON.stringify({
+        ...formData,
+        paymentMethod,
+        items: items.map((item) => ({
+          id: item.id,
+          size: item.size,
+          color: item.color,
+          quantity: item.quantity,
+        })),
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Failed to place order.");
+    }
+
+    const order: CreatedOrder = {
+      id: data.order.id,
+      orderNumber: data.order.orderNumber,
+      raw: data.order,
+    };
+
+    sessionStorage.setItem(
+      `dotverse-order-${order.orderNumber}`,
+      JSON.stringify(order.raw),
+    );
+
+    setCreatedOrder(order);
+
+    return order;
+  };
+
+  const selectPaymentMethod = (
+    method: "COD" | "UPI" | "CARD",
+  ) => {
+    // Prevent switching once a local order exists so repeated clicks or a
+    // retry never create a second order or decrement inventory twice.
+    if (isPlacingOrder || createdOrder) return;
+
+    setPaymentMethod(method);
+    setOrderError("");
+    setPaymentFailed(false);
+  };
+
   const handlePlaceOrder = async () => {
     if (isPlacingOrder) return;
 
     setIsPlacingOrder(true);
     setOrderError("");
+    setPaymentFailed(false);
+    paymentFailedRef.current = false;
 
     try {
-      // 1. Create order in DB (existing flow)
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Idempotency-Key": idempotencyKeyRef.current,
-        },
-        body: JSON.stringify({
-          ...formData,
-          paymentMethod,
-          items: items.map((item) => ({
-            id: item.id,
-            size: item.size,
-            color: item.color,
-            quantity: item.quantity,
-          })),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(
-          data.message || "Failed to place order."
-        );
-      }
-
-      sessionStorage.setItem(
-        `dotverse-order-${data.order.orderNumber}`,
-        JSON.stringify(data.order)
-      );
-
+      // COD never touches Razorpay and keeps the existing flow.
       if (paymentMethod === "COD") {
+        const order = await createOrderOnce();
+
         clearCart();
         router.push(
           `/order-success?order=${encodeURIComponent(
-            data.order.orderNumber
-          )}`
+            order.orderNumber,
+          )}`,
         );
         return;
       }
 
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-
+      // Fail fast before creating a local order so an unavailable gateway
+      // never leaves an orphan order or unnecessarily decrements inventory.
       if (!razorpayKey) {
         throw new Error(
-          "Online payments are not configured yet. Please choose Cash on Delivery."
+          "Online payments are not configured yet. Please choose Cash on Delivery.",
         );
       }
 
-      if (typeof window.Razorpay === "undefined") {
+      if (razorpayLoadError) {
         throw new Error(
-          "Payment gateway is still loading. Please try again in a moment."
+          "Payment gateway failed to load. Please check your connection and try again.",
         );
       }
 
-      // 2. Online Payment: Create Razorpay order
+      const RazorpayConstructor = window.Razorpay;
+
+      if (!razorpayReady || typeof RazorpayConstructor === "undefined") {
+        throw new Error(
+          "Payment gateway is still loading. Please try again in a moment.",
+        );
+      }
+
+      const order = await createOrderOnce();
+
+      // Server creates (or reuses) the Razorpay order and owns the amount.
       const paymentResponse = await fetch("/api/payments/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: data.order.id }),
+        body: JSON.stringify({ orderId: order.id }),
       });
 
       const paymentData = await paymentResponse.json();
 
       if (!paymentResponse.ok || !paymentData.success) {
         throw new Error(
-          paymentData.message || "Failed to initialize payment."
+          paymentData.message || "Failed to initialize payment.",
         );
       }
 
-      // 3. Open Razorpay Checkout
-      const options = {
+      const options: Record<string, unknown> = {
         key: razorpayKey,
         amount: paymentData.amount,
         currency: paymentData.currency,
         order_id: paymentData.razorpayOrderId,
         name: "DotVerse",
-        description: `Order #${data.order.orderNumber}`,
+        description: `Order #${order.orderNumber}`,
         handler: function () {
-          // Success: Webhook will handle confirmation
+          // Frontend callback is not authoritative proof of payment. The
+          // webhook confirms the order in the database; this only advances
+          // the user to the confirmation view.
           clearCart();
           router.push(
             `/order-success?order=${encodeURIComponent(
-              data.order.orderNumber
-            )}`
+              order.orderNumber,
+            )}`,
           );
         },
         modal: {
           ondismiss: function () {
             setIsPlacingOrder(false);
+
+            if (paymentFailedRef.current) {
+              return;
+            }
+
+            setOrderError(
+              "Payment was cancelled. Your order is saved — you can retry payment.",
+            );
           },
         },
         theme: {
@@ -190,7 +278,32 @@ export default function PaymentPage() {
         },
       };
 
-      const razorpay = new window.Razorpay(options);
+      let razorpay: RazorpayCheckout;
+
+      try {
+        razorpay = new RazorpayConstructor(options);
+      } catch (initError) {
+        console.error("Razorpay initialization failed:", initError);
+        throw new Error(
+          "Unable to open the payment window. Please try again.",
+        );
+      }
+
+      razorpay.on?.(
+        "payment.failed",
+        function (response: RazorpayPaymentFailure) {
+          console.error("Razorpay payment failed:", response?.error);
+
+          paymentFailedRef.current = true;
+          setPaymentFailed(true);
+          setIsPlacingOrder(false);
+          setOrderError(
+            response?.error?.description ||
+              "Payment failed. No amount was charged. Please try again.",
+          );
+        },
+      );
+
       razorpay.open();
     } catch (error) {
       console.error("Place order failed:", error);
@@ -198,19 +311,45 @@ export default function PaymentPage() {
       setOrderError(
         error instanceof Error
           ? error.message
-          : "Something went wrong while placing your order."
+          : "Something went wrong while placing your order.",
       );
       setIsPlacingOrder(false);
     }
   };
 
+  const isOnline = paymentMethod !== "COD";
+
+  const gatewayLoading =
+    isOnline && !razorpayReady && !razorpayLoadError;
+
+  const orderButtonDisabled =
+    isPlacingOrder || gatewayLoading;
+
+  const orderButtonLabel = isPlacingOrder
+    ? paymentMethod === "COD"
+      ? "PLACING ORDER..."
+      : "PROCESSING..."
+    : gatewayLoading
+      ? "LOADING GATEWAY..."
+      : createdOrder && orderError
+        ? "RETRY PAYMENT"
+        : "PLACE ORDER";
+
   return (
     <PageReveal>
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="afterInteractive"
+        onReady={() => setRazorpayReady(true)}
+        onError={() => {
+          setRazorpayReady(false);
+          setRazorpayLoadError(true);
+        }}
+      />
       <main className="py-16">
         <div className="mx-auto max-w-5xl px-4">
           <h1 className="mb-10 text-3xl font-bold">PAYMENT</h1>
-          
+
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
             {/* Payment form placeholder */}
             <section className="space-y-6">
@@ -222,8 +361,9 @@ export default function PaymentPage() {
                 <div className="space-y-3">
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod("COD")}
-                    className={`w-full rounded-xl border p-5 text-left transition ${
+                    onClick={() => selectPaymentMethod("COD")}
+                    disabled={isPlacingOrder || Boolean(createdOrder)}
+                    className={`w-full rounded-xl border p-5 text-left transition disabled:cursor-not-allowed disabled:opacity-70 ${
                       paymentMethod === "COD"
                         ? "border-violet-500 bg-violet-500/10"
                         : "border-white/10 bg-white/[0.02] hover:border-white/20"
@@ -237,8 +377,9 @@ export default function PaymentPage() {
 
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod("UPI")}
-                    className={`w-full rounded-xl border p-5 text-left transition ${
+                    onClick={() => selectPaymentMethod("UPI")}
+                    disabled={isPlacingOrder || Boolean(createdOrder)}
+                    className={`w-full rounded-xl border p-5 text-left transition disabled:cursor-not-allowed disabled:opacity-70 ${
                       paymentMethod === "UPI"
                         ? "border-violet-500 bg-violet-500/10"
                         : "border-white/10 bg-white/[0.02] hover:border-white/20"
@@ -252,8 +393,9 @@ export default function PaymentPage() {
 
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod("CARD")}
-                    className={`w-full rounded-xl border p-5 text-left transition ${
+                    onClick={() => selectPaymentMethod("CARD")}
+                    disabled={isPlacingOrder || Boolean(createdOrder)}
+                    className={`w-full rounded-xl border p-5 text-left transition disabled:cursor-not-allowed disabled:opacity-70 ${
                       paymentMethod === "CARD"
                         ? "border-violet-500 bg-violet-500/10"
                         : "border-white/10 bg-white/[0.02] hover:border-white/20"
@@ -319,22 +461,36 @@ export default function PaymentPage() {
               <button
                 type="button"
                 onClick={handlePlaceOrder}
-                disabled={isPlacingOrder}
+                disabled={orderButtonDisabled}
                 className="mt-6 w-full rounded-full bg-violet-600 px-6 py-4 font-semibold transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isPlacingOrder ? "PLACING ORDER..." : "PLACE ORDER"}
+                {orderButtonLabel}
               </button>
 
               {orderError && (
-                <p className="mt-3 text-sm text-red-400">
-                  {orderError}
-                </p>
+                <div
+                  className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
+                    paymentFailed
+                      ? "border-red-500/30 bg-red-500/10 text-red-300"
+                      : "border-white/10 bg-white/[0.03] text-white/70"
+                  }`}
+                >
+                  {paymentFailed && (
+                    <p className="font-semibold text-red-300">
+                      Payment failed
+                    </p>
+                  )}
+                  <p className={paymentFailed ? "mt-1" : ""}>
+                    {orderError}
+                  </p>
+                </div>
               )}
 
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="mt-3 w-full rounded-full border border-white/10 px-6 py-4 text-sm text-white/70 transition hover:bg-white/5"
+                disabled={isPlacingOrder}
+                className="mt-3 w-full rounded-full border border-white/10 px-6 py-4 text-sm text-white/70 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Back to checkout
               </button>
