@@ -46,3 +46,8 @@ next-env.d.ts
 /generated/
 
 .vercel
+
+# Local tool/agent configs (may contain secrets)
+opencode.json
+*codex*.toml
+C*Users*.toml
