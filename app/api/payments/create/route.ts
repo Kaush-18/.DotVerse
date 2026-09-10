@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { razorpay } from "@/lib/razorpay";
+import {
+  ensureActiveReservations,
+  InsufficientInventoryError,
+  InventoryStateError,
+} from "@/lib/inventory";
 
 export async function POST(request: Request) {
   try {
@@ -41,6 +46,60 @@ export async function POST(request: Request) {
         { success: false, message: "Order already paid." },
         { status: 400 }
       );
+    }
+
+    if (order.status === "CANCELLED") {
+      return NextResponse.json(
+        { success: false, message: "This order has been cancelled." },
+        { status: 400 }
+      );
+    }
+
+    const reservationItems = order.items
+      .filter((item) => item.variantId)
+      .map((item) => ({
+        variantId: item.variantId as string,
+        quantity: item.quantity,
+      }));
+
+    if (reservationItems.length === 0) {
+      return NextResponse.json(
+        { success: false, message: "Order has no reservable inventory." },
+        { status: 400 }
+      );
+    }
+
+    // Orders created before the reservation model existed already had their
+    // stock consumed at creation and have no reservation rows. Re-reserving
+    // them would decrement stock a second time, so skip reservation handling
+    // for that transitional case only.
+    const existingReservationCount = await prisma.inventoryReservation.count({
+      where: { orderId: order.id },
+    });
+
+    const isLegacyOrder = existingReservationCount === 0;
+
+    if (!isLegacyOrder) {
+      // Re-establish/renew the inventory reservation atomically before any
+      // payment attempt, so stock is guaranteed for the payment window and
+      // expired/released reservations never silently proceed.
+      try {
+        await prisma.$transaction(async (tx) => {
+          await ensureActiveReservations(tx, order.id, reservationItems);
+        });
+      } catch (error) {
+        if (
+          error instanceof InsufficientInventoryError ||
+          error instanceof InventoryStateError
+        ) {
+          return NextResponse.json(
+            { success: false, message: error.message },
+            { status: 409 }
+          );
+        }
+
+        throw error;
+      }
     }
 
     // Amount in paise

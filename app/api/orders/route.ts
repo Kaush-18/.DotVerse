@@ -5,6 +5,11 @@ import {
   OrderValidationError,
   parseCreateOrderRequest,
 } from "@/lib/validation/order";
+import {
+  ensureActiveReservations,
+  InsufficientInventoryError,
+  InventoryStateError,
+} from "@/lib/inventory";
 
 function generateOrderNumber() {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -154,46 +159,10 @@ export async function POST(request: Request) {
     const shipping = 0;
     const total = subtotal + shipping;
 
+    const isOnlinePayment = body.paymentMethod !== "COD";
+
     const order = await prisma.$transaction(async (tx) => {
-      for (const item of body.items) {
-        const product = productMap.get(item.id);
-
-        if (!product) {
-          throw new Error("Product disappeared during order creation.");
-        }
-
-        const variant = product.variants.find(
-          (currentVariant) =>
-            currentVariant.size === item.size &&
-            currentVariant.colorName === item.color,
-        );
-
-        if (!variant) {
-          throw new Error("Variant disappeared during order creation.");
-        }
-
-        const updatedVariant = await tx.productVariant.updateMany({
-          where: {
-            id: variant.id,
-            stock: {
-              gte: item.quantity,
-            },
-          },
-          data: {
-            stock: {
-              decrement: item.quantity,
-            },
-          },
-        });
-
-        if (updatedVariant.count !== 1) {
-          throw new Error(
-            `${product.name} (${item.color} / ${item.size}) is no longer available in the requested quantity.`,
-          );
-        }
-      }
-
-      return tx.order.create({
+      const createdOrder = await tx.order.create({
         data: {
           orderNumber: generateOrderNumber(),
           idempotencyKey: idempotencyKey!,
@@ -216,6 +185,9 @@ export async function POST(request: Request) {
           total,
 
           paymentMethod: body.paymentMethod,
+          // COD is fulfilled immediately; online orders stay pending until the
+          // payment webhook confirms them.
+          status: isOnlinePayment ? "PENDING" : "CONFIRMED",
 
           items: {
             create: orderItems,
@@ -226,6 +198,43 @@ export async function POST(request: Request) {
           items: true,
         },
       });
+
+      if (isOnlinePayment) {
+        // Reserve inventory for the payment window without selling it yet.
+        await ensureActiveReservations(
+          tx,
+          createdOrder.id,
+          orderItems.map((item) => ({
+            variantId: item.variantId,
+            quantity: item.quantity,
+          })),
+        );
+      } else {
+        // COD preserves the existing immediate stock consumption.
+        for (const item of orderItems) {
+          const updatedVariant = await tx.productVariant.updateMany({
+            where: {
+              id: item.variantId,
+              stock: {
+                gte: item.quantity,
+              },
+            },
+            data: {
+              stock: {
+                decrement: item.quantity,
+              },
+            },
+          });
+
+          if (updatedVariant.count !== 1) {
+            throw new InsufficientInventoryError(
+              `${item.productName} (${item.variantColor} / ${item.variantSize}) is no longer available in the requested quantity.`,
+            );
+          }
+        }
+      }
+
+      return createdOrder;
     });
 
     return NextResponse.json(
@@ -263,6 +272,26 @@ export async function POST(request: Request) {
           message: error.message,
         },
         { status: 400 },
+      );
+    }
+
+    if (error instanceof InsufficientInventoryError) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: error.message,
+        },
+        { status: 409 },
+      );
+    }
+
+    if (error instanceof InventoryStateError) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: error.message,
+        },
+        { status: 409 },
       );
     }
 

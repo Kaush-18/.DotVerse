@@ -29,7 +29,17 @@ type Order = {
   paymentMethod: string;
   items: OrderItem[];
   createdAt: string;
+  inventoryExceptionAt?: string | null;
 };
+
+type OrderStatusSnapshot = {
+  status: string;
+  paymentStatus: string;
+  paymentMethod: string;
+  inventoryExceptionAt: string | null;
+};
+
+const PENDING_POLL_INTERVAL_MS = 5000;
 
 export default function OrderSuccessContent() {
   const router = useRouter();
@@ -76,6 +86,59 @@ export default function OrderSuccessContent() {
     void fetchOrder();
   }, [orderNumber, router]);
 
+  const awaitingPayment =
+    order != null &&
+    order.paymentMethod !== "COD" &&
+    order.paymentStatus !== "PAID" &&
+    order.paymentStatus !== "FAILED";
+
+  useEffect(() => {
+    if (!orderNumber || !awaitingPayment) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const poll = async () => {
+      try {
+        const response = await fetch(
+          `/api/orders/${encodeURIComponent(orderNumber)}/status`,
+          { cache: "no-store" },
+        );
+
+        const data = await response.json();
+
+        if (cancelled || !response.ok || !data.success || !data.order) {
+          return;
+        }
+
+        const snapshot = data.order as OrderStatusSnapshot;
+
+        setOrder((current) =>
+          current
+            ? {
+                ...current,
+                status: snapshot.status,
+                paymentStatus: snapshot.paymentStatus,
+                inventoryExceptionAt: snapshot.inventoryExceptionAt,
+              }
+            : current,
+        );
+      } catch (error) {
+        console.error("Error polling order status:", error);
+      }
+    };
+
+    void poll();
+
+    const interval = setInterval(poll, PENDING_POLL_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [orderNumber, awaitingPayment]);
+
   if (loading) {
     return <Loader />;
   }
@@ -105,20 +168,27 @@ export default function OrderSuccessContent() {
   const isOnline = order.paymentMethod !== "COD";
   const paymentConfirmed = order.paymentStatus === "PAID";
   const paymentFailed = order.paymentStatus === "FAILED";
-  const awaitingConfirmation = isOnline && !paymentConfirmed && !paymentFailed;
-  const orderConfirmed = !isOnline || paymentConfirmed;
+  const inventoryException =
+    isOnline && paymentConfirmed && Boolean(order.inventoryExceptionAt);
+  const awaitingConfirmation =
+    isOnline && !paymentConfirmed && !paymentFailed && !inventoryException;
+  const orderConfirmed = !isOnline || (paymentConfirmed && !inventoryException);
 
   const heading = paymentFailed
     ? "PAYMENT FAILED"
-    : orderConfirmed
-      ? "ORDER CONFIRMED"
-      : "ORDER PLACED";
+    : inventoryException
+      ? "ACTION REQUIRED"
+      : orderConfirmed
+        ? "ORDER CONFIRMED"
+        : "ORDER PLACED";
 
   const description = paymentFailed
     ? "We couldn't confirm your payment for this order. No amount was charged. You can retry payment from the payment page."
-    : orderConfirmed
-      ? "Your order has been successfully placed."
-      : "Your order has been received. We're confirming your payment with the payment provider — this can take a moment.";
+    : inventoryException
+      ? "Your payment was received, but one or more items are no longer available. Our team will contact you to arrange a replacement or refund."
+      : orderConfirmed
+        ? "Your order has been successfully placed."
+        : "Your order has been received. We're confirming your payment with the payment provider — this can take a moment.";
 
   return (
     <PageReveal>
@@ -128,7 +198,11 @@ export default function OrderSuccessContent() {
           <section className="text-center">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-violet-400/30 bg-violet-500/10">
               <span className="text-4xl text-violet-300">
-                {paymentFailed ? "!" : awaitingConfirmation ? "…" : "✓"}
+                {paymentFailed || inventoryException
+                  ? "!"
+                  : awaitingConfirmation
+                    ? "…"
+                    : "✓"}
               </span>
             </div>
 
