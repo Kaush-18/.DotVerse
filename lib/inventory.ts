@@ -66,9 +66,13 @@ function aggregateByVariant(
  * and that the reserved quantity is removed from available stock.
  *
  * - Missing reservation rows are created after a conditional stock decrement.
- * - RELEASED/EXPIRED rows are revived by decrementing stock again.
+ * - RELEASED/EXPIRED rows are first claimed with a conditional status update,
+ *   and only the winning transaction decrements stock again.
  * - ACTIVE rows are left untouched (expired ones get a fresh window).
  * - FINALIZED rows abort: the inventory is already sold and cannot move again.
+ *
+ * All stock mutations use conditional `updateMany` guards so concurrent callers
+ * can never decrement the same reservation twice (which leaked stock before).
  */
 export async function ensureActiveReservations(
   tx: Prisma.TransactionClient,
@@ -106,34 +110,12 @@ export async function ensureActiveReservations(
       continue;
     }
 
-    const decremented = await tx.productVariant.updateMany({
-      where: {
-        id: variantId,
-        stock: { gte: quantity },
-      },
-      data: {
-        stock: { decrement: quantity },
-      },
-    });
+    if (!existing) {
+      // No reservation row yet: decrement stock, then create.
+      await decrementVariantStockOrThrow(tx, variantId, quantity);
 
-    if (decremented.count !== 1) {
-      throw new InsufficientInventoryError(
-        "One or more items are no longer available in the requested quantity.",
-      );
-    }
-
-    if (existing) {
-      await tx.inventoryReservation.update({
-        where: { id: existing.id },
-        data: {
-          status: "ACTIVE",
-          quantity,
-          expiresAt: expiry,
-          releasedAt: null,
-          finalizedAt: null,
-        },
-      });
-    } else {
+      // If a concurrent transaction created the row first, the unique
+      // constraint aborts this transaction and rolls back the decrement.
       await tx.inventoryReservation.create({
         data: {
           orderId,
@@ -142,7 +124,77 @@ export async function ensureActiveReservations(
           expiresAt: expiry,
         },
       });
+
+      continue;
     }
+
+    // RELEASED/EXPIRED row: claim the state transition atomically *before*
+    // touching stock. This is what prevents two concurrent revivals from both
+    // decrementing the same reservation (which permanently leaked stock).
+    const claimed = await tx.inventoryReservation.updateMany({
+      where: {
+        id: existing.id,
+        status: { in: ["RELEASED", "EXPIRED"] },
+      },
+      data: {
+        status: "ACTIVE",
+        quantity,
+        expiresAt: expiry,
+        releasedAt: null,
+        finalizedAt: null,
+      },
+    });
+
+    if (claimed.count !== 1) {
+      // A competing transaction changed the row first. Re-read to decide how
+      // to proceed without mutating stock a second time.
+      const fresh = await tx.inventoryReservation.findUnique({
+        where: { id: existing.id },
+      });
+
+      if (fresh?.status === "FINALIZED") {
+        throw new InventoryStateError(
+          "Inventory for this order has already been finalized.",
+        );
+      }
+
+      if (fresh?.status === "ACTIVE") {
+        // The competing transaction already revived and secured the stock.
+        continue;
+      }
+
+      // Rare release/expire churn after the claim lost; abort so the caller
+      // can retry from a fresh snapshot rather than risk a lost decrement.
+      throw new InventoryStateError(
+        "Inventory state changed while reserving. Please retry.",
+      );
+    }
+
+    // We own the revival: the conditional decrement runs exactly once. If it
+    // fails, the whole transaction (including the claim) rolls back.
+    await decrementVariantStockOrThrow(tx, variantId, quantity);
+  }
+}
+
+async function decrementVariantStockOrThrow(
+  tx: Prisma.TransactionClient,
+  variantId: string,
+  quantity: number,
+): Promise<void> {
+  const decremented = await tx.productVariant.updateMany({
+    where: {
+      id: variantId,
+      stock: { gte: quantity },
+    },
+    data: {
+      stock: { decrement: quantity },
+    },
+  });
+
+  if (decremented.count !== 1) {
+    throw new InsufficientInventoryError(
+      "One or more items are no longer available in the requested quantity.",
+    );
   }
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
@@ -40,10 +40,88 @@ type CreatedOrder = {
   raw: Record<string, unknown>;
 };
 
+type PendingCheckout = {
+  fingerprint: string;
+  idempotencyKey: string;
+  paymentMethod: "COD" | "UPI" | "CARD";
+  order: CreatedOrder | null;
+};
+
+const PENDING_CHECKOUT_STORAGE_KEY = "dotverse-pending-checkout";
+
+function checkoutFingerprint(
+  items: { id: string; size: string; color: string; quantity: number }[],
+  formData: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    address: string;
+    apartment?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    phone: string;
+  },
+): string {
+  const cart = items
+    .map((item) => `${item.id}:${item.size}:${item.color}:${item.quantity}`)
+    .sort()
+    .join("|");
+
+  const details = [
+    formData.email,
+    formData.phone,
+    formData.firstName,
+    formData.lastName,
+    formData.address,
+    formData.apartment ?? "",
+    formData.city,
+    formData.state,
+    formData.postalCode,
+  ].join("|");
+
+  return `${cart}::${details}`;
+}
+
+function readPendingCheckout(): PendingCheckout | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const raw = sessionStorage.getItem(PENDING_CHECKOUT_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as PendingCheckout) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearPendingCheckout(): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  sessionStorage.removeItem(PENDING_CHECKOUT_STORAGE_KEY);
+}
+
 export default function PaymentPage() {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
   const { formData } = useCheckout();
+
+  const fingerprint = useMemo(
+    () =>
+      checkoutFingerprint(
+        items.map((item) => ({
+          id: item.id,
+          size: item.size,
+          color: item.color,
+          quantity: item.quantity,
+        })),
+        formData,
+      ),
+    [items, formData],
+  );
 
   const [paymentMethod, setPaymentMethod] =
     useState<"COD" | "UPI" | "CARD">("COD");
@@ -66,7 +144,32 @@ export default function PaymentPage() {
   const [razorpayLoadError, setRazorpayLoadError] =
     useState(false);
 
-  const idempotencyKeyRef = useRef(crypto.randomUUID());
+  const idempotencyKeyRef = useRef<string>(crypto.randomUUID());
+  const restoredRef = useRef(false);
+
+  // Restore an in-flight checkout after a refresh so the same order (and its
+  // inventory reservation) is reused instead of a duplicate being created.
+  // Deferred to an effect to avoid a static-prerender/hydration mismatch.
+  useEffect(() => {
+    if (restoredRef.current) {
+      return;
+    }
+    restoredRef.current = true;
+
+    const pending = readPendingCheckout();
+
+    if (!pending || pending.fingerprint !== fingerprint) {
+      return;
+    }
+
+    idempotencyKeyRef.current = pending.idempotencyKey;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPaymentMethod(pending.paymentMethod);
+
+    if (pending.order) {
+      setCreatedOrder(pending.order);
+    }
+  }, [fingerprint]);
 
   const paymentFailedRef = useRef(false);
 
@@ -129,6 +232,16 @@ export default function PaymentPage() {
       return createdOrder;
     }
 
+    sessionStorage.setItem(
+      PENDING_CHECKOUT_STORAGE_KEY,
+      JSON.stringify({
+        fingerprint,
+        idempotencyKey: idempotencyKeyRef.current,
+        paymentMethod,
+        order: null,
+      } satisfies PendingCheckout),
+    );
+
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: {
@@ -164,6 +277,17 @@ export default function PaymentPage() {
       JSON.stringify(order.raw),
     );
 
+    // Reuse this exact order if the page is refreshed or payment is retried.
+    sessionStorage.setItem(
+      PENDING_CHECKOUT_STORAGE_KEY,
+      JSON.stringify({
+        fingerprint,
+        idempotencyKey: idempotencyKeyRef.current,
+        paymentMethod,
+        order,
+      } satisfies PendingCheckout),
+    );
+
     setCreatedOrder(order);
 
     return order;
@@ -194,6 +318,7 @@ export default function PaymentPage() {
       if (paymentMethod === "COD") {
         const order = await createOrderOnce();
 
+        clearPendingCheckout();
         clearCart();
         router.push(
           `/order-success?order=${encodeURIComponent(
@@ -253,6 +378,7 @@ export default function PaymentPage() {
           // Frontend callback is not authoritative proof of payment. The
           // webhook confirms the order in the database; this only advances
           // the user to the confirmation view.
+          clearPendingCheckout();
           clearCart();
           router.push(
             `/order-success?order=${encodeURIComponent(
