@@ -5,6 +5,17 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
 import PageReveal from "@/components/animations/PageReveal";
+import Script from "next/script";
+
+declare global {
+  interface Window {
+    Razorpay: {
+      new (options: object): {
+        open: () => void;
+      };
+    };
+  }
+}
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -81,6 +92,7 @@ export default function PaymentPage() {
     setOrderError("");
 
     try {
+      // 1. Create order in DB (existing flow)
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -107,17 +119,79 @@ export default function PaymentPage() {
         );
       }
 
-
-
-      // Clear cart AFTER successful order creation
-      clearCart();
-
-      // Then show confirmation page
-      router.push(
-        `/order-success?order=${encodeURIComponent(
-          data.order.orderNumber
-        )}`
+      sessionStorage.setItem(
+        `dotverse-order-${data.order.orderNumber}`,
+        JSON.stringify(data.order)
       );
+
+      if (paymentMethod === "COD") {
+        clearCart();
+        router.push(
+          `/order-success?order=${encodeURIComponent(
+            data.order.orderNumber
+          )}`
+        );
+        return;
+      }
+
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+
+      if (!razorpayKey) {
+        throw new Error(
+          "Online payments are not configured yet. Please choose Cash on Delivery."
+        );
+      }
+
+      if (typeof window.Razorpay === "undefined") {
+        throw new Error(
+          "Payment gateway is still loading. Please try again in a moment."
+        );
+      }
+
+      // 2. Online Payment: Create Razorpay order
+      const paymentResponse = await fetch("/api/payments/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: data.order.id }),
+      });
+
+      const paymentData = await paymentResponse.json();
+
+      if (!paymentResponse.ok || !paymentData.success) {
+        throw new Error(
+          paymentData.message || "Failed to initialize payment."
+        );
+      }
+
+      // 3. Open Razorpay Checkout
+      const options = {
+        key: razorpayKey,
+        amount: paymentData.amount,
+        currency: paymentData.currency,
+        order_id: paymentData.razorpayOrderId,
+        name: "DotVerse",
+        description: `Order #${data.order.orderNumber}`,
+        handler: function () {
+          // Success: Webhook will handle confirmation
+          clearCart();
+          router.push(
+            `/order-success?order=${encodeURIComponent(
+              data.order.orderNumber
+            )}`
+          );
+        },
+        modal: {
+          ondismiss: function () {
+            setIsPlacingOrder(false);
+          },
+        },
+        theme: {
+          color: "#7c3aed", // violet-600
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error) {
       console.error("Place order failed:", error);
 
@@ -126,13 +200,13 @@ export default function PaymentPage() {
           ? error.message
           : "Something went wrong while placing your order."
       );
-    } finally {
       setIsPlacingOrder(false);
     }
   };
 
   return (
     <PageReveal>
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <main className="py-16">
         <div className="mx-auto max-w-5xl px-4">
           <h1 className="mb-10 text-3xl font-bold">PAYMENT</h1>

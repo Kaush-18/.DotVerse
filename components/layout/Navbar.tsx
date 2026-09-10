@@ -89,9 +89,9 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-1 shrink-0">
-          <button aria-label="Search" className="p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
+          <Link href="/shop" aria-label="Search" className="p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
             <Search size={20} />
-          </button>
+          </Link>
           <Link href={accountHref} aria-label="Account" className="p-3 rounded-full hover:bg-white/10 text-white/70 transition-colors">
             <CircleUser size={20} />
           </Link>

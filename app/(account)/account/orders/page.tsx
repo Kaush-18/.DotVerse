@@ -3,10 +3,11 @@ import { ArrowRight, PackageOpen } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { formatPrice } from "@/lib/utils";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-const money = (paise: number) => `₹${(paise / 100).toFixed(2)}`;
+const money = formatPrice;
 
 export default async function OrdersPage() {
   const session = await auth.api.getSession({ headers: await headers() });

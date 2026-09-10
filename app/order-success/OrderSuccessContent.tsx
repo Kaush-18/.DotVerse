@@ -52,17 +52,20 @@ export default function OrderSuccessContent() {
           { cache: "no-store" },
         );
 
-        if (!response.ok) {
-          throw new Error("Order not found");
-        }
-
         const data = await response.json();
 
-        if (!data.success || !data.order) {
-          throw new Error(data.message || "Order not found");
+        if (response.ok && data.success && data.order) {
+          setOrder(data.order);
+          return;
         }
 
-        setOrder(data.order);
+        const cached = sessionStorage.getItem(
+          `dotverse-order-${orderNumber}`,
+        );
+
+        if (cached) {
+          setOrder(JSON.parse(cached) as Order);
+        }
       } catch (error) {
         console.error("Error fetching order:", error);
       } finally {

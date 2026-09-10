@@ -54,7 +54,7 @@ export default function SizeGuidePage() {
 
           <header className="size-guide-hero">
             <p className="size-guide-kicker">.DOT / FIT SUPPORT</p>
-            <h1>Find your fit.</h1>
+            <h1>Size &amp; Fit</h1>
             <p>
               Every current DotVerse piece is available in S, M, L, XL, and
               XXL. Use the product-specific descriptions below as your starting

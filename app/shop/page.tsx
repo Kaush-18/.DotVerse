@@ -148,10 +148,10 @@ export default async function ShopPage(props: ShopPageProps) {
                 {activeFilters.map(([key, value]) => (
                   <span key={key} className="bg-white/10 text-white text-xs px-3 py-1 rounded-full flex items-center gap-2">
                     {key}: {value as string}
-                    <a href={`/shop?${new URLSearchParams(Object.entries(searchParams).filter(([k]) => k !== key).map(([k, v]) => [k, v as string])).toString()}`}>×</a>
+                    <Link href={`/shop?${new URLSearchParams(Object.entries(searchParams).filter(([k]) => k !== key).map(([k, v]) => [k, v as string])).toString()}`}>×</Link>
                   </span>
                 ))}
-                <a href="/shop" className="text-white/50 text-xs px-3 py-1">Clear all</a>
+                <Link href="/shop" className="text-white/50 text-xs px-3 py-1">Clear all</Link>
               </div>
             )}
 

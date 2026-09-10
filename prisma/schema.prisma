@@ -150,6 +150,9 @@ model Order {
   userId         String?
   user           User?         @relation(fields: [userId], references: [id])
   items          OrderItem[]
+  providerOrderId   String?
+  providerPaymentId String?
+  paidAt            DateTime?
 }
 
 model OrderItem {
