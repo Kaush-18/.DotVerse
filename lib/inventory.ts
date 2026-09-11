@@ -279,11 +279,11 @@ export async function releaseActiveReservations(
 /**
  * Expires ACTIVE reservations whose window has elapsed and returns their stock.
  *
- * There is no scheduler in the repository yet; this function is the cleanup
- * primitive intended to be invoked by a production scheduler (for example a
- * Vercel Cron job calling a protected route). Until such a job is wired up,
- * abandoned online orders keep their reserved stock until they are released by
- * a payment failure or revived/expired lazily by another lifecycle event.
+ * Invoked by the authenticated cleanup endpoint, which a Vercel Cron job
+ * (`/api/inventory/cleanup`, see vercel.json) calls every 10 minutes so that
+ * abandoned online orders do not hold reserved stock beyond the reservation
+ * window. Each row is claimed with a conditional status update before its stock
+ * is restored, so overlapping/duplicate invocations are idempotent.
  */
 export async function releaseExpiredReservations(
   now: Date = new Date(),

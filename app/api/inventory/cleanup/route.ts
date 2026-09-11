@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { releaseExpiredReservations } from "@/lib/inventory";
 
 function getExpectedSecret(): string | undefined {
+  // `||` (not `??`) so an empty INVENTORY_CLEANUP_SECRET does not shadow the
+  // Vercel Cron secret, and a blank value is treated as unconfigured.
   return (
-    process.env.INVENTORY_CLEANUP_SECRET ?? process.env.CRON_SECRET
+    process.env.INVENTORY_CLEANUP_SECRET?.trim() ||
+    process.env.CRON_SECRET?.trim() ||
+    undefined
   );
 }
 
