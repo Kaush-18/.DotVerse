@@ -12,7 +12,7 @@ export const products: Product[] = [
     description:
       "A heavy graphic tee built around the DotVerse cosmos. Dense-print artwork, drop-shoulder cut and a relaxed drape engineered for all-day wear.",
 
-    price: 349,
+    price: 1,
     originalPrice: 1499,
 
     badge: "NEW",
@@ -56,7 +56,7 @@ export const products: Product[] = [
     description:
       "An oversized silhouette sharpened by contrast-ribbed trims. Cut from a structured heavyweight jersey that holds its shape, no matter the orbit.",
 
-    price: 349,
+    price: 1,
     originalPrice: 1299,
 
     badge: "NEW",
@@ -96,7 +96,7 @@ export const products: Product[] = [
     description:
       "A premium everyday staple with a sculpted collar and clean lines. Finely spun cotton for a soft hand-feel and a sharp, lasting drape.",
 
-    price: 349,
+    price: 1,
     originalPrice: 1399,
 
     badge: "NEW",
@@ -140,7 +140,7 @@ export const products: Product[] = [
     description:
       "A limited-run graphic piece tuned to a single frequency. Hand-drawn electrostatic artwork with a boxy fit and tonal, sculpted ribbing.",
 
-    price: 349,
+    price: 1,
     originalPrice: 1399,
 
     badge: "LIMITED",
