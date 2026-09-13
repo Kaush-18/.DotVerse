@@ -154,6 +154,7 @@ model Order {
   providerOrderId   String?
   providerPaymentId String?
   paidAt            DateTime?
+  cancelledAt       DateTime?
   inventoryExceptionAt DateTime?
   reservations   InventoryReservation[]
 }

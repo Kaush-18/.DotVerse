@@ -14,6 +14,8 @@ type OrderItem = {
   quantity: number;
 };
 
+// A full order as returned by the authenticated endpoint. Guests never see these
+// optional (PII-bearing) fields.
 type Order = {
   id: string;
   orderNumber: string;
@@ -32,6 +34,8 @@ type Order = {
   inventoryExceptionAt?: string | null;
 };
 
+// The minimal, PII-free status snapshot exposed to guests through the unauthenticated
+// /status endpoint. It never contains customer detail, items, IDs, or Razorpay IDs.
 type OrderStatusSnapshot = {
   status: string;
   paymentStatus: string;
@@ -49,13 +53,18 @@ export default function OrderSuccessContent() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Initial load: authenticated users get the full order; guests (or a stale auth
+  // order) fall back to the minimal status endpoint so the page can still reflect the
+  // authoritative payment state without exposing any customer PII.
   useEffect(() => {
+    let cancelled = false;
+
     if (!orderNumber) {
       router.replace("/");
       return;
     }
 
-    const fetchOrder = async () => {
+    const fetchFullOrder = async () => {
       try {
         const response = await fetch(
           `/api/orders/${encodeURIComponent(orderNumber)}`,
@@ -64,26 +73,97 @@ export default function OrderSuccessContent() {
 
         const data = await response.json();
 
-        if (response.ok && data.success && data.order) {
-          setOrder(data.order);
-          return;
+        if (!cancelled && response.ok && data.success && data.order) {
+          setOrder(data.order as Order);
+          return true;
         }
 
+        return false;
+      } catch {
+        return false;
+      }
+    };
+
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch(
+          `/api/orders/${encodeURIComponent(orderNumber)}/status`,
+          { cache: "no-store" },
+        );
+
+        const data = await response.json();
+
+        if (!cancelled && response.ok && data.success && data.order) {
+          return { found: true, snapshot: data.order as OrderStatusSnapshot };
+        }
+      } catch {
+        // fall through
+      }
+
+      return { found: false, snapshot: null };
+    };
+
+    (async () => {
+      const hasFull = await fetchFullOrder();
+
+      if (hasFull) {
+        // A cached copy (from the payment flow) can still surface detail that the
+        // authenticated endpoint could not (for example an unauthenticated session).
         const cached = sessionStorage.getItem(
           `dotverse-order-${orderNumber}`,
         );
 
-        if (cached) {
-          setOrder(JSON.parse(cached) as Order);
+        if (cached && !cancelled) {
+          const parsed = JSON.parse(cached) as Order;
+          setOrder((current) => current ?? parsed);
         }
-      } catch (error) {
-        console.error("Error fetching order:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    void fetchOrder();
+        if (!cancelled) setLoading(false);
+        return;
+      }
+
+      const cached = sessionStorage.getItem(`dotverse-order-${orderNumber}`);
+
+      if (cached) {
+        const parsed = JSON.parse(cached) as Order;
+        setOrder(parsed);
+      }
+
+      // For guests (no session) or when the full endpoint 404s, recover the
+      // payment/order state from the minimal status endpoint. This produces a
+      // state-only view with no customer PII. Cached data takes precedence so
+      // the status fallback only applies when no cached full order is available.
+      if (!cached) {
+        const statusResult = await fetchStatus();
+
+        if (!cancelled && statusResult.found && statusResult.snapshot) {
+          const snapshot = statusResult.snapshot;
+          setOrder({
+            id: "",
+            orderNumber,
+            firstName: "",
+            lastName: "",
+            city: "",
+            state: "",
+            subtotal: 0,
+            shipping: 0,
+            total: 0,
+            status: snapshot.status,
+            paymentStatus: snapshot.paymentStatus,
+            paymentMethod: snapshot.paymentMethod,
+            items: [],
+            createdAt: "",
+            inventoryExceptionAt: snapshot.inventoryExceptionAt,
+          });
+        }
+      }
+
+      if (!cancelled) setLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [orderNumber, router]);
 
   const awaitingPayment =
@@ -92,6 +172,8 @@ export default function OrderSuccessContent() {
     order.paymentStatus !== "PAID" &&
     order.paymentStatus !== "FAILED";
 
+  // Polls the minimal status endpoint while a payment is still in flight. The
+  // webhook is the sole authoritative source of payment state; this only reflects it.
   useEffect(() => {
     if (!orderNumber || !awaitingPayment) {
       return;
@@ -120,9 +202,26 @@ export default function OrderSuccessContent() {
                 ...current,
                 status: snapshot.status,
                 paymentStatus: snapshot.paymentStatus,
+                paymentMethod: snapshot.paymentMethod,
                 inventoryExceptionAt: snapshot.inventoryExceptionAt,
               }
-            : current,
+            : {
+                id: "",
+                orderNumber: orderNumber,
+                firstName: "",
+                lastName: "",
+                city: "",
+                state: "",
+                subtotal: 0,
+                shipping: 0,
+                total: 0,
+                status: snapshot.status,
+                paymentStatus: snapshot.paymentStatus,
+                paymentMethod: snapshot.paymentMethod,
+                items: [],
+                createdAt: "",
+                inventoryExceptionAt: snapshot.inventoryExceptionAt,
+              },
         );
       } catch (error) {
         console.error("Error polling order status:", error);
@@ -174,6 +273,10 @@ export default function OrderSuccessContent() {
     isOnline && !paymentConfirmed && !paymentFailed && !inventoryException;
   const orderConfirmed = !isOnline || (paymentConfirmed && !inventoryException);
 
+  // Guests only ever hold a state-only view (empty PII/detail fields), so we can
+  // render the safe confirmation layout without leaking customer order content.
+  const isGuestView = order.items?.length === 0;
+
   const heading = paymentFailed
     ? "PAYMENT FAILED"
     : inventoryException
@@ -215,7 +318,7 @@ export default function OrderSuccessContent() {
             </h1>
 
             <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/50 md:text-base">
-              {orderConfirmed && (
+              {!isGuestView && orderConfirmed && order.firstName && (
                 <>
                   Thank you for your purchase,{" "}
                   <span className="text-white">{order.firstName}</span>.{" "}
@@ -264,90 +367,89 @@ export default function OrderSuccessContent() {
             </div>
           </section>
 
-          <section className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]">
-            <div className="border-b border-white/10 px-6 py-5 md:px-8">
-              <h2 className="text-lg font-semibold">YOUR ORDER</h2>
-            </div>
+          {!isGuestView && order.items && order.items.length > 0 && (
+            <section className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]">
+              <div className="border-b border-white/10 px-6 py-5 md:px-8">
+                <h2 className="text-lg font-semibold">YOUR ORDER</h2>
+              </div>
 
-            <div className="divide-y divide-white/10">
-              {order.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between gap-6 px-6 py-6 md:px-8"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">
-                      {item.productName}
-                    </p>
+              <div className="divide-y divide-white/10">
+                {order.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between gap-6 px-6 py-6 md:px-8"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">
+                        {item.productName}
+                      </p>
 
-                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-white/45">
-                      <span>{item.variantColor}</span>
-                      <span>•</span>
-                      <span>Size {item.variantSize}</span>
-                      <span>•</span>
-                      <span>Qty {item.quantity}</span>
+                      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-white/45">
+                        <span>{item.variantColor}</span>
+                        <span>•</span>
+                        <span>Size {item.variantSize}</span>
+                        <span>•</span>
+                        <span>Qty {item.quantity}</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <p className="shrink-0 font-semibold">
-                    ₹{item.price * item.quantity}
+                    <p className="shrink-0 font-semibold">
+                      ₹{item.price * item.quantity}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {!isGuestView && order.firstName && (
+            <section className="mt-6 grid gap-6 md:grid-cols-2">
+
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
+                <h2 className="text-lg font-semibold">DELIVERY</h2>
+
+                <div className="mt-6">
+                  <p className="font-medium">
+                    {order.firstName} {order.lastName}
+                  </p>
+
+                  <p className="mt-2 text-sm leading-6 text-white/45">
+                    {order.city}, {order.state}
                   </p>
                 </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="mt-6 grid gap-6 md:grid-cols-2">
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
-              <h2 className="text-lg font-semibold">DELIVERY</h2>
-
-              <div className="mt-6">
-                <p className="font-medium">
-                  {order.firstName} {order.lastName}
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-white/50">
-                  {order.city}, {order.state}
-                </p>
               </div>
-            </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
-              <h2 className="text-lg font-semibold">
-                ORDER SUMMARY
-              </h2>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
+                <h2 className="text-lg font-semibold">ORDER SUMMARY</h2>
 
-              <div className="mt-6 space-y-3 text-sm">
-                <div className="flex justify-between text-white/50">
-                  <span>Subtotal</span>
-                  <span>₹{order.subtotal}</span>
-                </div>
+                <div className="mt-6 space-y-3 text-sm">
+                  <div className="flex justify-between text-white/45">
+                    <span>Subtotal</span>
+                    <span>₹{order.subtotal}</span>
+                  </div>
 
-                <div className="flex justify-between text-white/50">
-                  <span>Shipping</span>
-                  <span>
-                    {order.shipping === 0
-                      ? "FREE"
-                      : `₹${order.shipping}`}
-                  </span>
-                </div>
+                  <div className="flex justify-between text-white/45">
+                    <span>Shipping</span>
+                    <span>
+                      {order.shipping === 0
+                        ? "FREE"
+                        : `₹${order.shipping}`}
+                    </span>
+                  </div>
 
-                <div className="my-5 border-t border-white/10" />
+                  <div className="my-4 border-t border-white/10" />
 
-                <div className="flex items-center justify-between">
-                  <span className="text-base font-semibold">
-                    Total
-                  </span>
-
-                  <span className="text-xl font-bold text-violet-300">
-                    ₹{order.total}
-                  </span>
+                  <div className="flex justify-between text-base font-semibold">
+                    <span>Total</span>
+                    <span className="text-violet-300">
+                      ₹{order.total}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-          </section>
+            </section>
+          )}
 
           <section className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <button
