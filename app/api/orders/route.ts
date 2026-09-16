@@ -10,6 +10,7 @@ import {
   InsufficientInventoryError,
   InventoryStateError,
 } from "@/lib/inventory";
+import { createGuestPaymentToken } from "@/lib/guest-order-authorization";
 
 function generateOrderNumber() {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -53,14 +54,29 @@ export async function POST(request: Request) {
         status: true,
         paymentStatus: true,
         total: true,
+        userId: true,
+        idempotencyKey: true,
       },
     });
 
     if (existingOrder) {
+      const { userId, idempotencyKey: existingIdempotencyKey, ...safeOrder } =
+        existingOrder;
+
       return NextResponse.json({
         success: true,
         message: "Order already exists.",
-        order: existingOrder,
+        order: {
+          ...safeOrder,
+          ...(userId === null
+            ? {
+                guestPaymentToken: createGuestPaymentToken(
+                  existingOrder.id,
+                  existingIdempotencyKey,
+                ),
+              }
+            : {}),
+        },
         idempotent: true,
       });
     }
@@ -258,6 +274,14 @@ export async function POST(request: Request) {
           status: order.status,
           paymentStatus: order.paymentStatus,
           paymentMethod: order.paymentMethod,
+          ...(order.userId === null
+            ? {
+                guestPaymentToken: createGuestPaymentToken(
+                  order.id,
+                  order.idempotencyKey,
+                ),
+              }
+            : {}),
           items: order.items,
           createdAt: order.createdAt,
         },

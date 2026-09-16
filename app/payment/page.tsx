@@ -37,6 +37,7 @@ declare global {
 type CreatedOrder = {
   id: string;
   orderNumber: string;
+  guestPaymentToken?: string;
   raw: Record<string, unknown>;
 };
 
@@ -269,6 +270,7 @@ export default function PaymentPage() {
     const order: CreatedOrder = {
       id: data.order.id,
       orderNumber: data.order.orderNumber,
+      guestPaymentToken: data.order.guestPaymentToken,
       raw: data.order,
     };
 
@@ -356,7 +358,10 @@ export default function PaymentPage() {
       const paymentResponse = await fetch("/api/payments/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: order.id }),
+        body: JSON.stringify({
+          orderId: order.id,
+          guestPaymentToken: order.guestPaymentToken,
+        }),
       });
 
       const paymentData = await paymentResponse.json();

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { razorpay } from "@/lib/razorpay";
+import { isAuthorizedForPayment } from "@/lib/guest-order-authorization";
 import {
   ensureActiveReservations,
   InsufficientInventoryError,
@@ -13,7 +16,7 @@ export async function POST(request: Request) {
       throw new Error("Razorpay not configured.");
     }
 
-    const { orderId } = await request.json();
+    const { orderId, guestPaymentToken } = await request.json();
 
     if (!orderId) {
       return NextResponse.json(
@@ -31,6 +34,24 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { success: false, message: "Order not found." },
         { status: 404 }
+      );
+    }
+
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (
+      !isAuthorizedForPayment(
+        order.userId,
+        session?.user.id,
+        guestPaymentToken,
+        order.id,
+        order.idempotencyKey,
+      )
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Order not found." },
+        { status: 404 },
       );
     }
 
