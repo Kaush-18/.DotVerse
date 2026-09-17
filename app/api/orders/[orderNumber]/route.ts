@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
+import { isOrderOwnedByUser } from "@/lib/account-authorization";
 
 type RouteContext = {
   params: Promise<{
@@ -42,7 +43,6 @@ export async function GET(
     const order = await prisma.order.findUnique({
       where: {
         orderNumber,
-        userId: session.user.id,
       },
       select: {
         id: true,
@@ -60,6 +60,12 @@ export async function GET(
         status: true,
         paymentStatus: true,
         paymentMethod: true,
+        userId: true,
+        address: true,
+        apartment: true,
+        postalCode: true,
+        phone: true,
+        cancelledAt: true,
 
         items: {
           select: {
@@ -76,7 +82,7 @@ export async function GET(
       },
     });
 
-    if (!order) {
+    if (!order || !isOrderOwnedByUser(order.userId, session.user.id)) {
       return NextResponse.json(
         {
           success: false,
@@ -86,9 +92,13 @@ export async function GET(
       );
     }
 
+    const safeOrder = Object.fromEntries(
+      Object.entries(order).filter(([key]) => key !== "userId"),
+    );
+
     return NextResponse.json({
       success: true,
-      order,
+      order: safeOrder,
     });
   } catch (error) {
     console.error("Order lookup failed:", error);

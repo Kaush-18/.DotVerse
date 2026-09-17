@@ -8,6 +8,7 @@ import {
   isAuthorizedForPayment,
   isValidGuestPaymentToken,
 } from "../lib/guest-order-authorization";
+import { isOrderOwnedByUser } from "../lib/account-authorization";
 
 describe("guest payment authorization", () => {
   it("accepts a token for the exact order and idempotency key", () => {
@@ -50,5 +51,11 @@ describe("guest payment authorization", () => {
       isAuthorizedForPayment(null, undefined, undefined, "order-1", "request-1"),
       false,
     );
+  });
+
+  it("limits account order access to the authenticated owner", () => {
+    assert.equal(isOrderOwnedByUser("user-1", "user-1"), true);
+    assert.equal(isOrderOwnedByUser("user-1", "user-2"), false);
+    assert.equal(isOrderOwnedByUser(null, "user-1"), false);
   });
 });

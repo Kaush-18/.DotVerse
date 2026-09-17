@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Clock3, Package, UserRound } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock3, Mail, Package, UserRound } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -17,7 +17,14 @@ export default async function AccountDashboardPage() {
     where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
     take: 3,
-    select: { id: true, orderNumber: true, createdAt: true, status: true, total: true, items: { select: { quantity: true } } },
+    select: {
+      id: true,
+      orderNumber: true,
+      createdAt: true,
+      status: true,
+      total: true,
+      items: { select: { quantity: true } },
+    },
   });
   const firstName = session.user.name?.split(" ")[0] || "there";
   const totalOrders = await prisma.order.count({ where: { userId: session.user.id } });
@@ -30,6 +37,30 @@ export default async function AccountDashboardPage() {
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Welcome back, {firstName}.</h1>
         <p className="mt-2 text-sm text-white/50">Your DotVerse essentials, all in one place.</p>
       </header>
+
+      <section className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-white/[0.035] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6" aria-label="Profile summary">
+        <div className="flex min-w-0 items-center gap-4">
+          {session.user.image ? (
+            // The image is supplied by Better Auth and is not used for authorization.
+            <span
+              role="img"
+              aria-label="Profile image"
+              className="h-14 w-14 shrink-0 rounded-full border border-white/10 bg-cover bg-center"
+              style={{ backgroundImage: `url(${session.user.image})` }}
+            />
+          ) : (
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-violet-500/15 text-lg font-semibold text-violet-200">
+              {(session.user.name || session.user.email).slice(0, 1).toUpperCase()}
+            </span>
+          )}
+          <div className="min-w-0">
+            <p className="text-xs uppercase tracking-[0.2em] text-white/40">Signed in as</p>
+            <p className="mt-1 truncate text-base font-semibold text-white">{session.user.name}</p>
+            <p className="mt-1 flex items-center gap-1.5 truncate text-sm text-white/50"><Mail size={14} />{session.user.email}</p>
+          </div>
+        </div>
+        <Link href="/account/profile" className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-white/15 px-4 text-sm font-medium text-white/75 transition hover:border-violet-400/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70">Edit profile</Link>
+      </section>
 
       <section aria-label="Account overview" className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><Package size={18} className="text-violet-300" /><p className="mt-5 text-xs text-white/45">Total orders</p><p className="mt-1 text-2xl font-semibold text-white">{totalOrders}</p></div>
