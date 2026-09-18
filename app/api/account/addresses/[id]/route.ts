@@ -15,7 +15,13 @@ export async function PATCH(request: Request, { params }: Context) {
   if (!session) return NextResponse.json({ success: false, message: "Authentication required." }, { status: 401 });
   const { id } = await params;
   try {
-    const input = parseAddressInput(await request.json());
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ success: false, message: "Invalid address data." }, { status: 400 });
+    }
+    const input = parseAddressInput(body);
     const address = await prisma.$transaction(async (tx) => {
       const owned = await tx.address.findFirst({ where: { id, userId: session.user.id }, select: { id: true, isDefault: true } });
       if (!owned) return null;

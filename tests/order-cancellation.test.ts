@@ -1,11 +1,6 @@
 import { describe, it, mock } from "node:test";
 import assert from "node:assert/strict";
 
-// Ensure the module-level Prisma client import does not throw during test
-// evaluation. The actual DATABASE_URL is irrelevant; the cancellation tests
-// mock the transaction client completely and never hit a real database.
-process.env.DATABASE_URL ??= "postgresql://test@localhost/test?sslmode=disable";
-
 import { cancelOrderInTransaction, OrderCancellationError } from "../lib/order-cancellation";
 import type { Prisma } from "../generated/prisma/client";
 

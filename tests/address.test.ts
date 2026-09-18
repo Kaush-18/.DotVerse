@@ -33,6 +33,11 @@ describe("address validation", () => {
     assert.throws(() => parseAddressInput({ ...valid, label: "x".repeat(31) }), AddressValidationError);
   });
 
+  it("rejects malformed request bodies safely", () => {
+    assert.throws(() => parseAddressInput(null), AddressValidationError);
+    assert.throws(() => parseAddressInput([]), AddressValidationError);
+  });
+
   it("does not accept a client ownership field", () => {
     const parsed = parseAddressInput({ ...valid, userId: "another-user" });
     assert.equal("userId" in parsed, false);

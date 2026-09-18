@@ -41,7 +41,13 @@ export async function POST(request: Request) {
   if (!session) return NextResponse.json({ success: false, message: "Authentication required." }, { status: 401 });
 
   try {
-    const input = parseAddressInput(await request.json());
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ success: false, message: "Invalid address data." }, { status: 400 });
+    }
+    const input = parseAddressInput(body);
     const address = await prisma.$transaction(async (tx) => {
       const count = await tx.address.count({ where: { userId: session.user.id } });
       if (count >= MAX_ADDRESSES) throw new AddressValidationError("You can save up to 5 addresses.");
