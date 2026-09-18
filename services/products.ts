@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Product, ProductBadge } from "@/types/product";
 import { Product as PrismaProduct, Category, Collection, ProductImage, ProductVariant, Prisma } from "../generated/prisma/client";
 
-type FullProduct = PrismaProduct & {
+export type FullProduct = PrismaProduct & {
   category: Category;
   collection: Collection;
   images: ProductImage[];
@@ -16,7 +16,7 @@ export type RelatedProductsResult = {
   relationship: RelatedProductsRelationship;
 };
 
-function mapProduct(product: FullProduct): Product {
+export function mapProduct(product: FullProduct): Product {
   const colors = Array.from(
     new Map(
       product.variants.map((v) => [v.colorValue, { name: v.colorName, value: v.colorValue }])

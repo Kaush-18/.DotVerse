@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import type { Product } from "@/types/product";
+import { useWishlist } from "@/context/WishlistContext";
 
 type ProductQuickViewProps = {
   product: Product | null;
@@ -22,6 +23,8 @@ export default function ProductQuickView({
   product,
   onClose,
 }: ProductQuickViewProps) {
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const liked = isWishlisted(product?.id ?? "");
   useEffect(() => {
     if (!product) return;
 
@@ -203,9 +206,10 @@ export default function ProductQuickView({
             <button
               type="button"
               className="quick-view-wishlist"
-              aria-label="Add to wishlist"
+               aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+               onClick={() => void toggleWishlist(product.id, product)}
             >
-              <Heart size={19} />
+               <Heart size={19} fill={liked ? "currentColor" : "none"} />
             </button>
           </div>
         </div>

@@ -10,6 +10,8 @@ import ProductGrid from "@/components/product/ProductGrid";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types/product";
 import { collections } from "@/components/home/collectionData";
+import { Heart } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -28,6 +30,8 @@ export default function ProductDetailClient({
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { addToCart } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const liked = isWishlisted(product.id);
   const collection = collections.find(
     (item) => item.title.toLowerCase() === product.collection.toLowerCase()
   );
@@ -210,7 +214,7 @@ export default function ProductDetailClient({
               )}
 
               {/* Actions */}
-              <div className="mt-10">
+              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                 <button
                   type="button"
                   onClick={handleAddToCart}
@@ -219,6 +223,7 @@ export default function ProductDetailClient({
                 >
                   {isAdding ? "Added to cart ✓" : "Add to cart"}
                 </button>
+                <button type="button" onClick={() => void toggleWishlist(product.id, product)} aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`} className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full border border-white/15 px-6 text-sm font-semibold text-white transition hover:border-violet-400/60 hover:bg-white/5"><Heart size={18} fill={liked ? "currentColor" : "none"} />{liked ? "Saved" : "Wishlist"}</button>
                 {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
               </div>
             </div>

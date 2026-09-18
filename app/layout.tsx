@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
 import { CheckoutProvider } from "@/context/CheckoutContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import {
@@ -70,7 +71,8 @@ export default function RootLayout({
       <body className="min-h-screen" suppressHydrationWarning>
         <CheckoutProvider>
           <CartProvider>
-            <Navbar />
+            <WishlistProvider>
+              <Navbar />
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{
@@ -95,7 +97,8 @@ export default function RootLayout({
             <main className="site-content w-full min-w-0">
               {children}
             </main>
-            <Footer />
+              <Footer />
+            </WishlistProvider>
           </CartProvider>
         </CheckoutProvider>
       </body>

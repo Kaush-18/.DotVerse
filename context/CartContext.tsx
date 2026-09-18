@@ -7,17 +7,15 @@ import {
   useState,
   ReactNode,
 } from "react";
-
-type CartItem = {
-  id: string;
-  slug: string;
-  name: string;
-  price: number;
-  image: string;
-  size: string;
-  color: string;
-  quantity: number;
-};
+import {
+  CART_STORAGE_KEY,
+  CartItem,
+  clampCartQuantity,
+  MAX_CART_QUANTITY,
+  parseCartStorage,
+  sameCartVariant,
+  serializeCartStorage,
+} from "@/lib/cart";
 
 type CartContextType = {
   items: CartItem[];
@@ -48,51 +46,45 @@ export function CartProvider({
   children: ReactNode;
 }) {
   const [items, setItems] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") {
-      return [];
-    }
-
-    try {
-      const savedCart = localStorage.getItem("dotverse-cart");
-
-      if (!savedCart) {
-        return [];
-      }
-
-      return JSON.parse(savedCart) as CartItem[];
-    } catch {
-      return [];
-    }
+    return [];
   });
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Save cart
   useEffect(() => {
-    localStorage.setItem(
-      "dotverse-cart",
-      JSON.stringify(items)
-    );
-  }, [items]);
+    try {
+      // localStorage is an external browser store; hydrate after the server render.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setItems(parseCartStorage(window.localStorage.getItem(CART_STORAGE_KEY)));
+    } catch {
+      setItems([]);
+    } finally {
+      setIsHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      window.localStorage.setItem(CART_STORAGE_KEY, serializeCartStorage(items));
+    } catch {
+      // Storage can be unavailable in private browsing; shopping still works in memory.
+    }
+  }, [isHydrated, items]);
 
   const addToCart = (
     item: Omit<CartItem, "quantity">,
     quantity = 1
   ) => {
     setItems((currentItems) => {
-      const existingItem = currentItems.find(
-        (cartItem) =>
-          cartItem.id === item.id &&
-          cartItem.size === item.size &&
-          cartItem.color === item.color
-      );
+      const safeQuantity = Math.min(MAX_CART_QUANTITY, Math.max(1, Math.floor(quantity)));
+      const existingItem = currentItems.find((cartItem) => sameCartVariant(cartItem, item));
 
       if (existingItem) {
         return currentItems.map((cartItem) =>
-          cartItem.id === item.id &&
-          cartItem.size === item.size &&
-          cartItem.color === item.color
+          sameCartVariant(cartItem, item)
             ? {
                 ...cartItem,
-                quantity: cartItem.quantity + quantity,
+                quantity: clampCartQuantity(cartItem.quantity + safeQuantity),
               }
             : cartItem
         );
@@ -102,7 +94,7 @@ export function CartProvider({
         ...currentItems,
         {
           ...item,
-          quantity,
+          quantity: safeQuantity,
         },
       ];
     });
@@ -143,7 +135,7 @@ export function CartProvider({
         item.color === color
           ? {
               ...item,
-              quantity,
+              quantity: clampCartQuantity(quantity),
             }
           : item
       )

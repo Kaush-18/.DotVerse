@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 
 import type { Product } from "@/types/product";
 import { collections } from "@/components/home/collectionData";
+import { useWishlist } from "@/context/WishlistContext";
 
 interface ProductCardProps {
   product: Product;
@@ -22,7 +22,8 @@ export default function ProductCard({
   onQuickView,
   variant = "default",
 }: ProductCardProps) {
-  const [liked, setLiked] = useState(false);
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const liked = isWishlisted(product.id);
   const collection = collections.find(
     (item) => item.title.toLowerCase() === product.collection.toLowerCase(),
   );
@@ -68,7 +69,7 @@ export default function ProductCard({
               ? `Remove ${product.name} from wishlist`
               : `Add ${product.name} to wishlist`
           }
-          onClick={() => setLiked((value) => !value)}
+           onClick={() => void toggleWishlist(product.id, product)}
         >
           <Heart
             size={18}

@@ -4,9 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import type { Product } from "@/types/product";
 import { collections } from "./collectionData";
 
@@ -24,7 +24,8 @@ export default function NewArrivalCard({
   product: Product;
   index: number;
 }) {
-  const [liked, setLiked] = useState(false);
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const liked = isWishlisted(product.id);
   const { addToCart } = useCart();
   const color = product.colors[0];
   const size = product.sizes[0] ?? "M";
@@ -63,7 +64,7 @@ export default function NewArrivalCard({
           type="button"
           className={`new-arrivals-rebuild-wishlist${liked ? " is-liked" : ""}`}
           aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
-          onClick={() => setLiked((value) => !value)}
+           onClick={() => void toggleWishlist(product.id, product)}
         >
           <Heart size={17} fill={liked ? "currentColor" : "none"} />
         </button>

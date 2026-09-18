@@ -44,6 +44,7 @@ model Product {
   collection    Collection       @relation(fields: [collectionId], references: [id])
   images        ProductImage[]
   variants      ProductVariant[]
+  wishlistItems WishlistItem[]
 }
 
 model ProductImage {
@@ -86,6 +87,41 @@ model User {
   accounts      Account[]
   orders        Order[]
   sessions      Session[]
+  addresses     Address[]
+  wishlistItems WishlistItem[]
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  label      String
+  firstName  String
+  lastName   String
+  phone      String
+  address    String
+  apartment  String?
+  city       String
+  state      String
+  postalCode String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Session {

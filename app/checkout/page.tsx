@@ -5,6 +5,7 @@ import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
 import Container from "@/components/layout/Container";
 import PageReveal from "@/components/animations/PageReveal";
+import SavedAddresses from "@/components/checkout/SavedAddresses";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -45,6 +46,18 @@ export default function CheckoutPage() {
           <h1 className="mb-12 text-4xl font-bold text-white">
             CHECKOUT
           </h1>
+
+          <SavedAddresses onSelect={(address) => setFormData({
+            ...formData,
+            firstName: address.firstName,
+            lastName: address.lastName,
+            phone: address.phone,
+            address: address.address,
+            apartment: address.apartment || "",
+            city: address.city,
+            state: address.state,
+            postalCode: address.postalCode,
+          })} />
 
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
             {/* Checkout Form */}
