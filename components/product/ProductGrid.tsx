@@ -6,14 +6,16 @@ import ProductCard from "./ProductCard";
 interface ProductGridProps {
   products: Product[];
   onQuickView?: (product: Product) => void;
+  className?: string;
 }
 
 export default function ProductGrid({
   products,
   onQuickView,
+  className,
 }: ProductGridProps) {
   return (
-    <div className="products-grid">
+    <div className={className ?? "products-grid"}>
       {products.map((product, index) => (
         <ProductCard
           key={product.id}

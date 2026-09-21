@@ -1,16 +1,13 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+
 import Container from "@/components/layout/Container";
-import PageReveal from "@/components/animations/PageReveal";
 import ProductGrid from "@/components/product/ProductGrid";
 import ShopControls from "@/components/shop/ShopControls";
-import { getFilteredProducts } from "@/services/products";
 import { collections } from "@/components/home/collectionData";
-import {
-  absoluteUrl,
-  defaultSocialImage,
-  siteName,
-} from "@/lib/seo";
+import { getFilteredProducts } from "@/services/products";
+import { absoluteUrl, defaultSocialImage, siteName } from "@/lib/seo";
 
 interface ShopPageProps {
   searchParams: Promise<{
@@ -26,155 +23,124 @@ interface ShopPageProps {
   }>;
 }
 
-export async function generateMetadata({
-  searchParams,
-}: ShopPageProps): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: ShopPageProps): Promise<Metadata> {
   const params = await searchParams;
   const hasFilters = Object.values(params).some(Boolean);
   const title = "Shop DotVerse Graphic T-Shirts & Streetwear";
-  const description =
-    "Browse DotVerse's original graphic T-shirts and modern streetwear collection, designed with distinctive visuals, everyday comfort, and a bold point of view.";
+  const description = "Browse DotVerse's original graphic T-shirts and modern streetwear collection, designed with distinctive visuals, everyday comfort, and a bold point of view.";
 
   return {
     title,
     description,
     alternates: { canonical: "https://dotverse.store/shop" },
     robots: hasFilters ? { index: false, follow: true } : undefined,
-    openGraph: {
-      title,
-      description,
-      url: "https://dotverse.store/shop",
-      siteName,
-      type: "website",
-      images: [
-        {
-          url: absoluteUrl(defaultSocialImage),
-          alt: "DotVerse graphic T-shirts and modern streetwear",
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [absoluteUrl(defaultSocialImage)],
-    },
+    openGraph: { title, description, url: "https://dotverse.store/shop", siteName, type: "website", images: [{ url: absoluteUrl(defaultSocialImage), alt: "DotVerse graphic T-shirts and modern streetwear" }] },
+    twitter: { card: "summary_large_image", title, description, images: [absoluteUrl(defaultSocialImage)] },
   };
 }
 
-export default async function ShopPage(props: ShopPageProps) {
-  const searchParams = await props.searchParams;
-
+export default async function ShopPage({ searchParams }: ShopPageProps) {
+  const params = await searchParams;
   const products = await getFilteredProducts({
-    q: searchParams.q,
-    category: searchParams.category,
-    collection: searchParams.collection,
-    color: searchParams.color,
-    size: searchParams.size,
-    minPrice: searchParams.minPrice ? parseInt(searchParams.minPrice) : undefined,
-    maxPrice: searchParams.maxPrice ? parseInt(searchParams.maxPrice) : undefined,
-    inStock: searchParams.inStock === 'true',
-    sort: searchParams.sort,
+    q: params.q,
+    category: params.category,
+    collection: params.collection,
+    color: params.color,
+    size: params.size,
+    minPrice: params.minPrice ? parseInt(params.minPrice, 10) : undefined,
+    maxPrice: params.maxPrice ? parseInt(params.maxPrice, 10) : undefined,
+    inStock: params.inStock === "true",
+    sort: params.sort,
   });
-
-  const activeFilters = Object.entries(searchParams).filter(([key, value]) => value && key !== 'sort');
+  const activeCollection = params.collection ?? "";
 
   return (
-    <PageReveal>
-      <main>
-        <section className="relative overflow-hidden pt-20 sm:pt-24 md:pt-28 lg:pt-32">
-          {/* Background atmosphere */}
-          <div
-            className="
-              pointer-events-none
-              absolute
-              left-1/2
-              top-0
-              z-0
-              h-[420px]
-              w-[600px]
-              -translate-x-1/2
-              rounded-full
-              bg-violet-700/[0.08]
-              blur-[130px]
-            "
-          />
-
-          <Container className="relative z-10">
-            {/* Header */}
-            <div className="mb-12 sm:mb-14 md:mb-16">
-              <div className="mb-4 flex items-center gap-3 sm:mb-5">
-                <span className="h-px w-8 bg-violet-500 sm:w-10" />
-                <span className="text-[9px] font-semibold uppercase tracking-[0.28em] text-violet-300 sm:text-[10px] sm:tracking-[0.3em]">
-                  Shop all
-                </span>
-              </div>
-
-              <h1 className="max-w-[850px] text-[clamp(3.1rem,7vw,6rem)] font-black leading-[0.88] tracking-[-0.065em] text-white">
-                Shop original
-                <br />
-                <span className="text-white/35">graphic T-shirts.</span>
-              </h1>
-
-              <p className="mt-6 max-w-[500px] text-sm leading-6 text-white/60">
-                Discover our premium streetwear collection featuring high-quality graphic T-shirts. 
-                Each piece blends futuristic design with cosmic-inspired motifs, crafted for those 
-                who look beyond the ordinary. Explore apparel engineered for comfort and distinct style.
-              </p>
-
-              <nav aria-label="Shop collections" className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-300">
-                {collections.map((collection) => (
-                  <Link
-                    key={collection.id}
-                    href={`/collections/${collection.id}`}
-                    className="transition-colors hover:text-white"
-                  >
-                    Explore {collection.title}
-                  </Link>
-                ))}
-              </nav>
-
-              <p className="mt-6 max-w-[500px] text-sm leading-6 text-white/55">
-                Explore the full DotVerse catalogue across Cosmic, Essentials,
-                and Signature.
-              </p>
+    <main className="dot-shop dot-shop-reference">
+      <div className="dot-shop-reference-background" aria-hidden="true" />
+      <section className="dot-shop-reference-hero" aria-labelledby="shop-heading">
+        <Image className="dot-shop-reference-hero-bg" src="/images/hero/dotverse-cosmic-hero-bg.png" alt="" fill priority sizes="100vw" />
+        <div className="dot-shop-reference-hero-shade" aria-hidden="true" />
+        <Container className="dot-shop-reference-hero-inner">
+          <div className="dot-shop-reference-hero-copy">
+            <p className="dot-shop-reference-kicker">.DOT / DIGITAL SHOWROOM</p>
+            <h1 id="shop-heading">WEAR<br /><em>YOUR POINT.</em></h1>
+            <p className="dot-shop-reference-description">Explore the full .Dot collection — pieces designed around identity, movement and individuality.</p>
+            <div className="dot-shop-reference-stats" aria-label="Shop statistics">
+              <span><strong>{products.length.toString().padStart(2, "0")}</strong><small>PIECES</small></span>
+              <span><strong>03</strong><small>COLLECTIONS</small></span>
             </div>
+          </div>
+          <div className="dot-shop-reference-hero-art" aria-label=".Dot cosmic collection hero image">
+            <div className="dot-shop-reference-orbit dot-shop-reference-orbit-one" aria-hidden="true" />
+            <div className="dot-shop-reference-orbit dot-shop-reference-orbit-two" aria-hidden="true" />
+            <Image src="/images/hero/dotverse-hero-tshirts.png" alt=".Dot cosmic T-shirts" fill sizes="(max-width: 700px) 90vw, 58vw" />
+            <span className="dot-shop-reference-hero-note">CLOTHES<br />FOR A BRIGHTER<br />TOMORROW</span>
+            <span className="dot-shop-reference-hero-index">01 / 03</span>
+          </div>
+        </Container>
+        <div className="dot-shop-reference-slides" aria-hidden="true"><span className="is-active">01</span><span>02</span><span>03</span></div>
+      </section>
 
-            {/* Product grid */}
-            <ShopControls />
+      <Container>
+        <nav className="dot-shop-reference-tabs" aria-label="Shop collections">
+          <span className="dot-shop-reference-section-label">THE EDIT / 2026</span>
+          <div className="dot-shop-reference-tab-list">
+            <Link href="/shop" className={!activeCollection ? "is-active" : ""} aria-current={!activeCollection ? "page" : undefined}>ALL <span>{products.length.toString().padStart(2, "0")}</span></Link>
+            {collections.map((collection) => (
+              <Link key={collection.id} href={`/shop?collection=${collection.id}`} className={activeCollection === collection.id ? "is-active" : ""} aria-current={activeCollection === collection.id ? "page" : undefined}>{collection.title}</Link>
+            ))}
+          </div>
+        </nav>
 
-            {activeFilters.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-8">
-                {activeFilters.map(([key, value]) => (
-                  <span key={key} className="bg-white/10 text-white text-xs px-3 py-1 rounded-full flex items-center gap-2">
-                    {key}: {value as string}
-                    <Link href={`/shop?${new URLSearchParams(Object.entries(searchParams).filter(([k]) => k !== key).map(([k, v]) => [k, v as string])).toString()}`}>×</Link>
-                  </span>
-                ))}
-                <Link href="/shop" className="text-white/50 text-xs px-3 py-1">Clear all</Link>
-              </div>
-            )}
+        <ShopControls productCount={products.length} />
 
-            {products.length > 0 ? (
-              <ProductGrid products={products} />
-            ) : (
-              <div className="py-20 text-center">
-                <p className="text-white/60">No pieces found matching your filters.</p>
-              </div>
-            )}
+        {products.length > 0 ? (
+          <ProductGrid products={products} className="dot-shop-reference-grid" />
+        ) : (
+          <section className="dot-shop-reference-empty" aria-labelledby="shop-empty-heading">
+            <span className="dot-shop-reference-kicker">THE EDIT IS QUIET HERE</span>
+            <h2 id="shop-empty-heading">Nothing here.</h2>
+            <p>Try another collection or reset your filters.</p>
+            <Link href="/shop" className="dot-shop-reference-button">Reset filters <span aria-hidden="true">→</span></Link>
+          </section>
+        )}
 
-            {/* Bottom label */}
-            <div className="mt-10 flex items-center justify-between border-t border-white/[0.07] pt-5">
-              <span className="text-[9px] uppercase tracking-[0.25em] text-white/25 sm:text-[10px]">
-                .Dot / DotVerse
-              </span>
-              <span className="text-[9px] uppercase tracking-[0.25em] text-white/25 sm:text-[10px]">
-                Designed beyond the ordinary
-              </span>
-            </div>
-          </Container>
+        <section className="dot-shop-reference-editorial" aria-labelledby="shop-editorial-heading">
+          <Image src="/images/hero/ChatGPT Image Sep 7, 2026, 03_18_56 AM.png" alt="Atmospheric rocky landscape beneath a moon" fill sizes="100vw" />
+          <div className="dot-shop-reference-editorial-shade" aria-hidden="true" />
+          <div className="dot-shop-reference-editorial-copy">
+            <p className="dot-shop-reference-kicker">THE POINT OF VIEW CONTINUES</p>
+            <h2 id="shop-editorial-heading">IDENTITY<br /><em>IN EVERY THREAD.</em></h2>
+            <p>More than just fashion. A reflection of who you are and where you&apos;re heading.</p>
+            <Link href="/#collections" className="dot-shop-reference-button">Explore collections <span aria-hidden="true">→</span></Link>
+          </div>
         </section>
-      </main>
-    </PageReveal>
+
+        <section className="dot-shop-reference-worlds" aria-labelledby="shop-worlds-heading">
+          <div className="dot-shop-reference-worlds-heading">
+            <p className="dot-shop-reference-kicker">OUR COLLECTIONS</p>
+            <h2 id="shop-worlds-heading">THREE WORLDS.<br /><em>ONE UNIVERSE.</em></h2>
+          </div>
+          <div className="dot-shop-reference-world-grid">
+            {collections.map((collection, index) => (
+              <Link key={collection.id} href={`/collections/${collection.id}`} className="dot-shop-reference-world">
+                <Image src={`/images/collections/${collection.id === "essentials" ? "essential" : collection.id}.png`} alt={`${collection.title} collection`} fill sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw" />
+                <span className="dot-shop-reference-world-shade" aria-hidden="true" />
+                <span className="dot-shop-reference-world-number">0{index + 1}</span>
+                <span className="dot-shop-reference-world-copy"><strong>{collection.title}</strong><small>{index === 0 ? "A visual exploration of the unknown." : index === 1 ? "The foundation of everyday identity." : "Statement pieces built around the .Dot philosophy."}</small><b>Explore <i aria-hidden="true">→</i></b></span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="dot-shop-reference-final" aria-labelledby="shop-final-heading">
+          <span className="dot-shop-reference-final-dot" aria-hidden="true">.</span>
+          <p className="dot-shop-reference-kicker">THE NEXT CHAPTER IS YOURS</p>
+          <h2 id="shop-final-heading">FIND YOUR<br /><em>POINT.</em></h2>
+          <p>Explore the full collection and be part of something bigger.</p>
+          <Link href="/shop" className="dot-shop-reference-button">Shop now <span aria-hidden="true">→</span></Link>
+        </section>
+      </Container>
+    </main>
   );
 }

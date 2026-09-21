@@ -2,15 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Check, Heart, Minus, Plus, ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import Container from "@/components/layout/Container";
-import PageReveal from "@/components/animations/PageReveal";
 import ProductGrid from "@/components/product/ProductGrid";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types/product";
 import { collections } from "@/components/home/collectionData";
-import { Heart } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
 
 interface ProductDetailClientProps {
@@ -24,72 +24,86 @@ export default function ProductDetailClient({
   relatedProducts,
   relatedProductsRelationship,
 }: ProductDetailClientProps) {
+  const router = useRouter();
+  const { addToCart } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { addToCart } = useCart();
-  const { isWishlisted, toggleWishlist } = useWishlist();
+
   const liked = isWishlisted(product.id);
   const collection = collections.find(
-    (item) => item.title.toLowerCase() === product.collection.toLowerCase()
+    (item) => item.title.toLowerCase() === product.collection.toLowerCase(),
   );
+  const image = product.images[activeImage] ?? product.images[0];
+  const discount = product.originalPrice && product.originalPrice > product.price
+    ? Math.round((1 - product.price / product.originalPrice) * 100)
+    : 0;
 
   const selectedVariant = useMemo(() => {
     if (!selectedSize || !selectedColor) return null;
     return product.variants.find(
-      (v) => v.size === selectedSize && v.colorName === selectedColor
-    );
-  }, [selectedSize, selectedColor, product.variants]);
+      (variant) => variant.size === selectedSize && variant.colorName === selectedColor,
+    ) ?? null;
+  }, [product.variants, selectedColor, selectedSize]);
 
-  const maxQuantity = useMemo(() => {
-    if (!selectedVariant) return 20;
-    return Math.min(selectedVariant.stock, 20);
-  }, [selectedVariant]);
+  const maxQuantity = selectedVariant ? Math.min(selectedVariant.stock, 20) : 1;
+  const productIsAvailable = product.stock > 0;
+  const isLowStock = productIsAvailable && product.stock <= 5;
 
-  const isSizeAvailable = (size: string) => {
-    if (!selectedColor) return product.variants.some((v) => v.size === size && v.stock > 0);
-    return product.variants.some((v) => v.size === size && v.colorName === selectedColor && v.stock > 0);
-  };
+  const isSizeAvailable = (size: string) => product.variants.some(
+    (variant) => variant.size === size
+      && (!selectedColor || variant.colorName === selectedColor)
+      && variant.stock > 0,
+  );
 
-  const isColorAvailable = (colorName: string) => {
-    if (!selectedSize) return product.variants.some((v) => v.colorName === colorName && v.stock > 0);
-    return product.variants.some((v) => v.colorName === colorName && v.size === selectedSize && v.stock > 0);
-  };
+  const isColorAvailable = (color: string) => product.variants.some(
+    (variant) => variant.colorName === color
+      && (!selectedSize || variant.size === selectedSize)
+      && variant.stock > 0,
+  );
 
-  const handleSizeSelect = (size: string) => {
+  const selectSize = (size: string) => {
     setSelectedSize(size);
     setQuantity(1);
     setError(null);
-    // If selected color is not available for this size, clear it
-    if (selectedColor && !product.variants.some(v => v.size === size && v.colorName === selectedColor && v.stock > 0)) {
+    if (selectedColor && !product.variants.some(
+      (variant) => variant.size === size && variant.colorName === selectedColor && variant.stock > 0,
+    )) {
       setSelectedColor(null);
     }
   };
 
-  const handleColorSelect = (colorName: string) => {
-    setSelectedColor(colorName);
+  const selectColor = (color: string) => {
+    setSelectedColor(color);
     setQuantity(1);
     setError(null);
-    // If selected size is not available for this color, clear it
-    if (selectedSize && !product.variants.some(v => v.size === selectedSize && v.colorName === colorName && v.stock > 0)) {
+    if (selectedSize && !product.variants.some(
+      (variant) => variant.size === selectedSize && variant.colorName === color && variant.stock > 0,
+    )) {
       setSelectedSize(null);
     }
   };
 
-  const handleAddToCart = () => {
+  const addSelectedVariant = (destination?: "/checkout") => {
+    if (!productIsAvailable) {
+      setError("This piece is currently out of stock.");
+      return false;
+    }
     if (!selectedSize) {
-      setError("Please select a size");
-      return;
+      setError("Select a size to continue.");
+      return false;
     }
     if (!selectedColor) {
-      setError("Please select a color");
-      return;
+      setError("Select a color to continue.");
+      return false;
     }
-    if (!selectedVariant || selectedVariant.stock === 0) {
-      setError("Selected variant is out of stock");
-      return;
+    if (!selectedVariant || selectedVariant.stock < 1) {
+      setError("That combination is currently unavailable.");
+      return false;
     }
 
     addToCart({
@@ -102,198 +116,147 @@ export default function ProductDetailClient({
       color: selectedColor,
     }, quantity);
 
-    setIsAdding(true);
     setError(null);
-    setTimeout(() => setIsAdding(false), 2000);
+    setIsAdding(true);
+    window.setTimeout(() => setIsAdding(false), 1800);
+    if (destination) router.push(destination);
+    return true;
   };
 
-  return (
-    <PageReveal>
-      <main>
-        <Container>
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 pt-8 text-[10px] uppercase tracking-[0.2em] text-white/35">
-            <Link href="/" className="transition-colors hover:text-white">Home</Link>
-            <span>/</span>
-            <Link href="/shop" className="transition-colors hover:text-white">Shop</Link>
-            {collection && (
-              <>
-                <span>/</span>
-                <Link href={`/collections/${collection.id}`} className="transition-colors hover:text-white">
-                  {collection.title}
-                </Link>
-              </>
-            )}
-            <span>/</span>
-            <span className="text-violet-300">{product.name}</span>
-          </nav>
+  const relationshipTitle = relatedProductsRelationship === "collection" && collection
+    ? `More from ${collection.title}`
+    : relatedProductsRelationship === "category" && relatedProducts[0]
+      ? `More ${relatedProducts[0].category}`
+      : "Explore more DotVerse pieces";
 
-          <div className="grid grid-cols-1 gap-10 py-10 sm:py-12 md:grid-cols-2 md:gap-12 lg:gap-16">
-            <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/[0.1] bg-[#0b0714] sm:rounded-3xl">
-              <Image src={product.images[0]} alt={`${product.name} by DotVerse`} fill sizes="(max-width: 768px) 100vw, 50vw" priority className="object-cover" />
+  return (
+    <main className="dot-product-page">
+      <Container>
+        <nav aria-label="Breadcrumb" className="dot-product-breadcrumb">
+          <Link href="/">Home</Link><span>/</span><Link href="/shop">Shop</Link>
+          {collection && <><span>/</span><Link href={`/collections/${collection.id}`}>{collection.title}</Link></>}
+          <span>/</span><span className="is-current">{product.name}</span>
+        </nav>
+
+        <section className="dot-product-shell" aria-labelledby="product-heading">
+          <div className="dot-product-gallery">
+            <div className="dot-product-gallery-main">
+              <Image
+                key={image}
+                src={image}
+                alt={`${product.name} by DotVerse`}
+                fill
+                priority
+                sizes="(max-width: 900px) 100vw, 58vw"
+                className="dot-product-main-image"
+              />
+              <div className="dot-product-image-count">{String(activeImage + 1).padStart(2, "0")} / {String(product.images.length).padStart(2, "0")}</div>
+            </div>
+            {product.images.length > 1 && (
+              <div className="dot-product-thumbnails" aria-label="Product images">
+                {product.images.map((productImage, index) => (
+                  <button
+                    key={productImage}
+                    type="button"
+                    className={activeImage === index ? "is-active" : ""}
+                    onClick={() => setActiveImage(index)}
+                    aria-label={`View image ${index + 1}`}
+                    aria-pressed={activeImage === index}
+                  >
+                    <Image src={productImage} alt={`${product.name} view ${index + 1}`} fill sizes="96px" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="dot-product-info">
+            <div className="dot-product-info-topline">
+              <span className="premium-eyebrow">{product.badge ?? "The .Dot edit"}</span>
+              <span className="dot-product-id">.DOT / {product.id.slice(0, 8)}</span>
+            </div>
+            <h1 id="product-heading">{product.name}</h1>
+            <div className="dot-product-category">
+              {collection && <Link href={`/collections/${collection.id}`}>{collection.title}</Link>}
+              <span>{product.category}</span>
+            </div>
+            <p className="dot-product-description">{product.description}</p>
+
+            <div className="dot-product-price-row">
+              <span className="dot-product-price">₹{product.price.toLocaleString("en-IN")}</span>
+              {product.originalPrice && product.originalPrice > product.price && (
+                <><del>₹{product.originalPrice.toLocaleString("en-IN")}</del><span className="dot-product-discount">-{discount}%</span></>
+              )}
             </div>
 
-            <div className="flex flex-col justify-center">
-              <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-black leading-[0.9] tracking-[-0.05em] text-white">{product.name}</h1>
+            <div className={`dot-product-stock ${!productIsAvailable ? "is-out" : isLowStock ? "is-low" : ""}`}>
+              <span className="dot-product-stock-dot" aria-hidden="true" />
+              {!productIsAvailable ? "Currently unavailable" : isLowStock ? "Low stock — move with intention" : "Available to ship"}
+            </div>
 
-              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.2em]">
-                {collection && (
-                  <Link
-                    href={`/collections/${collection.id}`}
-                    className="text-violet-300 transition-colors hover:text-white"
-                  >
-                    Part of {collection.title} Collection
-                  </Link>
-                )}
-                <span className="text-white/40">{product.category}</span>
+            <div className="dot-product-options">
+              <div className="dot-product-option-header"><span>Color</span><span>{selectedColor ?? "Select a color"}</span></div>
+              <div className="dot-product-colors">
+                {product.colors.map((color) => {
+                  const available = isColorAvailable(color.name);
+                  return <button key={color.name} type="button" className={selectedColor === color.name ? "is-selected" : ""} style={{ backgroundColor: color.value }} onClick={() => selectColor(color.name)} disabled={!available} aria-label={`Select ${color.name}`} aria-pressed={selectedColor === color.name} />;
+                })}
               </div>
+            </div>
 
-              <p className="mt-6 text-sm leading-6 text-white/65">
-                {product.description}
-              </p>
-
-              {/* Price and Badges */}
-              <div className="mt-6 flex items-baseline gap-3">
-                <span className="text-2xl font-bold text-white">₹{product.price}</span>
-                {product.originalPrice && product.originalPrice > product.price && (
-                  <span className="text-lg text-white/50 line-through">₹{product.originalPrice}</span>
-                )}
+            <div className="dot-product-options">
+              <div className="dot-product-option-header"><span>Size</span><Link href="/size-guide">Size guide ↗</Link></div>
+              <div className="dot-product-sizes">
+                {product.sizes.map((size) => {
+                  const available = isSizeAvailable(size);
+                  return <button key={size} type="button" className={selectedSize === size ? "is-selected" : ""} onClick={() => selectSize(size)} disabled={!available} aria-pressed={selectedSize === size}>{size}</button>;
+                })}
               </div>
+            </div>
 
-              {/* Colors */}
-              <div className="mt-8">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/50">Color</p>
-                <div className="flex items-center gap-2.5">
-                  {product.colors.map((color) => {
-                    const available = isColorAvailable(color.name);
-                    return (
-                      <button
-                        key={`${product.id}-${color.value}`}
-                        type="button"
-                        onClick={() => handleColorSelect(color.name)}
-                        disabled={!available}
-                        className={`h-9 w-9 rounded-full border border-white/20 transition-transform duration-300 hover:scale-110 ${selectedColor === color.name ? 'ring-2 ring-violet-400 ring-offset-2 ring-offset-[#08050f]' : ''} ${!available ? 'opacity-30 cursor-not-allowed' : ''}`}
-                        style={{ backgroundColor: color.value }}
-                        aria-label={`Select ${color.name}`}
-                      />
-                    );
-                  })}
-                </div>
+            <div className="dot-product-quantity-row">
+              <span>Quantity</span>
+              <div className="dot-product-quantity" aria-label="Quantity selector">
+                <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1} aria-label="Decrease quantity"><Minus size={14} /></button>
+                <span aria-live="polite">{quantity}</span>
+                <button type="button" onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))} disabled={!selectedVariant || quantity >= maxQuantity} aria-label="Increase quantity"><Plus size={14} /></button>
               </div>
+            </div>
 
-              {/* Sizes */}
-              <div className="mt-8">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/50">Size</p>
-                <div className="flex flex-wrap items-center gap-2.5">
-                  {product.sizes.map((size) => {
-                    const available = isSizeAvailable(size);
-                    return (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => handleSizeSelect(size)}
-                        disabled={!available}
-                        className={`min-w-[48px] rounded-full border px-4 py-2.5 text-xs font-medium transition-all duration-300 ${selectedSize === size ? 'border-violet-500 bg-white/10 text-white' : 'border-white/15 text-white/70'} ${!available ? 'opacity-30 cursor-not-allowed' : ''}`}
-                      >
-                        {size}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+            <div className="dot-product-actions">
+              <button type="button" className="dot-product-add" onClick={() => addSelectedVariant()} disabled={isAdding || !productIsAvailable}>
+                {isAdding ? <><Check size={17} /> Added to cart</> : <><ShoppingBag size={17} /> Add to cart</>}
+              </button>
+              <button type="button" className="dot-product-buy" onClick={() => addSelectedVariant("/checkout")} disabled={!productIsAvailable}>Buy now <span aria-hidden="true">↗</span></button>
+              <button type="button" className={`dot-product-wishlist ${liked ? "is-liked" : ""}`} onClick={() => void toggleWishlist(product.id, product)} aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}><Heart size={18} fill={liked ? "currentColor" : "none"} /><span>{liked ? "Saved" : "Save"}</span></button>
+            </div>
+            {error && <p className="dot-product-error" role="alert">{error}</p>}
 
-              {/* Quantity */}
-              {selectedVariant && selectedVariant.stock > 0 && (
-                <div className="mt-8">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/50">Quantity</p>
-                  <div className="flex items-center gap-3">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="h-10 w-10 rounded-full border border-white/20 text-white">-</button>
-                    <span className="text-white">{quantity}</span>
-                    <button onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))} className="h-10 w-10 rounded-full border border-white/20 text-white">+</button>
-                  </div>
-                </div>
-              )}
-
-              {/* Actions */}
-              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  disabled={isAdding || (selectedVariant?.stock === 0)}
-                  className="w-full rounded-full bg-gradient-to-r from-violet-700 via-violet-600 to-indigo-600 px-8 py-4 text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50"
-                >
-                  {isAdding ? "Added to cart ✓" : "Add to cart"}
-                </button>
-                <button type="button" onClick={() => void toggleWishlist(product.id, product)} aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`} className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full border border-white/15 px-6 text-sm font-semibold text-white transition hover:border-violet-400/60 hover:bg-white/5"><Heart size={18} fill={liked ? "currentColor" : "none"} />{liked ? "Saved" : "Wishlist"}</button>
-                {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
-              </div>
+            <div className="dot-product-promises">
+              <div><span>01</span><p>Free shipping<br /><small>On every order</small></p></div>
+              <div><span>02</span><p>Made to move<br /><small>7-day returns</small></p></div>
             </div>
           </div>
-          {/* Related products */}
-          <section className="border-t border-white/[0.08] py-16 sm:py-20">
-            <div className="mb-8 flex items-center gap-3">
-              <span className="h-px w-8 bg-violet-500" />
-              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-violet-300">
-                More from the universe
-              </p>
-            </div>
+        </section>
 
-            {relatedProducts.length > 0 && (
-              <>
-                <h2 className="mb-8 text-2xl font-semibold text-white">
-                  {relatedProductsRelationship === "collection" && collection
-                    ? `More from ${collection.title}`
-                    : relatedProductsRelationship === "category" && relatedProducts[0]
-                      ? `More ${relatedProducts[0].category}`
-                      : "Explore more DotVerse pieces"}
-                </h2>
-                <p className="mb-8 -mt-4 max-w-xl text-sm leading-6 text-white/55">
-                  {relatedProductsRelationship === "collection" && collection
-                    ? `Continue through the ${collection.title} side of the DotVerse universe.`
-                    : relatedProductsRelationship === "category"
-                      ? `Explore more ${relatedProducts[0]?.category.toLowerCase() ?? "pieces"} from the DotVerse catalogue.`
-                      : "Explore more pieces from the DotVerse catalogue."}
-                </p>
-                <ProductGrid products={relatedProducts} />
-              </>
-            )}
-          </section>
+        <section className="dot-product-story" aria-labelledby="product-story-heading">
+          <div className="dot-product-story-label"><span>01</span><span>The product story</span></div>
+          <div><h2 id="product-story-heading">A piece with<br /><em>a point of view.</em></h2><p>{product.description} Every detail is part of the same .Dot language: considered, graphic, and made for the everyday rotation.</p></div>
+        </section>
 
-          <section
-            className="border-t border-white/[0.08] py-12 sm:py-16"
-            aria-labelledby="product-explore-heading"
-          >
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-violet-300">
-                  Continue exploring
-                </p>
-                <h2
-                  id="product-explore-heading"
-                  className="mt-3 text-2xl font-semibold text-white"
-                >
-                  Find your next frequency.
-                </h2>
-              </div>
-              <nav
-                aria-label="Continue exploring DotVerse"
-                className="flex flex-wrap gap-x-5 gap-y-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65"
-              >
-                {collection && (
-                  <Link
-                    href={`/collections/${collection.id}`}
-                    className="transition-colors hover:text-white"
-                  >
-                    {collection.title} Collection →
-                  </Link>
-                )}
-                <Link href="/shop" className="transition-colors hover:text-white">
-                  Shop all pieces →
-                </Link>
-              </nav>
-            </div>
+        {relatedProducts.length > 0 && (
+          <section className="dot-product-related" aria-labelledby="related-products-heading">
+            <div className="dot-product-related-heading"><div><span className="premium-eyebrow">Continue through the universe</span><h2 id="related-products-heading">{relationshipTitle}</h2></div><Link href={collection ? `/collections/${collection.id}` : "/shop"}>View all <span aria-hidden="true">↗</span></Link></div>
+            <ProductGrid products={relatedProducts} />
           </section>
-        </Container>
-      </main>
-    </PageReveal>
+        )}
+
+        <section className="dot-product-explore" aria-labelledby="product-explore-heading">
+          <span className="premium-eyebrow">The next frequency is yours</span>
+          <h2 id="product-explore-heading">Find your<br /><em>point.</em></h2>
+          <Link href="/shop" className="premium-button premium-button-outline">Shop all pieces <span aria-hidden="true">↗</span></Link>
+        </section>
+      </Container>
+    </main>
   );
 }
