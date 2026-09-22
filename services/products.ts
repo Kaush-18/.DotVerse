@@ -236,6 +236,8 @@ export async function getFilteredProducts(params: {
     where.OR = [
       { name: { contains: params.q, mode: 'insensitive' } },
       { description: { contains: params.q, mode: 'insensitive' } },
+      { category: { name: { contains: params.q, mode: 'insensitive' } } },
+      { collection: { name: { contains: params.q, mode: 'insensitive' } } },
     ];
   }
 

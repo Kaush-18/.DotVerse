@@ -106,12 +106,13 @@ export default function ShopControls({ productCount }: { productCount: number })
     <section className="shop-controls" aria-label="Shop controls">
       <div className="shop-controls-topline">
         <p>{productCount} {productCount === 1 ? "piece" : "pieces"}</p>
-        <button type="button" className="shop-mobile-filter-trigger" onClick={() => setMobileOpen(true)} aria-expanded={mobileOpen}>
+        <button type="button" className="shop-mobile-filter-trigger" onClick={() => setMobileOpen(true)} aria-expanded={mobileOpen} aria-controls="shop-filter-drawer">
           Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
         </button>
-        <label className="shop-search">
+        <label className="shop-search" htmlFor="shop-search-input">
           <span className="sr-only">Search products</span>
           <input
+            id="shop-search-input"
             type="search"
             placeholder="Search the collection"
             defaultValue={searchParams.get("q") ?? ""}
@@ -119,9 +120,9 @@ export default function ShopControls({ productCount }: { productCount: number })
           />
           <span aria-hidden="true">⌕</span>
         </label>
-        <label className="shop-sort">
+        <label className="shop-sort" htmlFor="shop-sort-select">
           <span>Sort</span>
-          <select value={searchParams.get("sort") ?? "featured"} onChange={(event) => updateQuery({ sort: event.target.value === "featured" ? null : event.target.value })}>
+          <select id="shop-sort-select" value={searchParams.get("sort") ?? "featured"} onChange={(event) => updateQuery({ sort: event.target.value === "featured" ? null : event.target.value })}>
             {sortOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
           </select>
         </label>
@@ -145,7 +146,7 @@ export default function ShopControls({ productCount }: { productCount: number })
 
       {mobileOpen && (
         <div className="shop-filter-drawer-backdrop" role="presentation" onClick={() => setMobileOpen(false)}>
-          <div className="shop-filter-drawer" role="dialog" aria-modal="true" aria-labelledby="shop-filter-heading" onClick={(event) => event.stopPropagation()}>
+          <div id="shop-filter-drawer" className="shop-filter-drawer" role="dialog" aria-modal="true" aria-labelledby="shop-filter-heading" onClick={(event) => event.stopPropagation()}>
             <div className="shop-filter-drawer-heading">
               <div><span className="premium-eyebrow">Refine the edit</span><h2 id="shop-filter-heading">Filters</h2></div>
               <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close filters">×</button>

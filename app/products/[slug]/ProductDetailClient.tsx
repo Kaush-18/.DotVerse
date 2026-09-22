@@ -241,7 +241,7 @@ export default function ProductDetailClient({
 
         <section className="dot-product-story" aria-labelledby="product-story-heading">
           <div className="dot-product-story-label"><span>01</span><span>The product story</span></div>
-          <div><h2 id="product-story-heading">A piece with<br /><em>a point of view.</em></h2><p>{product.description} Every detail is part of the same .Dot language: considered, graphic, and made for the everyday rotation.</p></div>
+           <div><h2 id="product-story-heading">A piece with<br /><em>a point of view.</em></h2><p>{product.description}</p></div>
         </section>
 
         {relatedProducts.length > 0 && (
