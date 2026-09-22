@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { ArrowLeft, ArrowRight, Check, LockKeyhole } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
 import PageReveal from "@/components/animations/PageReveal";
@@ -456,16 +458,6 @@ export default function PaymentPage() {
   const orderButtonDisabled =
     isPlacingOrder || gatewayLoading;
 
-  const orderButtonLabel = isPlacingOrder
-    ? paymentMethod === "COD"
-      ? "PLACING ORDER..."
-      : "PROCESSING..."
-    : gatewayLoading
-      ? "LOADING GATEWAY..."
-      : createdOrder && orderError
-        ? "RETRY PAYMENT"
-        : "PLACE ORDER";
-
   return (
     <PageReveal>
       <Script
@@ -477,155 +469,33 @@ export default function PaymentPage() {
           setRazorpayLoadError(true);
         }}
       />
-      <main className="py-16">
-        <div className="mx-auto max-w-5xl px-4">
-          <h1 className="mb-10 text-3xl font-bold">PAYMENT</h1>
+      <main className="dot-payment-page">
+        <div className="dot-payment-container">
+          <header className="dot-payment-header">
+            <div><p className="dot-payment-kicker">.DOT / SECURE CHECKOUT</p><h1>PAY<br /><em>SECURELY.</em></h1></div>
+            <div className="dot-payment-progress"><span>01 Information</span><i aria-hidden="true" /><span>02 Delivery</span><i aria-hidden="true" /><strong>03 Payment</strong></div>
+          </header>
 
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-            {/* Payment form placeholder */}
-            <section className="space-y-6">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-                <h2 className="mb-6 text-lg font-semibold">
-                  Payment Method
-                </h2>
-
-                <div className="space-y-3">
-                  <button
-                    type="button"
-                    onClick={() => selectPaymentMethod("COD")}
-                    disabled={isPlacingOrder || Boolean(createdOrder)}
-                    className={`w-full rounded-xl border p-5 text-left transition disabled:cursor-not-allowed disabled:opacity-70 ${
-                      paymentMethod === "COD"
-                        ? "border-violet-500 bg-violet-500/10"
-                        : "border-white/10 bg-white/[0.02] hover:border-white/20"
-                    }`}
-                  >
-                    <p className="font-medium">Cash on Delivery</p>
-                    <p className="mt-1 text-sm text-white/50">
-                      Pay when your order arrives.
-                    </p>
+          <div className="dot-payment-layout">
+            <section className="dot-payment-methods" aria-labelledby="payment-method-heading">
+              <div className="dot-payment-section-heading"><span>01</span><div><p>Payment method</p><h2 id="payment-method-heading">Choose how to pay.</h2></div></div>
+              <div className="dot-payment-method-list" role="radiogroup" aria-label="Payment method">
+                {([
+                  ["COD", "Cash on Delivery", "Pay when your order arrives.", "COD"],
+                  ["UPI", "UPI", "Google Pay, PhonePe, Paytm and other UPI apps.", "ONLINE PAYMENT"],
+                  ["CARD", "Credit / Debit Card", "Visa, Mastercard, RuPay and more.", "ONLINE PAYMENT"],
+                ] as const).map(([method, title, description, label]) => (
+                  <button key={method} type="button" role="radio" aria-checked={paymentMethod === method} onClick={() => selectPaymentMethod(method)} disabled={isPlacingOrder || Boolean(createdOrder)} className={`dot-payment-method ${paymentMethod === method ? "is-selected" : ""}`}>
+                    <span className="dot-payment-method-mark" aria-hidden="true">{paymentMethod === method ? <Check size={14} /> : null}</span><span className="dot-payment-method-copy"><small>{label}</small><strong>{title}</strong><span>{description}</span></span><ArrowRight className="dot-payment-method-arrow" size={16} aria-hidden="true" />
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() => selectPaymentMethod("UPI")}
-                    disabled={isPlacingOrder || Boolean(createdOrder)}
-                    className={`w-full rounded-xl border p-5 text-left transition disabled:cursor-not-allowed disabled:opacity-70 ${
-                      paymentMethod === "UPI"
-                        ? "border-violet-500 bg-violet-500/10"
-                        : "border-white/10 bg-white/[0.02] hover:border-white/20"
-                    }`}
-                  >
-                    <p className="font-medium">UPI</p>
-                    <p className="mt-1 text-sm text-white/50">
-                      Google Pay, PhonePe, Paytm and other UPI apps.
-                    </p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => selectPaymentMethod("CARD")}
-                    disabled={isPlacingOrder || Boolean(createdOrder)}
-                    className={`w-full rounded-xl border p-5 text-left transition disabled:cursor-not-allowed disabled:opacity-70 ${
-                      paymentMethod === "CARD"
-                        ? "border-violet-500 bg-violet-500/10"
-                        : "border-white/10 bg-white/[0.02] hover:border-white/20"
-                    }`}
-                  >
-                    <p className="font-medium">
-                      Credit / Debit Card
-                    </p>
-                    <p className="mt-1 text-sm text-white/50">
-                      Visa, Mastercard, RuPay and more.
-                    </p>
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            {/* Order summary */}
-            <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-              <h2 className="mb-6 text-lg font-semibold">
-                YOUR ORDER
-              </h2>
-
-              <div className="space-y-4">
-                {items.map((item) => (
-                                <div
-                                  key={`${item.id}-${item.size}-${item.color}`}
-                                  className="flex items-center justify-between gap-4"
-                                >
-
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-white/50">
-                        {item.color} / {item.size} × {item.quantity}
-                      </p>
-                    </div>
-
-                    <p className="font-medium">
-                      ₹{item.price * item.quantity}
-                    </p>
-                  </div>
                 ))}
               </div>
+              <div className="dot-payment-action-block"><div className="dot-payment-action-label"><span>02</span><div><p>Final step</p><h2>{paymentMethod === "COD" ? "Place your order." : "Open secure payment."}</h2></div></div><button type="button" onClick={handlePlaceOrder} disabled={orderButtonDisabled} className="dot-payment-primary">{isPlacingOrder ? <><span className="dot-payment-spinner" aria-hidden="true" />{paymentMethod === "COD" ? "Placing order..." : "Processing payment..."}</> : gatewayLoading ? "Loading gateway..." : createdOrder && orderError ? "Retry payment" : paymentMethod === "COD" ? "Place order" : "Pay securely"}<ArrowRight size={16} aria-hidden="true" /></button>{orderError && <div className={`dot-payment-error ${paymentFailed ? "is-failed" : ""}`} role="alert">{paymentFailed && <strong>Payment failed</strong>}<span>{orderError}</span></div>}</div>
+              <div className="dot-payment-trust"><LockKeyhole size={16} aria-hidden="true" /><div><strong>Secure payment</strong><span>Your payment is handled through the existing secure payment provider.</span></div></div>
+              <button type="button" onClick={() => router.back()} disabled={isPlacingOrder} className="dot-payment-back"><ArrowLeft size={14} /> Back to checkout</button>
+            </section>
 
-              <div className="my-6 border-t border-white/10" />
-
-              <div className="flex justify-between text-sm text-white/60">
-                <span>Subtotal</span>
-                <span>₹{subtotal}</span>
-              </div>
-
-              <div className="mt-3 flex justify-between text-sm text-white/60">
-                <span>Shipping</span>
-                <span>Free</span>
-              </div>
-
-              <div className="my-5 border-t border-white/10" />
-
-              <div className="flex justify-between text-lg font-semibold">
-                <span>Total</span>
-                <span>₹{total}</span>
-              </div>
-
-              <button
-                type="button"
-                onClick={handlePlaceOrder}
-                disabled={orderButtonDisabled}
-                className="mt-6 w-full rounded-full bg-violet-600 px-6 py-4 font-semibold transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {orderButtonLabel}
-              </button>
-
-              {orderError && (
-                <div
-                  className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
-                    paymentFailed
-                      ? "border-red-500/30 bg-red-500/10 text-red-300"
-                      : "border-white/10 bg-white/[0.03] text-white/70"
-                  }`}
-                >
-                  {paymentFailed && (
-                    <p className="font-semibold text-red-300">
-                      Payment failed
-                    </p>
-                  )}
-                  <p className={paymentFailed ? "mt-1" : ""}>
-                    {orderError}
-                  </p>
-                </div>
-              )}
-
-              <button
-                type="button"
-                onClick={() => router.back()}
-                disabled={isPlacingOrder}
-                className="mt-3 w-full rounded-full border border-white/10 px-6 py-4 text-sm text-white/70 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                Back to checkout
-              </button>
-            </aside>
+            <aside className="dot-payment-summary" aria-labelledby="payment-summary-heading"><div className="dot-payment-summary-inner"><p className="dot-payment-kicker">02 / YOUR ORDER</p><h2 id="payment-summary-heading">ORDER SUMMARY</h2><div className="dot-payment-items">{items.map((item) => <div className="dot-payment-item" key={`${item.id}-${item.size}-${item.color}`}><div className="dot-payment-item-image"><Image src={item.image} alt={`${item.name} by DotVerse`} fill sizes="58px" /></div><div><p>{item.name}</p><span>{item.color} / {item.size} × {item.quantity}</span></div><strong>₹{(item.price * item.quantity).toLocaleString("en-IN")}</strong></div>)}</div><div className="dot-payment-totals"><div><span>Subtotal</span><strong>₹{subtotal.toLocaleString("en-IN")}</strong></div><div><span>Shipping</span><strong>Free</strong></div><div className="dot-payment-total"><span>Total</span><strong>₹{total.toLocaleString("en-IN")}</strong></div></div></div></aside>
           </div>
         </div>
       </main>
