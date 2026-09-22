@@ -2722,6 +2722,57 @@ html {
 }
 
 /* =========================================================
+   .DOT ACCOUNT / PRIVATE DASHBOARD
+   ========================================================= */
+
+.dot-account-dashboard { --account-ink: #f5f3ef; --account-muted: rgba(245, 243, 239, 0.62); --account-faint: rgba(245, 243, 239, 0.38); --account-line: rgba(245, 243, 239, 0.14); --account-accent: #bea6ff; animation: account-rise 0.65s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.dot-account-header { display: flex; justify-content: space-between; gap: 36px; align-items: end; padding-bottom: clamp(42px, 7vw, 82px); border-bottom: 1px solid var(--account-line); }
+.dot-account-kicker, .dot-account-eyebrow { margin: 0; color: var(--account-accent); font-size: 9px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; }
+.dot-account-header h1 { margin: 20px 0 0; color: var(--account-ink); font-size: clamp(3.8rem, 8vw, 8rem); font-weight: 650; line-height: 0.79; letter-spacing: -0.11em; }
+.dot-account-header h1 em { color: var(--account-accent); font-style: normal; }
+.dot-account-intro { max-width: 360px; margin: 26px 0 0; color: var(--account-muted); font-size: 0.86rem; line-height: 1.7; }
+.dot-account-intro strong { color: var(--account-ink); font-weight: 500; }
+.dot-account-identity { display: flex; gap: 14px; align-items: center; min-width: min(280px, 100%); padding-bottom: 4px; }
+.dot-account-avatar { display: grid; width: 52px; height: 52px; flex: 0 0 auto; place-items: center; border: 1px solid rgba(190, 166, 255, 0.45); color: var(--account-accent); background: rgba(190, 166, 255, 0.1); font-size: 1.1rem; font-weight: 600; }
+.dot-account-identity > div:last-child { min-width: 0; }
+.dot-account-identity span { display: block; color: var(--account-faint); font-size: 8px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; }
+.dot-account-identity strong { display: block; margin-top: 6px; overflow: hidden; color: var(--account-ink); font-size: 0.9rem; font-weight: 500; text-overflow: ellipsis; }
+.dot-account-identity p { display: flex; gap: 6px; align-items: center; margin: 6px 0 0; overflow: hidden; color: var(--account-faint); font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.dot-account-order-feature, .dot-account-paths { padding: clamp(38px, 6vw, 70px) 0; border-bottom: 1px solid var(--account-line); }
+.dot-account-section-label { display: flex; gap: 12px; align-items: center; color: var(--account-faint); font-size: 8px; font-weight: 600; letter-spacing: 0.19em; text-transform: uppercase; }
+.dot-account-section-label span:first-child { color: var(--account-accent); }
+.dot-account-order-content { display: flex; justify-content: space-between; gap: 30px; align-items: end; margin: 28px 0 0 42px; }
+.dot-account-order-content h2 { margin: 13px 0 0; color: var(--account-ink); font-family: var(--font-geist-mono), monospace; font-size: clamp(1.8rem, 4vw, 3.7rem); font-weight: 500; letter-spacing: -0.07em; }
+.dot-account-order-content > div:first-child > p:last-child { margin: 12px 0 0; color: var(--account-muted); font-size: 0.78rem; }
+.dot-account-order-side { display: grid; justify-items: end; gap: 7px; }
+.dot-account-order-side strong { color: var(--account-ink); font-size: 1.2rem; font-weight: 500; }
+.dot-account-order-side span { color: var(--account-accent); font-size: 8px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
+.dot-account-order-side a { display: inline-flex; gap: 8px; align-items: center; margin-top: 8px; color: var(--account-muted); font-size: 8px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; transition: gap 0.3s ease, color 0.3s ease; }
+.dot-account-order-side a:hover, .dot-account-order-side a:focus-visible { gap: 12px; color: var(--account-ink); }
+.dot-account-primary { display: inline-flex; gap: 10px; align-items: center; min-height: 48px; padding: 0 16px; border: 1px solid var(--account-accent); color: #08070a; background: var(--account-accent); font-size: 8px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; transition: padding 0.3s ease, background 0.3s ease, border-color 0.3s ease; }
+.dot-account-primary:hover, .dot-account-primary:focus-visible { padding-inline: 21px; border-color: var(--account-ink); background: var(--account-ink); }
+.dot-account-path-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; margin: 26px 0 0 42px; }
+.dot-account-path { display: flex; gap: 15px; align-items: center; min-width: 0; padding: 22px 0; border-bottom: 1px solid rgba(245, 243, 239, 0.1); color: var(--account-muted); transition: color 0.3s ease, padding 0.3s ease, border-color 0.3s ease; }
+.dot-account-path:hover, .dot-account-path:focus-visible { padding-inline: 8px; border-color: rgba(190, 166, 255, 0.48); color: var(--account-ink); }
+.dot-account-path > svg:first-child { flex: 0 0 auto; color: var(--account-accent); }
+.dot-account-path span { display: grid; min-width: 0; gap: 6px; }
+.dot-account-path strong { color: var(--account-ink); font-size: 0.9rem; font-weight: 500; }
+.dot-account-path small { overflow: hidden; color: var(--account-faint); font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.dot-account-path-arrow { margin-left: auto; flex: 0 0 auto; color: var(--account-faint); transition: transform 0.3s ease, color 0.3s ease; }
+.dot-account-path:hover .dot-account-path-arrow, .dot-account-path:focus-visible .dot-account-path-arrow { color: var(--account-accent); transform: translateX(4px); }
+@keyframes account-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 700px) {
+  .dot-account-header { display: block; }
+  .dot-account-identity { margin-top: 34px; }
+  .dot-account-order-content { display: block; margin-left: 0; }
+  .dot-account-order-side { justify-items: start; margin-top: 26px; }
+  .dot-account-path-grid { grid-template-columns: 1fr; margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dot-account-dashboard, .dot-account-dashboard * { animation: none !important; transition-duration: 0.01ms !important; }
+}
+
+/* =========================================================
    .DOT SHOP / DIGITAL SHOWROOM REBUILD
    ========================================================= */
 

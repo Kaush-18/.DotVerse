@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Clock3, Mail, Package, UserRound } from "lucide-react";
+import { ArrowRight, Heart, Mail, MapPin, Package, UserRound } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -27,53 +27,41 @@ export default async function AccountDashboardPage() {
     },
   });
   const firstName = session.user.name?.split(" ")[0] || "there";
-  const totalOrders = await prisma.order.count({ where: { userId: session.user.id } });
   const latest = orders[0];
 
+  const quickLinks = [
+    { href: "/account/orders", label: "Orders", description: "Track every piece on its way.", icon: Package },
+    { href: "/account/wishlist", label: "Wishlist", description: "Return to the pieces you saved.", icon: Heart },
+    { href: "/account/addresses", label: "Addresses", description: "Keep delivery details ready.", icon: MapPin },
+    { href: "/account/profile", label: "Profile", description: "Keep your details current.", icon: UserRound },
+  ];
+
   return (
-    <div className="space-y-8">
-      <header className="border-b border-white/10 pb-7">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-violet-300/80">Your space</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Welcome back, {firstName}.</h1>
-        <p className="mt-2 text-sm text-white/50">Your DotVerse essentials, all in one place.</p>
+    <div className="dot-account-dashboard">
+      <header className="dot-account-header">
+        <div>
+          <p className="dot-account-kicker">.DOT / PRIVATE SPACE</p>
+          <h1>YOUR<br /><em>POINT.</em></h1>
+          <p className="dot-account-intro">Welcome back, <strong>{firstName}</strong>. Your DotVerse essentials, all in one place.</p>
+        </div>
+        <div className="dot-account-identity">
+          <div className="dot-account-avatar" aria-hidden="true">{(session.user.name || session.user.email).slice(0, 1).toUpperCase()}</div>
+          <div><span>Signed in as</span><strong>{session.user.name}</strong><p><Mail size={13} />{session.user.email}</p></div>
+        </div>
       </header>
 
-      <section className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-white/[0.035] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6" aria-label="Profile summary">
-        <div className="flex min-w-0 items-center gap-4">
-          {session.user.image ? (
-            // The image is supplied by Better Auth and is not used for authorization.
-            <span
-              role="img"
-              aria-label="Profile image"
-              className="h-14 w-14 shrink-0 rounded-full border border-white/10 bg-cover bg-center"
-              style={{ backgroundImage: `url(${session.user.image})` }}
-            />
-          ) : (
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-violet-500/15 text-lg font-semibold text-violet-200">
-              {(session.user.name || session.user.email).slice(0, 1).toUpperCase()}
-            </span>
-          )}
-          <div className="min-w-0">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/40">Signed in as</p>
-            <p className="mt-1 truncate text-base font-semibold text-white">{session.user.name}</p>
-            <p className="mt-1 flex items-center gap-1.5 truncate text-sm text-white/50"><Mail size={14} />{session.user.email}</p>
-          </div>
+      <section className="dot-account-order-feature" aria-labelledby="account-latest-heading">
+        <div className="dot-account-section-label"><span>01</span><span>Latest movement</span></div>
+        <div className="dot-account-order-content">
+          <div><p className="dot-account-eyebrow">Recent order</p><h2 id="account-latest-heading">{latest ? latest.orderNumber : "NO ORDERS YET"}</h2>{latest ? <p>{new Date(latest.createdAt).toLocaleDateString()} · {latest.items.reduce((sum, item) => sum + item.quantity, 0)} pieces</p> : <p>Your next favorite piece is waiting.</p>}</div>
+          {latest ? <div className="dot-account-order-side"><strong>{money(latest.total)}</strong><span>{latest.status}</span><Link href={`/account/orders/${latest.orderNumber}`}>View order <ArrowRight size={14} /></Link></div> : <Link href="/shop" className="dot-account-primary">Explore the collection <ArrowRight size={14} /></Link>}
         </div>
-        <Link href="/account/profile" className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-white/15 px-4 text-sm font-medium text-white/75 transition hover:border-violet-400/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70">Edit profile</Link>
       </section>
 
-      <section aria-label="Account overview" className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><Package size={18} className="text-violet-300" /><p className="mt-5 text-xs text-white/45">Total orders</p><p className="mt-1 text-2xl font-semibold text-white">{totalOrders}</p></div>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><Clock3 size={18} className="text-violet-300" /><p className="mt-5 text-xs text-white/45">Latest order</p><p className="mt-1 truncate text-lg font-semibold text-white">{latest?.orderNumber || "No orders yet"}</p></div>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><CheckCircle2 size={18} className="text-violet-300" /><p className="mt-5 text-xs text-white/45">Account status</p><p className="mt-1 text-lg font-semibold text-emerald-300">Active</p></div>
+      <section className="dot-account-paths" aria-labelledby="account-paths-heading">
+        <div className="dot-account-section-label"><span>02</span><span id="account-paths-heading">Your space</span></div>
+        <div className="dot-account-path-grid">{quickLinks.map(({ href, label, description, icon: Icon }) => <Link href={href} key={href} className="dot-account-path"><Icon size={18} /><span><strong>{label}</strong><small>{description}</small></span><ArrowRight size={16} className="dot-account-path-arrow" /></Link>)}</div>
       </section>
-
-      <section>
-        <div className="mb-4 flex items-center justify-between gap-4"><h2 className="text-lg font-semibold text-white">Recent orders</h2><Link href="/account/orders" className="text-xs font-medium text-violet-300 transition hover:text-violet-200">View all</Link></div>
-        {orders.length === 0 ? <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-10 text-center"><p className="text-lg font-medium text-white">No orders yet.</p><p className="mt-2 text-sm text-white/50">Your next favorite piece is waiting.</p><Link href="/shop" className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-violet-600 px-5 text-sm font-semibold text-white transition hover:bg-violet-500">Explore the collection <ArrowRight size={15} /></Link></div> : <div className="space-y-3">{orders.map((order) => <Link key={order.id} href={`/account/orders/${order.orderNumber}`} className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-violet-400/30 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"><div className="min-w-0"><p className="truncate text-sm font-semibold text-white">{order.orderNumber}</p><p className="mt-1 text-xs text-white/45">{new Date(order.createdAt).toLocaleDateString()} · {order.items.reduce((sum, item) => sum + item.quantity, 0)} items</p></div><div className="text-right"><p className="text-sm font-semibold text-white">{money(order.total)}</p><p className="mt-1 text-[10px] uppercase tracking-wider text-violet-300">{order.status}</p></div></Link>)}</div>}
-      </section>
-
-      <section><h2 className="mb-4 text-lg font-semibold text-white">Quick actions</h2><div className="grid gap-3 sm:grid-cols-3"><Link href="/account/orders" className="group rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-violet-400/30 hover:bg-white/[0.06]"><Package size={18} className="text-violet-300" /><p className="mt-4 text-sm font-medium text-white">View orders</p><p className="mt-1 text-xs text-white/45">Track every delivery</p></Link><Link href="/account/profile" className="group rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-violet-400/30 hover:bg-white/[0.06]"><UserRound size={18} className="text-violet-300" /><p className="mt-4 text-sm font-medium text-white">Edit profile</p><p className="mt-1 text-xs text-white/45">Keep your details current</p></Link><Link href="/shop" className="group rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-violet-400/30 hover:bg-white/[0.06]"><ArrowRight size={18} className="text-violet-300" /><p className="mt-4 text-sm font-medium text-white">Continue shopping</p><p className="mt-1 text-xs text-white/45">Find your next essential</p></Link></div></section>
     </div>
   );
 }
