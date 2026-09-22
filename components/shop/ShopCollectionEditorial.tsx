@@ -46,16 +46,12 @@ function CollectionCard({ collection, index }: { collection: Collection; index: 
             className="shop-collection-image"
           />
           <span className="shop-collection-wash" aria-hidden="true" />
-          <span className="shop-collection-number">{String(index + 1).padStart(2, "0")}</span>
-          <span className="shop-collection-corner" aria-hidden="true">.DOT</span>
         </div>
         <div className="shop-collection-content">
-          <div className="shop-collection-heading">
-            <p className="shop-collection-kicker">{String(index + 1).padStart(2, "0")} / COLLECTION</p>
-            <h3>{collection.title}</h3>
-          </div>
+          <p className="shop-collection-kicker">{String(index + 1).padStart(2, "0")} / COLLECTION</p>
+          <h3>{collection.title}</h3>
           <p className="shop-collection-description">{collection.description}</p>
-          <span className="shop-collection-link">Explore collection <b aria-hidden="true">↗</b></span>
+          <span className="shop-collection-link">Explore collection <span aria-hidden="true">→</span></span>
         </div>
       </Link>
     </article>
@@ -64,10 +60,17 @@ function CollectionCard({ collection, index }: { collection: Collection; index: 
 
 export default function ShopCollectionEditorial({ collections }: { collections: Collection[] }) {
   return (
-    <div className="shop-collections-editorial">
-      {collections.map((collection, index) => (
-        <CollectionCard key={collection.id} collection={collection} index={index} />
-      ))}
+    <div className="dot-shop-collections">
+      <div className="dot-shop-collections-heading">
+        <p className="dot-shop-collections-kicker">COLLECTIONS / 03</p>
+        <h2 id="shop-stories-heading">THE .DOT UNIVERSE</h2>
+        <p className="dot-shop-collections-note">Three expressions of the .Dot identity.</p>
+      </div>
+      <div className="dot-collection-grid">
+        {collections.map((collection, index) => (
+          <CollectionCard key={collection.id} collection={collection} index={index} />
+        ))}
+      </div>
     </div>
   );
 }

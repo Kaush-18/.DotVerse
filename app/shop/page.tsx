@@ -69,7 +69,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   return (
     <ShopPageShell>
-      <div className="shop-redesign-atmosphere" aria-hidden="true" />
       <Container>
         <header className="shop-redesign-header" aria-labelledby="shop-heading">
           <div>
@@ -112,13 +111,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         </section>
 
         <section className="shop-redesign-stories" aria-labelledby="shop-stories-heading">
-          <div className="shop-redesign-stories-heading">
-            <div>
-              <p className="shop-redesign-section-kicker">THREE WORLDS</p>
-              <h2 id="shop-stories-heading">One universe.</h2>
-            </div>
-            <p>Explore the distinct energies that make .Dot.</p>
-          </div>
           <ShopCollectionEditorial collections={collections} />
         </section>
 

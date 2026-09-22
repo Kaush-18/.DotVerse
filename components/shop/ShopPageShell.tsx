@@ -36,7 +36,11 @@ export default function ShopPageShell({ children }: { children: ReactNode }) {
 
   return (
     <main ref={shellRef} className="dot-shop-redesign">
-      {children}
+      <div className="shop-page-background" aria-hidden="true">
+        <div className="shop-page-background-art" />
+        <div className="shop-page-background-overlay" />
+      </div>
+      <div className="shop-page-content">{children}</div>
     </main>
   );
 }
