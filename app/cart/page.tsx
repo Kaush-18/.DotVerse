@@ -1,104 +1,87 @@
 "use client";
 
-import Link from "next/link";
-import { Trash2, Minus, Plus } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { Minus, Plus, Trash2 } from "lucide-react";
 
-import { useCart } from "@/context/CartContext";
 import Container from "@/components/layout/Container";
 import PageReveal from "@/components/animations/PageReveal";
+import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
-  const { items, updateQuantity, removeFromCart, subtotal } = useCart();
+  const { items, updateQuantity, removeFromCart, subtotal, totalItems } = useCart();
 
   return (
     <PageReveal>
-      <main className="pt-20 pb-20">
+      <main className="dot-cart-page">
         <Container>
-          <h1 className="text-4xl font-bold text-white mb-8">CART</h1>
-
           {items.length === 0 ? (
-            <div className="text-white/60">
-              Your cart is empty.{" "}
-              <Link href="/shop" className="text-violet-400 underline">
-                Go shop
-              </Link>
-            </div>
+            <section className="dot-cart-empty" aria-labelledby="cart-empty-heading">
+              <p className="dot-cart-kicker">.DOT / SHOPPING BAG</p>
+              <h1 id="cart-empty-heading">YOUR BAG<br /><em>IS EMPTY.</em></h1>
+              <p>Nothing is waiting here yet. Find the piece that feels like yours.</p>
+              <Link href="/shop" className="dot-cart-primary-link">Explore the collection <span aria-hidden="true">↗</span></Link>
+              <span className="dot-cart-empty-mark" aria-hidden="true">.</span>
+            </section>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              <div className="lg:col-span-2 space-y-6">
-                {items.map((item) => (
-                  <div
-                    key={`${item.id}-${item.size}-${item.color}`}
-                    className="flex gap-4 p-4 rounded-xl border border-white/10 bg-white/5"
-                  >
-                    <div className="relative w-24 h-24 rounded-lg overflow-hidden">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-white">{item.name}</h3>
-                      <p className="text-sm text-white/60">
-                        {item.color} / {item.size}
-                      </p>
-                      <div className="flex items-center gap-4 mt-4">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity - 1)}
-                          className="p-1 rounded-full bg-white/10"
-                        >
-                          <Minus size={16} />
-                        </button>
-                        <span>{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity + 1)}
-                          className="p-1 rounded-full bg-white/10"
-                        >
-                          <Plus size={16} />
-                        </button>
-                        <button
-                          onClick={() => removeFromCart(item.id, item.size, item.color)}
-                          className="ml-auto text-red-400"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="text-lg font-bold text-white">
-                      ₹{(item.price * item.quantity).toLocaleString("en-IN")}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="p-6 rounded-2xl border border-white/10 bg-white/5 h-fit">
-                <h2 className="text-xl font-bold text-white mb-6">ORDER SUMMARY</h2>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-white/60">Subtotal</span>
-                    <span className="text-white">₹{subtotal.toLocaleString("en-IN")}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-white/60">Shipping</span>
-                    <span className="text-white">Free</span>
-                  </div>
-                  <hr className="border-white/10" />
-                  <div className="flex justify-between text-lg font-bold">
-                    <span className="text-white">Total</span>
-                    <span className="text-white">₹{subtotal.toLocaleString("en-IN")}</span>
-                  </div>
-                  <Link
-                    href="/checkout"
-                    className="block w-full py-4 bg-violet-600 rounded-full font-bold text-center text-white mt-6 hover:bg-violet-700 transition-colors"
-                  >
-                    Proceed to checkout
-                  </Link>
+            <>
+              <header className="dot-cart-header">
+                <div>
+                  <p className="dot-cart-kicker">.DOT / SHOPPING BAG</p>
+                  <h1>YOUR BAG</h1>
                 </div>
+                <p className="dot-cart-count">{String(totalItems).padStart(2, "0")} {totalItems === 1 ? "PIECE" : "PIECES"}</p>
+              </header>
+
+              <div className="dot-cart-layout">
+                <section className="dot-cart-items" aria-labelledby="cart-items-heading">
+                  <div className="dot-cart-section-heading">
+                    <h2 id="cart-items-heading">Selected pieces</h2>
+                    <span>01 / EDIT</span>
+                  </div>
+                  <div className="dot-cart-item-list">
+                    {items.map((item, index) => (
+                      <article key={`${item.id}-${item.size}-${item.color}`} className="dot-cart-item" style={{ "--cart-item-delay": `${index * 70}ms` } as React.CSSProperties}>
+                        <Link href={`/products/${item.slug}`} className="dot-cart-item-image" aria-label={`View ${item.name}`}>
+                          <Image src={item.image} alt={`${item.name} by DotVerse`} fill sizes="(max-width: 700px) 34vw, 180px" />
+                        </Link>
+                        <div className="dot-cart-item-details">
+                          <div className="dot-cart-item-heading">
+                            <div>
+                              <p className="dot-cart-item-label">{item.color} / {item.size}</p>
+                              <h3><Link href={`/products/${item.slug}`}>{item.name}</Link></h3>
+                            </div>
+                            <p className="dot-cart-item-price">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
+                          </div>
+                          <div className="dot-cart-item-footer">
+                            <div className="dot-cart-quantity" aria-label={`Quantity for ${item.name}`}>
+                              <button type="button" onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity - 1)} disabled={item.quantity <= 1} aria-label={`Decrease quantity of ${item.name}`}><Minus size={13} /></button>
+                              <span aria-live="polite">{item.quantity}</span>
+                              <button type="button" onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity + 1)} aria-label={`Increase quantity of ${item.name}`}><Plus size={13} /></button>
+                            </div>
+                            <span className="dot-cart-unit-price">₹{item.price.toLocaleString("en-IN")} each</span>
+                            <button type="button" className="dot-cart-remove" onClick={() => removeFromCart(item.id, item.size, item.color)} aria-label={`Remove ${item.name} from your bag`}><Trash2 size={14} /><span>Remove</span></button>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                  <Link href="/shop" className="dot-cart-continue">← Continue shopping</Link>
+                </section>
+
+                <aside className="dot-cart-summary" aria-labelledby="cart-summary-heading">
+                  <p className="dot-cart-kicker">02 / CHECKOUT</p>
+                  <h2 id="cart-summary-heading">ORDER SUMMARY</h2>
+                  <div className="dot-cart-summary-lines">
+                    <div><span>Subtotal</span><strong>₹{subtotal.toLocaleString("en-IN")}</strong></div>
+                    <div><span>Shipping</span><strong>Free</strong></div>
+                  </div>
+                  <div className="dot-cart-total"><span>Total</span><strong>₹{subtotal.toLocaleString("en-IN")}</strong></div>
+                  <Link href="/checkout" className="dot-cart-checkout">Proceed to checkout <span aria-hidden="true">→</span></Link>
+                  <p className="dot-cart-summary-note">Shipping is calculated as free for this order.</p>
+                </aside>
               </div>
-            </div>
+            </>
           )}
         </Container>
       </main>
