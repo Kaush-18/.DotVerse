@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowRight, Check, Copy, LockKeyhole } from "lucide-react";
 import PageReveal from "@/components/animations/PageReveal";
-import Loader from "@/components/loader/Loader";
 
 type OrderItem = {
   id: string;
@@ -23,6 +23,10 @@ type Order = {
   lastName: string;
   city: string;
   state: string;
+  address?: string;
+  apartment?: string | null;
+  postalCode?: string;
+  phone?: string;
   subtotal: number;
   shipping: number;
   total: number;
@@ -52,6 +56,14 @@ export default function OrderSuccessContent() {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  const copyOrderNumber = async () => {
+    if (!orderNumber || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(orderNumber);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+  };
 
   // Initial load: authenticated users get the full order; guests (or a stale auth
   // order) fall back to the minimal status endpoint so the page can still reflect the
@@ -239,26 +251,12 @@ export default function OrderSuccessContent() {
   }, [orderNumber, awaitingPayment]);
 
   if (loading) {
-    return <Loader />;
+    return <main className="dot-success-page"><div className="dot-success-loading"><span className="dot-success-loading-mark" /><p>Retrieving your order</p></div></main>;
   }
 
   if (!order) {
     return (
-      <main className="min-h-screen bg-[#07040d] px-6 py-24 text-white">
-        <div className="mx-auto max-w-xl text-center">
-          <h1 className="text-3xl font-bold">ORDER NOT FOUND</h1>
-
-          <p className="mt-4 text-white/50">
-            We couldn&apos;t retrieve the details for this order.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => router.push("/shop")}
-            className="mt-8 rounded-full bg-violet-600 px-8 py-4 font-semibold transition hover:bg-violet-500"
-          >
-            Continue Shopping
-          </button>
+      <main className="dot-success-page"><div className="dot-success-fallback"><p className="dot-success-kicker">.DOT / ORDER STATUS</p><h1>ORDER DETAILS<br /><em>UNAVAILABLE.</em></h1><p>We couldn&apos;t verify the details for this order. You can return to the collection or track a purchase with its order number.</p><div className="dot-success-actions"><button type="button" onClick={() => router.push("/track-order")} className="dot-success-primary">Track order <ArrowRight size={15} /></button><button type="button" onClick={() => router.push("/shop")} className="dot-success-secondary">Continue shopping</button></div>
         </div>
       </main>
     );
@@ -293,184 +291,5 @@ export default function OrderSuccessContent() {
         ? "Your order has been successfully placed."
         : "Your order has been received. We're confirming your payment with the payment provider — this can take a moment.";
 
-  return (
-    <PageReveal>
-      <main className="min-h-screen bg-[#07040d] px-6 py-16 text-white md:py-24">
-        <div className="mx-auto max-w-5xl">
-
-          <section className="text-center">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-violet-400/30 bg-violet-500/10">
-              <span className="text-4xl text-violet-300">
-                {paymentFailed || inventoryException
-                  ? "!"
-                  : awaitingConfirmation
-                    ? "…"
-                    : "✓"}
-              </span>
-            </div>
-
-            <p className="mt-8 text-xs font-semibold uppercase tracking-[0.35em] text-violet-400">
-              DotVerse
-            </p>
-
-            <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-              {heading}
-            </h1>
-
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/50 md:text-base">
-              {!isGuestView && orderConfirmed && order.firstName && (
-                <>
-                  Thank you for your purchase,{" "}
-                  <span className="text-white">{order.firstName}</span>.{" "}
-                </>
-              )}
-              {description}
-            </p>
-
-            <div className="mt-7">
-              <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-white/30">
-                Order Number
-              </p>
-
-              <p className="mt-2 font-mono text-lg font-semibold text-violet-300 md:text-xl">
-                {order.orderNumber}
-              </p>
-            </div>
-          </section>
-
-          <section className="mt-12 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/35">
-                Order Status
-              </p>
-              <p className="mt-3 font-semibold text-violet-300">
-                {order.status}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/35">
-                Payment Method
-              </p>
-              <p className="mt-3 font-semibold">
-                {order.paymentMethod}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/35">
-                Payment Status
-              </p>
-              <p className="mt-3 font-semibold text-violet-300">
-                {order.paymentStatus}
-              </p>
-            </div>
-          </section>
-
-          {!isGuestView && order.items && order.items.length > 0 && (
-            <section className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]">
-              <div className="border-b border-white/10 px-6 py-5 md:px-8">
-                <h2 className="text-lg font-semibold">YOUR ORDER</h2>
-              </div>
-
-              <div className="divide-y divide-white/10">
-                {order.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between gap-6 px-6 py-6 md:px-8"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate font-medium">
-                        {item.productName}
-                      </p>
-
-                      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-white/45">
-                        <span>{item.variantColor}</span>
-                        <span>•</span>
-                        <span>Size {item.variantSize}</span>
-                        <span>•</span>
-                        <span>Qty {item.quantity}</span>
-                      </div>
-                    </div>
-
-                    <p className="shrink-0 font-semibold">
-                      ₹{item.price * item.quantity}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {!isGuestView && order.firstName && (
-            <section className="mt-6 grid gap-6 md:grid-cols-2">
-
-              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
-                <h2 className="text-lg font-semibold">DELIVERY</h2>
-
-                <div className="mt-6">
-                  <p className="font-medium">
-                    {order.firstName} {order.lastName}
-                  </p>
-
-                  <p className="mt-2 text-sm leading-6 text-white/45">
-                    {order.city}, {order.state}
-                  </p>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
-                <h2 className="text-lg font-semibold">ORDER SUMMARY</h2>
-
-                <div className="mt-6 space-y-3 text-sm">
-                  <div className="flex justify-between text-white/45">
-                    <span>Subtotal</span>
-                    <span>₹{order.subtotal}</span>
-                  </div>
-
-                  <div className="flex justify-between text-white/45">
-                    <span>Shipping</span>
-                    <span>
-                      {order.shipping === 0
-                        ? "FREE"
-                        : `₹${order.shipping}`}
-                    </span>
-                  </div>
-
-                  <div className="my-4 border-t border-white/10" />
-
-                  <div className="flex justify-between text-base font-semibold">
-                    <span>Total</span>
-                    <span className="text-violet-300">
-                      ₹{order.total}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-            </section>
-          )}
-
-          <section className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => router.push("/shop")}
-              className="w-full rounded-full bg-violet-600 px-8 py-4 font-semibold transition hover:bg-violet-500 sm:w-auto"
-            >
-              Continue Shopping
-            </button>
-
-            <button
-              type="button"
-              onClick={() => router.push("/")}
-              className="w-full rounded-full border border-white/10 px-8 py-4 font-medium text-white/65 transition hover:bg-white/5 hover:text-white sm:w-auto"
-            >
-              Back to Home
-            </button>
-          </section>
-
-        </div>
-      </main>
-    </PageReveal>
-  );
+  return <PageReveal><main className="dot-success-page"><div className="dot-success-container"><section className={`dot-success-hero ${paymentFailed || inventoryException ? "is-alert" : ""}`}><div className="dot-success-mark" aria-hidden="true">{paymentFailed || inventoryException ? "!" : awaitingConfirmation ? "…" : <Check size={34} />}</div><p className="dot-success-kicker">.DOT / PURCHASE JOURNEY</p><h1>{heading}</h1><p className="dot-success-description">{!isGuestView && orderConfirmed && order.firstName && <>Thank you for your purchase, <strong>{order.firstName}</strong>. </>}{description}</p><div className="dot-success-order-number"><span>Order number</span><strong>{order.orderNumber}</strong><button type="button" onClick={copyOrderNumber} aria-label="Copy order number"><Copy size={14} />{copied ? "Copied" : "Copy"}</button></div></section><section className="dot-success-meta" aria-label="Order status"><div><span>Order status</span><strong>{order.status}</strong></div><div><span>Payment method</span><strong>{order.paymentMethod}</strong></div><div><span>Payment status</span><strong>{order.paymentStatus}</strong></div></section>{!isGuestView && order.items?.length > 0 && <section className="dot-success-order"><div className="dot-success-section-heading"><h2>YOUR ORDER</h2><span>01 / ITEMS</span></div><div className="dot-success-items">{order.items.map((item) => <div className="dot-success-item" key={item.id}><div className="dot-success-item-image"><span aria-hidden="true">.DOT</span></div><div><strong>{item.productName}</strong><span>{item.variantColor} / Size {item.variantSize} / Qty {item.quantity}</span></div><b>₹{(item.price * item.quantity).toLocaleString("en-IN")}</b></div>)}</div></section>}{!isGuestView && order.firstName && <section className="dot-success-details"><div><p className="dot-success-kicker">02 / DELIVERY</p><h2>Delivering to</h2><p className="dot-success-address"><strong>{order.firstName} {order.lastName}</strong>{order.address && <>{order.address}{order.apartment ? `, ${order.apartment}` : ""}</>}{order.city}, {order.state} {order.postalCode}{order.phone && order.phone}</p></div><div><p className="dot-success-kicker">03 / SUMMARY</p><h2>Order total</h2><div className="dot-success-totals"><span>Subtotal <b>₹{order.subtotal.toLocaleString("en-IN")}</b></span><span>Shipping <b>{order.shipping === 0 ? "FREE" : `₹${order.shipping.toLocaleString("en-IN")}`}</b></span><strong>Total <b>₹{order.total.toLocaleString("en-IN")}</b></strong></div></div></section>}<section className="dot-success-actions"><button type="button" onClick={() => router.push("/track-order")} className="dot-success-primary">Track order <ArrowRight size={15} /></button><button type="button" onClick={() => router.push("/shop")} className="dot-success-secondary">Continue shopping</button></section><div className="dot-success-trust"><LockKeyhole size={15} /> Your order status reflects the latest available order information.</div></div></main></PageReveal>;
 }
