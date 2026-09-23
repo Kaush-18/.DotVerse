@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   X,
@@ -9,9 +10,11 @@ import {
   ShoppingBag,
   Plus,
   Minus,
+  Check,
 } from "lucide-react";
 
 import type { Product } from "@/types/product";
+import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 
 type ProductQuickViewProps = {
@@ -19,27 +22,36 @@ type ProductQuickViewProps = {
   onClose: () => void;
 };
 
-export default function ProductQuickView({
+function QuickViewModal({
   product,
   onClose,
-}: ProductQuickViewProps) {
+}: {
+  product: Product;
+  onClose: () => void;
+}) {
+  const { addToCart } = useCart();
   const { isWishlisted, toggleWishlist } = useWishlist();
-  const liked = isWishlisted(product?.id ?? "");
+  const liked = isWishlisted(product.id);
+
+  const [selectedColor, setSelectedColor] = useState<string>(
+    product.colors[0]?.name || "Black",
+  );
+  const [selectedSize, setSelectedSize] = useState<string>(
+    product.sizes[0] || "M",
+  );
+  const [quantity, setQuantity] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
+
   useEffect(() => {
-    if (!product) return;
-
     const previousOverflow = document.body.style.overflow;
-
     document.body.style.overflow = "hidden";
 
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [product]);
+  }, []);
 
   useEffect(() => {
-    if (!product) return;
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
@@ -51,9 +63,31 @@ export default function ProductQuickView({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [product, onClose]);
+  }, [onClose]);
 
-  if (!product) return null;
+  const handleAddToCart = () => {
+    const color = selectedColor || product.colors[0]?.name || "Black";
+    const size = selectedSize || product.sizes[0] || "M";
+
+    addToCart(
+      {
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        image: product.images[0],
+        size,
+        color,
+      },
+      quantity,
+    );
+
+    setIsAdded(true);
+    setTimeout(() => {
+      setIsAdded(false);
+      onClose();
+    }, 1000);
+  };
 
   const quickView = (
     <div
@@ -120,7 +154,7 @@ export default function ProductQuickView({
           <div className="quick-view-option">
             <div className="quick-view-option-header">
               <span>Color</span>
-              <span>{product.colors[0]?.name || "Black"}</span>
+              <span>{selectedColor}</span>
             </div>
 
             <div className="quick-view-colors">
@@ -129,12 +163,14 @@ export default function ProductQuickView({
                   key={`${product.id}-quick-color-${index}`}
                   type="button"
                   className={`quick-color ${
-                    index === 0 ? "selected" : ""
+                    selectedColor === color.name ? "selected" : ""
                   }`}
                   style={{
                     backgroundColor: color.value,
                   }}
+                  onClick={() => setSelectedColor(color.name)}
                   aria-label={color.name}
+                  aria-pressed={selectedColor === color.name}
                 />
               ))}
             </div>
@@ -145,25 +181,28 @@ export default function ProductQuickView({
             <div className="quick-view-option-header">
               <span>Size</span>
 
-              <button
-                type="button"
+              <Link
+                href="/size-guide"
                 className="size-guide"
+                onClick={onClose}
               >
                 Size guide
-              </button>
+              </Link>
             </div>
 
             <div className="size-grid">
-              {product.sizes.map((size, index) => (
-                  <button
-                    key={size}
-                    type="button"
-                    className={`size-button ${
-                      index === 1 ? "selected" : ""
-                    }`}
-                  >
-                    {size}
-                  </button>
+              {product.sizes.map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  className={`size-button ${
+                    selectedSize === size ? "selected" : ""
+                  }`}
+                  onClick={() => setSelectedSize(size)}
+                  aria-pressed={selectedSize === size}
+                >
+                  {size}
+                </button>
               ))}
             </div>
           </div>
@@ -178,15 +217,19 @@ export default function ProductQuickView({
               <button
                 type="button"
                 aria-label="Decrease quantity"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                disabled={quantity <= 1}
               >
                 <Minus size={15} />
               </button>
 
-              <span>1</span>
+              <span>{quantity}</span>
 
               <button
                 type="button"
                 aria-label="Increase quantity"
+                onClick={() => setQuantity((q) => Math.min(20, q + 1))}
+                disabled={quantity >= 20}
               >
                 <Plus size={15} />
               </button>
@@ -198,18 +241,29 @@ export default function ProductQuickView({
             <button
               type="button"
               className="add-to-cart-button"
+              onClick={handleAddToCart}
+              disabled={isAdded}
             >
-              <ShoppingBag size={18} />
-              Add to cart
+              {isAdded ? (
+                <>
+                  <Check size={18} />
+                  Added!
+                </>
+              ) : (
+                <>
+                  <ShoppingBag size={18} />
+                  Add to cart
+                </>
+              )}
             </button>
 
             <button
               type="button"
               className="quick-view-wishlist"
-               aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
-               onClick={() => void toggleWishlist(product.id, product)}
+              aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+              onClick={() => void toggleWishlist(product.id, product)}
             >
-               <Heart size={19} fill={liked ? "currentColor" : "none"} />
+              <Heart size={19} fill={liked ? "currentColor" : "none"} />
             </button>
           </div>
         </div>
@@ -218,4 +272,13 @@ export default function ProductQuickView({
   );
 
   return createPortal(quickView, document.body);
+}
+
+export default function ProductQuickView({
+  product,
+  onClose,
+}: ProductQuickViewProps) {
+  if (!product) return null;
+
+  return <QuickViewModal key={product.id} product={product} onClose={onClose} />;
 }

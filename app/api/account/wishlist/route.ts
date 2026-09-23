@@ -41,12 +41,20 @@ export async function POST(request: Request) {
   const productId = typeof body === "object" && body !== null && "productId" in body && typeof body.productId === "string" ? body.productId.trim() : "";
   if (!productId || productId.length > 100) return NextResponse.json({ success: false, message: "A valid product is required." }, { status: 400 });
 
-  const product = await prisma.product.findUnique({ where: { id: productId }, select: { id: true } });
+  const product = await prisma.product.findFirst({
+    where: {
+      OR: [
+        { id: productId },
+        { slug: productId },
+      ],
+    },
+    select: { id: true },
+  });
   if (!product) return NextResponse.json({ success: false, message: "Product not found." }, { status: 404 });
 
   const item = await prisma.wishlistItem.upsert({
-    where: { userId_productId: { userId: session.user.id, productId } },
-    create: { userId: session.user.id, productId },
+    where: { userId_productId: { userId: session.user.id, productId: product.id } },
+    create: { userId: session.user.id, productId: product.id },
     update: {},
     select: { id: true, productId: true },
   });

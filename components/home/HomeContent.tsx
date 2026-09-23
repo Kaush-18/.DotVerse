@@ -9,8 +9,13 @@ import FeaturedCollections from "@/components/home/FeaturedCollections";
 import NewArrivals from "@/components/home/NewArrivals";
 import BrandContext from "@/components/home/BrandContext";
 import PageReveal from "@/components/animations/PageReveal";
+import type { Product } from "@/types/product";
 
-export default function HomeContent() {
+interface HomeContentProps {
+  featuredProducts?: Product[];
+}
+
+export default function HomeContent({ featuredProducts }: HomeContentProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,7 +36,7 @@ export default function HomeContent() {
         <PageReveal>
           <Hero />
           <FeaturedCollections />
-          <NewArrivals />
+          <NewArrivals initialProducts={featuredProducts} />
           <BrandContext />
         </PageReveal>
       )}

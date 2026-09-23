@@ -4,10 +4,19 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { products } from "@/data/products";
+import type { Product } from "@/types/product";
 import Container from "@/components/layout/Container";
 import NewArrivalCard from "./NewArrivalCard";
 
-export default function NewArrivals() {
+interface NewArrivalsProps {
+  initialProducts?: Product[];
+}
+
+export default function NewArrivals({ initialProducts }: NewArrivalsProps) {
+  const displayProducts = initialProducts && initialProducts.length > 0
+    ? initialProducts
+    : products.filter((product) => product.featured);
+
   return (
     <section className="new-arrivals-section new-arrivals-rebuild">
       <Container>
@@ -47,7 +56,7 @@ export default function NewArrivals() {
         </header>
 
         <div className="new-arrivals-rebuild-grid">
-          {products.filter((product) => product.featured).slice(0, 4).map((product, index) => (
+          {displayProducts.slice(0, 4).map((product, index) => (
             <NewArrivalCard key={product.id} product={product} index={index} />
           ))}
         </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { absoluteUrl, defaultSocialImage } from "@/lib/seo";
 import HomeContent from "@/components/home/HomeContent";
+import { getFeaturedProducts } from "@/services/products";
 
 const homepageTitle = "DotVerse | Graphic T-Shirts & Modern Streetwear";
 const homepageDescription =
@@ -30,10 +31,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const featuredProducts = await getFeaturedProducts().catch(() => []);
+
   return (
     <>
-      <HomeContent />
+      <HomeContent featuredProducts={featuredProducts} />
     </>
   );
 }

@@ -236,4 +236,28 @@ describe("cancelOrderInTransaction", () => {
     assert.ok(result.wasCancelled);
     assert.equal(result.restoredVariantIds.length, 0);
   });
+
+  it("should not increment stock if online order reservations were already expired/released", async () => {
+    const { tx, data } = makeTx();
+    data.orders.set("order-1", {
+      status: "PENDING",
+      paymentStatus: "PENDING",
+      items: [{ variantId: "var-1", quantity: 1 }],
+    });
+    data.reservations.push({ id: "res-order-1", orderId: "order-1", status: "EXPIRED" });
+    data.variants.set("var-1", 50);
+
+    const result = await cancelOrderInTransaction(tx, {
+      id: "order-1",
+      paymentStatus: "PENDING",
+      status: "PENDING",
+      items: [{ variantId: "var-1", quantity: 1 }],
+    });
+
+    assert.ok(result.wasCancelled);
+    assert.equal(result.releasedReservations, false);
+    assert.equal(result.restoredVariantIds.length, 0);
+    assert.equal(data.variants.get("var-1"), 50, "stock should not be incremented again");
+    assert.equal(data.orders.get("order-1")!.status, "CANCELLED");
+  });
 });

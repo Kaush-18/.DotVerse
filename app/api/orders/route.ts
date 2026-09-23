@@ -85,18 +85,21 @@ export async function POST(request: Request) {
 
     const products = await prisma.product.findMany({
       where: {
-        id: {
-          in: productIds,
-        },
+        OR: [
+          { id: { in: productIds } },
+          { slug: { in: productIds } },
+        ],
       },
       include: {
         variants: true,
       },
     });
 
-    const productMap = new Map(
-      products.map((product) => [product.id, product]),
-    );
+    const productMap = new Map<string, (typeof products)[0]>();
+    for (const product of products) {
+      productMap.set(product.id, product);
+      productMap.set(product.slug, product);
+    }
 
     let subtotal = 0;
 

@@ -106,11 +106,42 @@ export default function TrackOrderContent() {
 
       const data = await response.json();
 
-      if (!response.ok || !data.success || !data.order) {
-        throw new Error(data.message || "Order not found.");
+      if (response.ok && data.success && data.order) {
+        setOrder(data.order);
+        return;
       }
 
-      setOrder(data.order);
+      // Guest fallback: query minimal status endpoint
+      const statusResponse = await fetch(
+        `/api/orders/${encodeURIComponent(trimmedOrderNumber)}/status`,
+        {
+          cache: "no-store",
+        },
+      );
+
+      const statusData = await statusResponse.json();
+
+      if (statusResponse.ok && statusData.success && statusData.order) {
+        setOrder({
+          id: "",
+          orderNumber: trimmedOrderNumber,
+          firstName: "",
+          lastName: "",
+          city: "",
+          state: "",
+          subtotal: 0,
+          shipping: 0,
+          total: 0,
+          status: statusData.order.status,
+          paymentStatus: statusData.order.paymentStatus,
+          paymentMethod: statusData.order.paymentMethod,
+          items: [],
+          createdAt: "",
+        });
+        return;
+      }
+
+      throw new Error(data.message || "Order not found.");
     } catch (requestError) {
       console.error("Track order error:", requestError);
 
@@ -340,98 +371,102 @@ export default function TrackOrderContent() {
 
                 {/* Items */}
 
-                <div className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]">
-                  <div className="border-b border-white/10 px-6 py-5 md:px-8">
-                    <h3 className="font-semibold">
-                      YOUR ORDER
-                    </h3>
-                  </div>
+                {order.items && order.items.length > 0 && (
+                  <div className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]">
+                    <div className="border-b border-white/10 px-6 py-5 md:px-8">
+                      <h3 className="font-semibold">
+                        YOUR ORDER
+                      </h3>
+                    </div>
 
-                  <div className="divide-y divide-white/10">
-                    {order.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="
-                          flex
-                          items-center
-                          justify-between
-                          gap-6
-                          px-6
-                          py-6
-                          md:px-8
-                        "
-                      >
-                        <div className="min-w-0">
-                          <p className="font-medium">
-                            {item.productName}
-                          </p>
+                    <div className="divide-y divide-white/10">
+                      {order.items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="
+                            flex
+                            items-center
+                            justify-between
+                            gap-6
+                            px-6
+                            py-6
+                            md:px-8
+                          "
+                        >
+                          <div className="min-w-0">
+                            <p className="font-medium">
+                              {item.productName}
+                            </p>
 
-                          <p className="mt-2 text-sm text-white/40">
-                            {item.variantColor} • Size{" "}
-                            {item.variantSize} • Qty{" "}
-                            {item.quantity}
+                            <p className="mt-2 text-sm text-white/40">
+                              {item.variantColor} • Size{" "}
+                              {item.variantSize} • Qty{" "}
+                              {item.quantity}
+                            </p>
+                          </div>
+
+                          <p className="shrink-0 font-semibold">
+                            ₹{item.price * item.quantity}
                           </p>
                         </div>
-
-                        <p className="shrink-0 font-semibold">
-                          ₹{item.price * item.quantity}
-                        </p>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Details */}
 
-                <div className="mt-6 grid gap-6 md:grid-cols-2">
+                {order.items && order.items.length > 0 && order.city && (
+                  <div className="mt-6 grid gap-6 md:grid-cols-2">
 
-                  <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
-                    <h3 className="font-semibold">
-                      DELIVERY
-                    </h3>
+                    <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
+                      <h3 className="font-semibold">
+                        DELIVERY
+                      </h3>
 
-                    <div className="mt-6">
-                      <p className="font-medium">
-                        {order.firstName} {order.lastName}
-                      </p>
+                      <div className="mt-6">
+                        <p className="font-medium">
+                          {order.firstName} {order.lastName}
+                        </p>
 
-                      <p className="mt-2 text-sm leading-6 text-white/45">
-                        {order.city}, {order.state}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
-                    <h3 className="font-semibold">
-                      SUMMARY
-                    </h3>
-
-                    <div className="mt-6 space-y-3 text-sm">
-                      <div className="flex justify-between text-white/45">
-                        <span>Subtotal</span>
-                        <span>₹{order.subtotal}</span>
-                      </div>
-
-                      <div className="flex justify-between text-white/45">
-                        <span>Shipping</span>
-                        <span>
-                          {order.shipping === 0
-                            ? "FREE"
-                            : `₹${order.shipping}`}
-                        </span>
-                      </div>
-
-                      <div className="my-4 border-t border-white/10" />
-
-                      <div className="flex justify-between text-base font-semibold">
-                        <span>Total</span>
-                        <span className="text-violet-300">
-                          ₹{order.total}
-                        </span>
+                        <p className="mt-2 text-sm leading-6 text-white/45">
+                          {order.city}, {order.state}
+                        </p>
                       </div>
                     </div>
+
+                    <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 md:p-8">
+                      <h3 className="font-semibold">
+                        SUMMARY
+                      </h3>
+
+                      <div className="mt-6 space-y-3 text-sm">
+                        <div className="flex justify-between text-white/45">
+                          <span>Subtotal</span>
+                          <span>₹{order.subtotal}</span>
+                        </div>
+
+                        <div className="flex justify-between text-white/45">
+                          <span>Shipping</span>
+                          <span>
+                            {order.shipping === 0
+                              ? "FREE"
+                              : `₹${order.shipping}`}
+                          </span>
+                        </div>
+
+                        <div className="my-4 border-t border-white/10" />
+
+                        <div className="flex justify-between text-base font-semibold">
+                          <span>Total</span>
+                          <span className="text-violet-300">
+                            ₹{order.total}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Actions */}
 

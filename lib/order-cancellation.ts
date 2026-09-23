@@ -102,10 +102,18 @@ export async function cancelOrderInTransaction(
     };
   }
 
-  // No ACTIVE reservations (COD, or online already-released/expired). Restore stock by
-  // the order items' variant quantities. Because we already flipped to CANCELLED, this runs at
-  // most once. Any previously RELEASED/EXPIRED (non-FINALIZED) online reservation stock was
-  // already returned, so only COD-style items are decremented-now style stock to restore here.
+  // If this order ever had reservations (i.e. online order whose reservations were already
+  // released or expired), stock was already returned to availability earlier. Do not restore again.
+  const totalReservationCount = await tx.inventoryReservation.count({
+    where: { orderId: order.id },
+  });
+
+  if (totalReservationCount > 0) {
+    return { wasCancelled: true, restoredVariantIds: [], releasedReservations: false };
+  }
+
+  // No reservations at all (COD or legacy orders). Restore stock by
+  // the order items' variant quantities.
   const restored: string[] = [];
 
   for (const item of order.items) {

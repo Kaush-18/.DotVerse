@@ -10,6 +10,17 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ p
   const { productId } = await params;
   if (!productId || productId.length > 100) return NextResponse.json({ success: false, message: "Invalid product." }, { status: 400 });
 
-  await prisma.wishlistItem.deleteMany({ where: { userId: session.user.id, productId } });
+  const product = await prisma.product.findFirst({
+    where: {
+      OR: [
+        { id: productId },
+        { slug: productId },
+      ],
+    },
+    select: { id: true },
+  });
+  const targetId = product ? product.id : productId;
+
+  await prisma.wishlistItem.deleteMany({ where: { userId: session.user.id, productId: targetId } });
   return NextResponse.json({ success: true });
 }
