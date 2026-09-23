@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, PackageOpen } from "lucide-react";
+import {
+  ArrowUpRight,
+  Check,
+  CircleDot,
+  Clock3,
+  Package,
+  Truck,
+  X,
+} from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -9,9 +17,36 @@ import { redirect } from "next/navigation";
 
 const money = formatPrice;
 
+const statusDetails = {
+  PENDING: { icon: Clock3, label: "Pending" },
+  CONFIRMED: { icon: Check, label: "Confirmed" },
+  PROCESSING: { icon: Package, label: "Processing" },
+  SHIPPED: { icon: Truck, label: "Shipped" },
+  DELIVERED: { icon: Check, label: "Delivered" },
+  CANCELLED: { icon: X, label: "Cancelled" },
+} as const;
+
+function getStatusDetails(status: string) {
+  return statusDetails[status as keyof typeof statusDetails] ?? {
+    icon: CircleDot,
+    label: status,
+  };
+}
+
+function formatOrderDate(date: Date) {
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  })
+    .format(date)
+    .toUpperCase();
+}
+
 export default async function OrdersPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login?redirect=/account/orders");
+
   const orders = await prisma.order.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
@@ -20,12 +55,97 @@ export default async function OrdersPage() {
       orderNumber: true,
       createdAt: true,
       status: true,
-      paymentStatus: true,
-      paymentMethod: true,
       total: true,
       items: { select: { productName: true, quantity: true } },
     },
   });
 
-  return <div className="space-y-7"><header className="border-b border-white/10 pb-6"><p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-violet-300/80">Your history</p><h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">Orders</h1><p className="mt-2 text-sm text-white/50">A record of everything on its way to you.</p></header>{orders.length === 0 ? <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-14 text-center"><PackageOpen size={28} className="mx-auto text-violet-300" /><h2 className="mt-5 text-xl font-semibold text-white">No orders yet.</h2><p className="mt-2 text-sm text-white/50">Your next favorite piece is waiting.</p><Link href="/shop" className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-violet-600 px-5 text-sm font-semibold text-white transition hover:bg-violet-500">Explore the collection <ArrowRight size={15} /></Link></div> : <div className="space-y-3">{orders.map((order) => <Link key={order.id} href={`/account/orders/${order.orderNumber}`} className="block rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition hover:border-violet-400/30 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-sm font-semibold text-white">{order.orderNumber}</p><p className="mt-1 text-xs text-white/45">{new Date(order.createdAt).toLocaleDateString()} · {order.items.reduce((sum, item) => sum + item.quantity, 0)} items</p></div><div className="text-right"><p className="text-base font-semibold text-white">{money(order.total)}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-violet-300">{order.status}</p></div></div><div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 border-t border-white/10 pt-3 text-xs text-white/45"><span>Payment: {order.paymentStatus}</span><span>Method: {order.paymentMethod}</span><span className="text-violet-300">View details <ArrowRight size={12} className="ml-1 inline" /></span></div></Link>)}</div>}</div>;
+  return (
+    <div className="dot-orders-page">
+      <header className="dot-orders-header">
+        <div>
+          <p className="dot-orders-kicker">.DOT / ORDER ARCHIVE</p>
+          <h1>
+            YOUR
+            <br />
+            <em>COLLECTION.</em>
+          </h1>
+          <p className="dot-orders-intro">
+            Your purchases, collected in one place.
+          </p>
+        </div>
+        <div className="dot-orders-index" aria-hidden="true">
+          <span>PRIVATE RECORD</span>
+          <strong>{String(orders.length).padStart(2, "0")}</strong>
+          <span>ORDERS</span>
+        </div>
+      </header>
+
+      <section className="dot-orders-history" aria-labelledby="order-history-heading">
+        <div className="dot-orders-section-label">
+          <span>01</span>
+          <span id="order-history-heading">Order history</span>
+        </div>
+
+        {orders.length === 0 ? (
+          <div className="dot-orders-empty">
+            <p className="dot-orders-eyebrow">Order archive</p>
+            <h2>NO ORDERS YET</h2>
+            <p>Your collection starts here.</p>
+            <Link href="/shop" className="dot-orders-shop-link">
+              Explore .DOT <ArrowUpRight size={15} aria-hidden="true" />
+            </Link>
+          </div>
+        ) : (
+          <div className="dot-orders-list">
+            {orders.map((order, index) => {
+              const status = getStatusDetails(order.status);
+              const StatusIcon = status.icon;
+              const itemCount = order.items.reduce(
+                (sum, item) => sum + item.quantity,
+                0,
+              );
+              const itemNames = order.items
+                .slice(0, 2)
+                .map((item) => item.productName)
+                .join(" / ");
+              const remainingItems = order.items.length - 2;
+
+              return (
+                <Link
+                  key={order.id}
+                  href={`/account/orders/${encodeURIComponent(order.orderNumber)}`}
+                  className="dot-order-row"
+                  style={{ "--order-index": index } as React.CSSProperties}
+                  aria-label={`View order ${order.orderNumber}, ${status.label}, ${itemCount} items, ${money(order.total)}`}
+                >
+                  <span className="dot-order-number">{order.orderNumber}</span>
+                  <span className="dot-order-date">
+                    {formatOrderDate(order.createdAt)}
+                  </span>
+                  <span className={`dot-order-status dot-order-status-${order.status.toLowerCase()}`}>
+                    <StatusIcon size={14} strokeWidth={1.7} aria-hidden="true" />
+                    <span>{status.label}</span>
+                  </span>
+                  <span className="dot-order-items">
+                    <strong>
+                      {itemCount} {itemCount === 1 ? "ITEM" : "ITEMS"}
+                    </strong>
+                    <span>
+                      {itemNames}
+                      {remainingItems > 0 ? ` +${remainingItems}` : ""}
+                    </span>
+                  </span>
+                  <span className="dot-order-total">{money(order.total)}</span>
+                  <span className="dot-order-view">
+                    View order <ArrowUpRight size={15} aria-hidden="true" />
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </div>
+  );
 }
