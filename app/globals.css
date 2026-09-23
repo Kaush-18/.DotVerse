@@ -1452,16 +1452,14 @@ html {
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 50%;
 
-  cursor: pointer;
+  cursor: default;
 
   transition:
     transform 0.2s ease,
     border-color 0.2s ease;
 }
 
-.color-dot:hover,
 .color-dot.active {
-  transform: scale(1.15);
   border-color: #ffffff;
 }
 
@@ -1473,7 +1471,8 @@ html {
 
 .product-wishlist:focus-visible,
 .quick-view-btn:focus-visible,
-.color-dot:focus-visible {
+.product-image:focus-visible,
+.product-name a:focus-visible {
   outline: 2px solid rgba(167, 139, 250, 0.9);
   outline-offset: 3px;
 }
@@ -4383,7 +4382,7 @@ html {
 .dot-cart-item-price { flex: 0 0 auto; margin: 0; color: var(--cart-ink); font-size: 1rem; font-weight: 500; }
 .dot-cart-item-footer { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding-top: 24px; }
 .dot-cart-quantity { display: inline-flex; align-items: center; border: 1px solid var(--cart-line); }
-.dot-cart-quantity button { display: grid; width: 34px; height: 34px; place-items: center; border: 0; color: var(--cart-muted); background: transparent; cursor: pointer; transition: color 0.25s ease, background 0.25s ease; }
+.dot-cart-quantity button { display: grid; width: 44px; height: 44px; place-items: center; border: 0; color: var(--cart-muted); background: transparent; cursor: pointer; transition: color 0.25s ease, background 0.25s ease; }
 .dot-cart-quantity button:hover:not(:disabled), .dot-cart-quantity button:focus-visible { color: var(--cart-ink); background: rgba(190, 166, 255, 0.12); }
 .dot-cart-quantity button:disabled { cursor: not-allowed; opacity: 0.3; }
 .dot-cart-quantity span { min-width: 30px; color: var(--cart-ink); font-size: 11px; text-align: center; }
@@ -4964,7 +4963,7 @@ html {
 .dot-shop-redesign .shop-filter-drawer { width: min(430px, 100%); padding: 30px; color: var(--shop-redesign-ink); background: #111116; box-shadow: -24px 0 70px rgba(0, 0, 0, 0.46); animation: shop-drawer-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .dot-shop-redesign .shop-filter-drawer-heading { display: flex; align-items: start; justify-content: space-between; padding-bottom: 28px; border-bottom: 1px solid var(--shop-redesign-line); }
 .dot-shop-redesign .shop-filter-drawer-heading h2 { margin: 8px 0 0; font-size: 2.2rem; font-weight: 500; letter-spacing: -0.07em; }
-.dot-shop-redesign .shop-filter-drawer-heading button { border: 0; color: var(--shop-redesign-ink); background: none; font-size: 28px; cursor: pointer; }
+.dot-shop-redesign .shop-filter-drawer-heading button { display: grid; width: 44px; height: 44px; place-items: center; border: 0; color: var(--shop-redesign-ink); background: none; font-size: 28px; cursor: pointer; }
 .dot-shop-redesign .shop-filter-drawer-fields { display: grid; gap: 22px; padding: 28px 0; }
 .dot-shop-redesign .shop-filter-drawer-fields .shop-filter-field { justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid var(--shop-redesign-line); }
 .dot-shop-redesign .shop-filter-drawer-fields .shop-filter-field select { text-align: right; }

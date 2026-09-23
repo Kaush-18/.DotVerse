@@ -106,7 +106,7 @@ export default function ProductCard({
             <span>View product</span>
             <span aria-hidden="true">→</span>
           </Link>
-        ) : (
+        ) : onQuickView ? (
           <button
             type="button"
             className="quick-view-btn"
@@ -115,6 +115,15 @@ export default function ProductCard({
             <ShoppingBag size={15} />
             <span>Quick view</span>
           </button>
+        ) : (
+          <Link
+            href={`/products/${product.slug}`}
+            className="quick-view-btn product-view-link"
+            aria-label={`View details for ${product.name}`}
+          >
+            <ShoppingBag size={15} aria-hidden="true" />
+            <span>View product</span>
+          </Link>
         )}
       </div>
 
@@ -159,15 +168,16 @@ export default function ProductCard({
         <div className="product-colors">
           <div className="color-options">
             {product.colors.map((color, colorIndex) => (
-              <button
+              <span
                 key={`${product.id}-${color.value}`}
-                type="button"
                 className={`color-dot ${
                   colorIndex === 0 ? "active" : ""
                 }`}
                 style={{
                   backgroundColor: color.value,
                 }}
+                title={color.name}
+                role="img"
                 aria-label={color.name}
               />
             ))}

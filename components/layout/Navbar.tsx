@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -25,9 +25,13 @@ export default function Navbar() {
   const { totalItems } = useCart();
   const { data: session, isPending: isSessionPending } = authClient.useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
 
-  const closeMenu = () => setIsMenuOpen(false);
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    menuButtonRef.current?.focus();
+  };
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   // Scroll locking
@@ -104,6 +108,7 @@ export default function Navbar() {
             )}
           </Link>
           <button
+            ref={menuButtonRef}
             onClick={toggleMenu}
             aria-label="Open navigation"
             aria-expanded={isMenuOpen}
@@ -126,6 +131,9 @@ export default function Navbar() {
           {/* DRAWER */}
           <div
             id="mobile-navigation"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
             className="
               fixed inset-y-0 right-0 z-[100]
               h-[100dvh] w-[min(86vw,380px)]

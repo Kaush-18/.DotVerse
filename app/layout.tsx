@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
 import { CheckoutProvider } from "@/context/CheckoutContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { MotionConfig } from "framer-motion";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import {
@@ -69,9 +70,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen" suppressHydrationWarning>
-        <CheckoutProvider>
-          <CartProvider>
-            <WishlistProvider>
+        <MotionConfig reducedMotion="user">
+          <CheckoutProvider>
+            <CartProvider>
+              <WishlistProvider>
               <Navbar />
             <script
               type="application/ld+json"
@@ -98,9 +100,10 @@ export default function RootLayout({
               {children}
             </main>
               <Footer />
-            </WishlistProvider>
-          </CartProvider>
-        </CheckoutProvider>
+              </WishlistProvider>
+            </CartProvider>
+          </CheckoutProvider>
+        </MotionConfig>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 const categories = [
@@ -32,6 +32,9 @@ export default function ShopControls({ productCount }: { productCount: number })
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const hasOpenedFiltersRef = useRef(false);
+  const filterTriggerRef = useRef<HTMLButtonElement>(null);
+  const filterCloseRef = useRef<HTMLButtonElement>(null);
 
   const updateQuery = useCallback(
     (updates: Record<string, string | null>) => {
@@ -59,6 +62,44 @@ export default function ShopControls({ productCount }: { productCount: number })
     router.push(pathname, { scroll: false });
     setMobileOpen(false);
   };
+
+  useEffect(() => {
+    if (!mobileOpen) {
+      if (hasOpenedFiltersRef.current) filterTriggerRef.current?.focus();
+      return;
+    }
+
+    hasOpenedFiltersRef.current = true;
+    filterCloseRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const drawer = document.getElementById("shop-filter-drawer");
+      if (!drawer) return;
+      const focusable = Array.from(
+        drawer.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), select:not([disabled]), input:not([disabled])',
+        ),
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen]);
 
   const filterFields = (
     <>
@@ -106,7 +147,7 @@ export default function ShopControls({ productCount }: { productCount: number })
     <section className="shop-controls" aria-label="Shop controls">
       <div className="shop-controls-topline">
         <p>{productCount} {productCount === 1 ? "piece" : "pieces"}</p>
-        <button type="button" className="shop-mobile-filter-trigger" onClick={() => setMobileOpen(true)} aria-expanded={mobileOpen} aria-controls="shop-filter-drawer">
+        <button ref={filterTriggerRef} type="button" className="shop-mobile-filter-trigger" onClick={() => setMobileOpen(true)} aria-expanded={mobileOpen} aria-controls="shop-filter-drawer">
           Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
         </button>
         <label className="shop-search" htmlFor="shop-search-input">
@@ -149,7 +190,7 @@ export default function ShopControls({ productCount }: { productCount: number })
           <div id="shop-filter-drawer" className="shop-filter-drawer" role="dialog" aria-modal="true" aria-labelledby="shop-filter-heading" onClick={(event) => event.stopPropagation()}>
             <div className="shop-filter-drawer-heading">
               <div><span className="premium-eyebrow">Refine the edit</span><h2 id="shop-filter-heading">Filters</h2></div>
-              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close filters">×</button>
+              <button ref={filterCloseRef} type="button" onClick={() => setMobileOpen(false)} aria-label="Close filters">×</button>
             </div>
             <div className="shop-filter-drawer-fields">{filterFields}</div>
             <div className="shop-filter-drawer-actions">
