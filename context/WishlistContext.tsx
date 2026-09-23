@@ -8,6 +8,8 @@ export type WishlistItem = { id: string; product: Product };
 type WishlistContextValue = {
   wishlistItems: WishlistItem[];
   loading: boolean;
+  error: boolean;
+  retry: () => void;
   isWishlisted: (productId: string) => boolean;
   toggleWishlist: (productId: string, product?: Product) => Promise<boolean>;
 };
@@ -18,6 +20,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const [mutating, setMutating] = useState<Set<string>>(new Set());
   const userId = session?.user.id ?? null;
 
@@ -28,6 +32,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setWishlistItems([]);
     setLoading(Boolean(userId));
+    setError(false);
     if (!userId) return;
     void fetch("/api/account/wishlist", { cache: "no-store" })
       .then(async (response) => {
@@ -35,10 +40,14 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         if (!response.ok) throw new Error("Unable to load wishlist.");
         if (!cancelled) setWishlistItems(data.items ?? []);
       })
-      .catch(() => { if (!cancelled) setWishlistItems([]); })
+      .catch(() => { if (!cancelled) { setWishlistItems([]); setError(true); } })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [sessionPending, userId]);
+  }, [retryKey, sessionPending, userId]);
+
+  function retry() {
+    setRetryKey((key) => key + 1);
+  }
 
   async function toggleWishlist(productId: string, product?: Product) {
     if (!userId) { window.alert("Sign in to save items to your wishlist."); return false; }
@@ -66,7 +75,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     } finally { setMutating((current) => { const next = new Set(current); next.delete(productId); return next; }); }
   }
 
-  return <WishlistContext.Provider value={{ wishlistItems, loading, isWishlisted: (id) => wishlistItems.some((item) => item.product.id === id), toggleWishlist }}>{children}</WishlistContext.Provider>;
+  return <WishlistContext.Provider value={{ wishlistItems, loading, error, retry, isWishlisted: (id) => wishlistItems.some((item) => item.product.id === id), toggleWishlist }}>{children}</WishlistContext.Provider>;
 }
 
 export function useWishlist() {

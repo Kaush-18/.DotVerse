@@ -1,14 +1,77 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Heart } from "lucide-react";
+import { ArrowRight, Heart, RefreshCw } from "lucide-react";
+
 import ProductCard from "@/components/product/ProductCard";
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function WishlistPage() {
-  const { wishlistItems, loading } = useWishlist();
-  return <div className="space-y-7">
-    <header className="border-b border-white/10 pb-6"><p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-violet-300/80">Your saved pieces</p><h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">Wishlist</h1><p className="mt-2 text-sm text-white/50">Your saved pieces, ready when you are.</p></header>
-    {loading ? <div className="grid grid-cols-2 gap-4 sm:grid-cols-3" aria-busy="true"><div className="h-72 animate-pulse rounded-2xl bg-white/[0.04]" /><div className="h-72 animate-pulse rounded-2xl bg-white/[0.04]" /></div> : wishlistItems.length === 0 ? <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-14 text-center"><Heart size={28} className="mx-auto text-violet-300" /><h2 className="mt-5 text-xl font-semibold text-white">Your wishlist is empty.</h2><p className="mt-2 text-sm text-white/50">Save pieces you love and come back to them later.</p><Link href="/shop" className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-violet-600 px-5 text-sm font-semibold text-white transition hover:bg-violet-500">Explore the Collection <ArrowRight size={15} /></Link></div> : <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">{wishlistItems.map(({ product }, index) => <ProductCard key={product.id} product={product} index={index} />)}</div>}
-  </div>;
+  const { wishlistItems, loading, error, retry } = useWishlist();
+
+  return (
+    <div className="dot-wishlist-collection">
+      <header className="dot-wishlist-header">
+        <div>
+          <p className="dot-wishlist-kicker">.DOT / PRIVATE COLLECTION</p>
+          <h1>
+            PRIVATE
+            <br />
+            <em>COLLECTION.</em>
+          </h1>
+          <p className="dot-wishlist-intro">The pieces you chose to keep.</p>
+        </div>
+        <div className="dot-wishlist-count" aria-label={`${wishlistItems.length} saved pieces`}>
+          <span>ARCHIVE INDEX</span>
+          <strong>{String(wishlistItems.length).padStart(2, "0")}</strong>
+          <span>{wishlistItems.length === 1 ? "SAVED PIECE" : "SAVED PIECES"}</span>
+        </div>
+      </header>
+
+      <section className="dot-wishlist-content" aria-labelledby="wishlist-heading">
+        <div className="dot-wishlist-section-heading">
+          <div className="dot-wishlist-label">
+            <span>01</span>
+            <span id="wishlist-heading">Your collection</span>
+          </div>
+          {!loading && !error && wishlistItems.length > 0 && (
+            <span className="dot-wishlist-count-label">{wishlistItems.length} saved</span>
+          )}
+        </div>
+
+        {loading ? (
+          <div className="dot-wishlist-grid" aria-busy="true" aria-label="Loading your private collection">
+            {Array.from({ length: 4 }, (_, index) => <div key={index} className="dot-wishlist-skeleton" />)}
+          </div>
+        ) : error ? (
+          <div className="dot-wishlist-state dot-wishlist-error-state" role="alert">
+            <Heart size={20} aria-hidden="true" />
+            <p className="dot-wishlist-kicker">Private collection unavailable</p>
+            <h2>UNABLE TO LOAD<br />YOUR PIECES.</h2>
+            <p>Unable to load your saved pieces right now.</p>
+            <button type="button" className="dot-wishlist-primary" onClick={retry}>
+              <RefreshCw size={15} aria-hidden="true" /> Retry
+            </button>
+          </div>
+        ) : wishlistItems.length === 0 ? (
+          <div className="dot-wishlist-state">
+            <Heart size={20} aria-hidden="true" />
+            <p className="dot-wishlist-kicker">Private collection</p>
+            <h2>NOTHING<br />SAVED YET.</h2>
+            <p>Your collection is waiting for its first piece.</p>
+            <Link href="/shop" className="dot-wishlist-primary">
+              Explore the collection <ArrowRight size={15} aria-hidden="true" />
+            </Link>
+            <span className="dot-wishlist-state-note">Find something worth keeping.</span>
+          </div>
+        ) : (
+          <div className="dot-wishlist-grid">
+            {wishlistItems.map(({ product }, index) => (
+              <ProductCard key={product.id} product={product} index={index} />
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
 }
