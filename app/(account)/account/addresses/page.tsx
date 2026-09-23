@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Pencil, Plus, Star, Trash2 } from "lucide-react";
+import { ArrowUpRight, Check, MapPin, Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import AddressForm, { type AddressRecord } from "@/components/account/AddressForm";
@@ -12,13 +12,24 @@ export default function AddressesPage() {
   const [editing, setEditing] = useState<AddressRecord | null | undefined>(undefined);
 
   async function load() {
+    setLoading(true);
+    setError("");
     try {
       const response = await fetch("/api/account/addresses", { cache: "no-store" });
-      const data = await response.json() as { success?: boolean; message?: string; addresses?: AddressRecord[] };
-      if (!response.ok || !data.success) throw new Error(data.message || "Unable to load addresses.");
+      const data = await response.json() as {
+        success?: boolean;
+        message?: string;
+        addresses?: AddressRecord[];
+      };
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Unable to load addresses.");
+      }
       setAddresses(data.addresses || []);
-    } catch (requestError) { setError(requestError instanceof Error ? requestError.message : "Unable to load addresses."); }
-    finally { setLoading(false); }
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Unable to load addresses.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -35,12 +46,122 @@ export default function AddressesPage() {
   }
 
   async function makeDefault(address: AddressRecord) {
-    const response = await fetch(`/api/account/addresses/${address.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...address, isDefault: true }) });
+    const response = await fetch(`/api/account/addresses/${address.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...address, isDefault: true }),
+    });
     if (response.ok) await load();
     else setError("Unable to set the default address.");
   }
 
-  if (editing !== undefined) return <div className="space-y-7"><header className="border-b border-white/10 pb-6"><p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-violet-300/80">Your details</p><h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">{editing ? "Edit address" : "Add address"}</h1></header><div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5 sm:p-7"><AddressForm address={editing || undefined} onSaved={() => { setEditing(undefined); void load(); }} onCancel={() => setEditing(undefined)} /></div></div>;
+  if (editing !== undefined) {
+    return (
+      <div className="dot-address-book dot-address-edit-view">
+        <button type="button" className="dot-address-back" onClick={() => setEditing(undefined)}>
+          <ArrowUpRight size={14} aria-hidden="true" />
+          Back to address book
+        </button>
+        <header className="dot-address-header">
+          <div>
+            <p className="dot-address-kicker">.DOT / ADDRESS BOOK</p>
+            <h1>{editing ? "EDIT" : "ADD"}<br /><em>ADDRESS.</em></h1>
+            <p className="dot-address-intro">Keep a delivery destination ready for the next piece.</p>
+          </div>
+          <div className="dot-address-record" aria-hidden="true"><span>PRIVATE UTILITY</span><strong>{editing ? "02" : "01"}</strong><span>ADDRESS</span></div>
+        </header>
+        <section className="dot-address-form-shell" aria-labelledby="address-form-heading">
+          <div className="dot-address-section-label"><span>01</span><span id="address-form-heading">Delivery details</span></div>
+          <AddressForm
+            address={editing || undefined}
+            onSaved={() => { setEditing(undefined); void load(); }}
+            onCancel={() => setEditing(undefined)}
+          />
+        </section>
+      </div>
+    );
+  }
 
-  return <div className="space-y-7"><header className="flex flex-col gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-violet-300/80">Delivery details</p><h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">Saved addresses</h1><p className="mt-2 text-sm text-white/50">Save up to 5 addresses and reuse them at checkout.</p></div><button type="button" onClick={() => setEditing(null)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-4 text-sm font-semibold text-white transition hover:bg-violet-500"><Plus size={16} aria-hidden="true" /> Add new address</button></header>{error && <p role="alert" className="rounded-xl border border-red-400/20 bg-red-400/10 px-3 py-2.5 text-xs text-red-200">{error}</p>}{loading ? <div className="grid gap-4 sm:grid-cols-2" aria-busy="true"><div className="h-52 animate-pulse rounded-2xl bg-white/[0.04]" /><div className="h-52 animate-pulse rounded-2xl bg-white/[0.04]" /></div> : addresses.length === 0 ? <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-14 text-center"><MapPin size={28} className="mx-auto text-violet-300" /><h2 className="mt-5 text-xl font-semibold text-white">No saved addresses yet.</h2><p className="mt-2 text-sm text-white/50">Add your first address for a faster checkout.</p><button type="button" onClick={() => setEditing(null)} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-violet-600 px-5 text-sm font-semibold text-white">Add your first address <Plus size={15} /></button></div> : <div className="grid gap-4 sm:grid-cols-2">{addresses.map((address) => <article key={address.id} className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><div className="flex items-start justify-between gap-3"><div><p className="font-semibold text-white">{address.label}</p>{address.isDefault && <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-violet-400/25 bg-violet-500/10 px-2 py-1 text-[10px] uppercase tracking-wider text-violet-200"><Star size={11} /> Default</span>}</div><MapPin size={18} className="text-violet-300" aria-hidden="true" /></div><div className="mt-5 space-y-1 text-sm leading-6 text-white/65"><p className="font-medium text-white">{address.firstName} {address.lastName}</p><p>{address.address}</p>{address.apartment && <p>{address.apartment}</p>}<p>{address.city}, {address.state} {address.postalCode}</p><p>{address.phone}</p></div><div className="mt-5 flex flex-wrap gap-2 border-t border-white/10 pt-4"><button type="button" onClick={() => setEditing(address)} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-3 text-xs text-white/75 hover:text-white"><Pencil size={14} /> Edit</button>{!address.isDefault && <button type="button" onClick={() => void makeDefault(address)} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-violet-400/25 px-3 text-xs text-violet-200 hover:bg-violet-500/10"><Star size={14} /> Set default</button>}<button type="button" onClick={() => void remove(address)} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-red-300/25 px-3 text-xs text-red-200 hover:bg-red-400/10"><Trash2 size={14} /> Delete</button></div></article>)}</div>}</div>;
+  return (
+    <div className="dot-address-book">
+      <header className="dot-address-header">
+        <div>
+          <p className="dot-address-kicker">.DOT / ADDRESS BOOK</p>
+          <h1>ADDRESS<br /><em>BOOK.</em></h1>
+          <p className="dot-address-intro">Your delivery destinations, kept close.</p>
+        </div>
+        <div className="dot-address-record" aria-hidden="true">
+          <span>PRIVATE UTILITY</span>
+          <strong>{String(addresses.length).padStart(2, "0")}</strong>
+          <span>{addresses.length === 1 ? "ADDRESS" : "ADDRESSES"}</span>
+        </div>
+      </header>
+
+      <section className="dot-address-list-section" aria-labelledby="saved-addresses-heading">
+        <div className="dot-address-list-heading">
+          <div className="dot-address-section-label">
+            <span>01</span>
+            <span id="saved-addresses-heading">Saved destinations</span>
+          </div>
+          <button type="button" className="dot-address-add-link" onClick={() => setEditing(null)}>
+            <Plus size={15} aria-hidden="true" /> Add new address
+          </button>
+        </div>
+
+        {error && (
+          <div className="dot-address-error" role="alert">
+            <p>{error}</p>
+            <button type="button" onClick={() => void load()}>Try again</button>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="dot-address-grid" aria-busy="true" aria-label="Loading saved addresses">
+            <div className="dot-address-skeleton" />
+            <div className="dot-address-skeleton" />
+          </div>
+        ) : addresses.length === 0 ? (
+          <div className="dot-address-empty">
+            <MapPin size={20} aria-hidden="true" />
+            <p className="dot-address-kicker">Address book</p>
+            <h2>NO SAVED ADDRESSES</h2>
+            <p>Add your delivery address to make checkout faster.</p>
+            <button type="button" className="dot-address-primary" onClick={() => setEditing(null)}>
+              <Plus size={15} aria-hidden="true" /> Add address
+            </button>
+          </div>
+        ) : (
+          <div className="dot-address-grid">
+            {addresses.map((address, index) => (
+              <article key={address.id} className="dot-address-card" style={{ "--address-index": index } as React.CSSProperties}>
+                <div className="dot-address-card-top">
+                  <div>
+                    <p className="dot-address-card-index">0{index + 1}</p>
+                    <h2>{address.label}</h2>
+                  </div>
+                  {address.isDefault && (
+                    <span className="dot-address-default"><Star size={12} aria-hidden="true" /> Default</span>
+                  )}
+                </div>
+                <div className="dot-address-card-body">
+                  <p className="dot-address-recipient">{address.firstName} {address.lastName}</p>
+                  <p className="dot-address-phone">{address.phone}</p>
+                  <address>
+                    {address.address}
+                    {address.apartment && <><br />{address.apartment}</>}
+                    <br />{address.city}, {address.state} {address.postalCode}
+                  </address>
+                </div>
+                <div className="dot-address-card-actions">
+                  <button type="button" onClick={() => setEditing(address)}><Pencil size={14} aria-hidden="true" /> Edit</button>
+                  {!address.isDefault && <button type="button" onClick={() => void makeDefault(address)}><Check size={14} aria-hidden="true" /> Set default</button>}
+                  <button type="button" className="dot-address-delete" onClick={() => void remove(address)}><Trash2 size={14} aria-hidden="true" /> Delete</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
 }

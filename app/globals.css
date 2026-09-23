@@ -2570,6 +2570,466 @@ html {
 }
 
 /* =========================================================
+   .DOT ADDRESS BOOK
+   ========================================================= */
+
+.dot-address-book {
+  --address-ink: #f5f3ef;
+  --address-muted: rgba(245, 243, 239, 0.62);
+  --address-faint: rgba(245, 243, 239, 0.38);
+  --address-line: rgba(245, 243, 239, 0.14);
+  --address-accent: #bea6ff;
+  animation: account-rise 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.dot-address-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0;
+  color: var(--address-muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: gap 0.3s ease, color 0.3s ease;
+}
+
+.dot-address-back svg { transform: rotate(-90deg); }
+
+.dot-address-back:hover,
+.dot-address-back:focus-visible {
+  gap: 12px;
+  color: var(--address-ink);
+}
+
+.dot-address-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 32px 0 clamp(42px, 7vw, 82px);
+  border-bottom: 1px solid var(--address-line);
+}
+
+.dot-address-kicker {
+  margin: 0;
+  color: var(--address-accent);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.dot-address-header h1 {
+  margin: 20px 0 0;
+  color: var(--address-ink);
+  font-size: clamp(3.5rem, 8vw, 8rem);
+  font-weight: 650;
+  line-height: 0.79;
+  letter-spacing: -0.11em;
+}
+
+.dot-address-header h1 em {
+  color: var(--address-accent);
+  font-style: normal;
+}
+
+.dot-address-intro {
+  max-width: 360px;
+  margin: 26px 0 0;
+  color: var(--address-muted);
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+
+.dot-address-record {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  padding-bottom: 5px;
+  color: var(--address-faint);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.dot-address-record strong {
+  color: var(--address-ink);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: clamp(2.7rem, 5vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: -0.09em;
+  line-height: 0.9;
+}
+
+.dot-address-list-section,
+.dot-address-form-shell {
+  padding-top: clamp(38px, 6vw, 70px);
+}
+
+.dot-address-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.dot-address-section-label {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--address-faint);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+.dot-address-section-label > span:first-child {
+  color: var(--address-accent);
+}
+
+.dot-address-add-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0;
+  color: var(--address-accent);
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: gap 0.3s ease, color 0.3s ease;
+}
+
+.dot-address-add-link:hover,
+.dot-address-add-link:focus-visible {
+  gap: 12px;
+  color: var(--address-ink);
+}
+
+.dot-address-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 26px;
+  padding: 14px 0;
+  border-top: 1px solid rgba(240, 156, 156, 0.3);
+  border-bottom: 1px solid rgba(240, 156, 156, 0.3);
+  color: #e8bcbc;
+  font-size: 0.78rem;
+}
+
+.dot-address-error p { margin: 0; }
+
+.dot-address-error button {
+  min-height: 40px;
+  padding: 0;
+  color: var(--address-ink);
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.dot-address-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 26px;
+}
+
+.dot-address-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  min-height: 330px;
+  padding: 24px;
+  border: 1px solid var(--address-line);
+  background: rgba(255, 255, 255, 0.025);
+  animation: address-reveal 0.55s calc(var(--address-index) * 70ms) both;
+  transition: border-color 0.35s ease, background 0.35s ease, transform 0.35s ease;
+}
+
+.dot-address-card:hover {
+  border-color: rgba(190, 166, 255, 0.5);
+  background: rgba(255, 255, 255, 0.045);
+  transform: translateY(-3px);
+}
+
+.dot-address-card-top {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--address-line);
+}
+
+.dot-address-card-index {
+  margin: 0 0 10px;
+  color: var(--address-accent);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+}
+
+.dot-address-card h2 {
+  margin: 0;
+  color: var(--address-ink);
+  font-size: 1.18rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.dot-address-default {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 3px;
+  color: var(--address-accent);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dot-address-card-body {
+  padding: 23px 0;
+}
+
+.dot-address-recipient {
+  margin: 0;
+  color: var(--address-ink);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.dot-address-phone {
+  margin: 7px 0 0;
+  color: var(--address-faint);
+  font-size: 0.72rem;
+}
+
+.dot-address-card address {
+  margin-top: 17px;
+  color: var(--address-muted);
+  font-size: 0.79rem;
+  font-style: normal;
+  line-height: 1.8;
+}
+
+.dot-address-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-top: auto;
+  padding-top: 17px;
+  border-top: 1px solid var(--address-line);
+}
+
+.dot-address-card-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0;
+  color: var(--address-muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  transition: color 0.25s ease;
+}
+
+.dot-address-card-actions button:hover,
+.dot-address-card-actions button:focus-visible {
+  color: var(--address-ink);
+}
+
+.dot-address-card-actions button svg { color: var(--address-accent); }
+
+.dot-address-card-actions .dot-address-delete { color: rgba(232, 188, 188, 0.7); }
+.dot-address-card-actions .dot-address-delete:hover,
+.dot-address-card-actions .dot-address-delete:focus-visible { color: #e8bcbc; }
+
+.dot-address-empty {
+  max-width: 650px;
+  margin-top: 26px;
+  padding: clamp(62px, 10vw, 126px) 0 clamp(42px, 7vw, 82px);
+  border-top: 1px solid var(--address-line);
+  border-bottom: 1px solid var(--address-line);
+}
+
+.dot-address-empty > svg { color: var(--address-accent); }
+
+.dot-address-empty .dot-address-kicker { margin-top: 24px; }
+
+.dot-address-empty h2 {
+  margin: 16px 0 0;
+  color: var(--address-ink);
+  font-size: clamp(2.2rem, 5vw, 5rem);
+  font-weight: 650;
+  letter-spacing: -0.09em;
+  line-height: 0.9;
+}
+
+.dot-address-empty > p:not(.dot-address-kicker) {
+  margin: 20px 0 0;
+  color: var(--address-muted);
+  font-size: 0.9rem;
+}
+
+.dot-address-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  margin-top: 30px;
+  padding: 0 16px;
+  border: 1px solid var(--address-accent);
+  color: #09070d;
+  background: var(--address-accent);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: gap 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.dot-address-primary:hover,
+.dot-address-primary:focus-visible {
+  gap: 13px;
+  border-color: var(--address-ink);
+  background: var(--address-ink);
+}
+
+.dot-address-skeleton {
+  min-height: 330px;
+  border: 1px solid var(--address-line);
+  background: linear-gradient(100deg, rgba(255,255,255,0.025), rgba(255,255,255,0.07), rgba(255,255,255,0.025));
+  background-size: 200% 100%;
+  animation: address-skeleton 1.6s ease-in-out infinite;
+}
+
+.dot-address-form-shell > form {
+  max-width: 780px;
+  margin-top: 26px;
+  padding-top: 26px;
+  border-top: 1px solid var(--address-line);
+}
+
+.dot-address-form-shell > form label {
+  color: var(--address-muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.dot-address-form-shell > form input:not([type="checkbox"]) {
+  min-height: 50px;
+  border: 0;
+  border-bottom: 1px solid var(--address-line);
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--address-ink);
+  font-size: 0.88rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dot-address-form-shell > form input:not([type="checkbox"]):focus {
+  border-color: var(--address-accent);
+  box-shadow: 0 1px 0 var(--address-accent);
+}
+
+.dot-address-form-shell > form input:not([type="checkbox"])::placeholder { color: var(--address-faint); }
+
+.dot-address-form-shell > form label:has(input[type="checkbox"]) {
+  color: var(--address-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.dot-address-form-shell > form button[type="submit"] {
+  border-radius: 0;
+  background: var(--address-accent);
+  color: #09070d;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.dot-address-form-shell > form button[type="button"] {
+  border-radius: 0;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@keyframes address-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes address-skeleton {
+  0%, 100% { background-position: 200% 0; }
+  50% { background-position: -200% 0; }
+}
+
+@media (max-width: 700px) {
+  .dot-address-header { display: block; }
+
+  .dot-address-record {
+    display: flex;
+    align-items: baseline;
+    justify-content: start;
+    gap: 10px;
+    margin-top: 34px;
+    text-align: left;
+  }
+
+  .dot-address-record strong { order: -1; font-size: 2.4rem; }
+
+  .dot-address-list-heading { align-items: start; flex-direction: column; }
+
+  .dot-address-grid { grid-template-columns: 1fr; }
+
+  .dot-address-card { min-height: 0; }
+
+  .dot-address-error { align-items: start; flex-direction: column; }
+}
+
+@media (max-width: 400px) {
+  .dot-address-header h1 { font-size: clamp(3rem, 16vw, 4rem); }
+  .dot-address-card { padding: 20px; }
+  .dot-address-card-actions { gap: 4px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot-address-book,
+  .dot-address-card,
+  .dot-address-skeleton { animation: none; }
+}
+
+/* =========================================================
    .DOT SHOP / DIGITAL SHOWROOM
    ========================================================= */
 
