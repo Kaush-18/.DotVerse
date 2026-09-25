@@ -167,13 +167,16 @@ export default function TrackOrderContent() {
 
             {/* Header */}
 
-            <section className="text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-violet-400">
-                DotVerse
+            <section className="text-center flex flex-col items-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-violet-400">
+                .DOT / TRACKING
               </p>
 
-              <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-6xl">
-                TRACK YOUR ORDER
+              <h1 className="mt-4 text-4xl sm:text-5xl font-bold tracking-tighter uppercase md:text-7xl">
+                FOLLOW <br className="hidden sm:block" />
+                <em className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-white italic font-serif font-light">
+                  YOUR ORDER.
+                </em>
               </h1>
 
               <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-white/50 md:text-base">

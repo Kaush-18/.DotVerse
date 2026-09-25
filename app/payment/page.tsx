@@ -197,8 +197,9 @@ export default function PaymentPage() {
           <h1 className="text-4xl font-semibold">Your cart is empty</h1>
 
           <button
+            type="button"
             onClick={() => router.push("/shop")}
-            className="mt-8 rounded-full bg-violet-600 px-8 py-4 font-medium transition hover:bg-violet-500"
+            className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-white px-8 text-sm font-semibold text-black transition hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70 active:scale-[0.99]"
           >
             Continue Shopping
           </button>
@@ -220,8 +221,9 @@ export default function PaymentPage() {
           </p>
 
           <button
+            type="button"
             onClick={() => router.push("/checkout")}
-            className="mt-8 rounded-full bg-violet-600 px-8 py-4 font-medium transition hover:bg-violet-500"
+            className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-white px-8 text-sm font-semibold text-black transition hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70 active:scale-[0.99]"
           >
             Back to Checkout
           </button>

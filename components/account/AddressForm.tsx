@@ -76,6 +76,14 @@ export default function AddressForm({ address, onSaved, onCancel }: Props) {
     </div>
     <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-white/70"><input type="checkbox" checked={isDefault} onChange={(event) => setIsDefault(event.target.checked)} disabled={saving} className="h-4 w-4 accent-violet-500" /> Set as default address</label>
     {error && <p role="alert" className="rounded-xl border border-red-400/20 bg-red-400/10 px-3 py-2.5 text-xs text-red-200">{error}</p>}
-    <div className="flex flex-wrap gap-3"><button type="submit" disabled={saving} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 text-sm font-semibold text-white transition hover:bg-violet-500 disabled:opacity-60">{saving && <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />}{saving ? "Saving..." : address ? "Save changes" : "Add address"}</button><button type="button" onClick={onCancel} disabled={saving} className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 px-5 text-sm text-white/70 transition hover:text-white disabled:opacity-60">Cancel</button></div>
+    <div className="flex flex-wrap gap-3">
+      <button type="submit" disabled={saving} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-black transition hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60">
+        {saving && <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />}
+        {saving ? "Saving..." : address ? "Save changes" : "Add address"}
+      </button>
+      <button type="button" onClick={onCancel} disabled={saving} className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 text-sm font-medium text-white/70 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70 disabled:cursor-not-allowed disabled:opacity-60">
+        Cancel
+      </button>
+    </div>
   </form>;
 }
